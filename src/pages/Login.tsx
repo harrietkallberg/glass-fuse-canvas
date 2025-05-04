@@ -39,11 +39,11 @@ const Login = () => {
   
   return (
     <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
-      {/* Fluid background shapes with wave animation and more intense colors */}
+      {/* Fluid background shapes with earth tone palette */}
       <div 
         className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px] animate-float-slow animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #FF8A50 0%, #FEC6A1 100%)",
+          background: "linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)",
           opacity: "0.7"
         }}
       />
@@ -51,7 +51,7 @@ const Login = () => {
       <div 
         className="fluid-shape w-[600px] h-[600px] bottom-[-100px] right-[-50px] animate-float-medium animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #1EAEDB 0%, #A5D8E2 100%)",
+          background: "linear-gradient(135deg, #658579 0%, #97b5ad 100%)",
           opacity: "0.75"
         }}
       />
@@ -59,7 +59,7 @@ const Login = () => {
       <div 
         className="fluid-shape w-[550px] h-[550px] bottom-[10%] left-[5%] animate-float-reverse animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #FFBB00 0%, #FEF7CD 100%)",
+          background: "linear-gradient(135deg, #f7e2c8 0%, #f9eee2 100%)",
           opacity: "0.65"
         }}
       />
@@ -67,7 +67,7 @@ const Login = () => {
       <div 
         className="fluid-shape w-[500px] h-[500px] top-[10%] right-[5%] animate-pulse-float animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)",
+          background: "linear-gradient(135deg, #658579 0%, #8eaaa1 100%)",
           opacity: "0.6"
         }}
       />
@@ -75,7 +75,7 @@ const Login = () => {
       <div 
         className="fluid-shape w-[450px] h-[450px] bottom-[20%] right-[25%] animate-float-slow-reverse animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)",
+          background: "linear-gradient(135deg, #745641 0%, #aea795 100%)",
           opacity: "0.65"
         }}
       />
@@ -113,14 +113,14 @@ const Login = () => {
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between items-center">
                 <Label htmlFor="password" className="text-foreground/90">Password</Label>
-                <Link to="/forgot-password" className="text-sm text-primary hover:text-primary/80 transition-colors">
+                <Link to="/forgot-password" className="text-sm text-[#bd8770] hover:text-[#745641]/80 transition-colors">
                   Forgot password?
                 </Link>
               </div>
@@ -131,13 +131,13 @@ const Login = () => {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
               />
             </div>
             
             <Button 
               type="submit" 
-              className="w-full h-11 bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10"
+              className="w-full h-11 bg-gradient-to-r from-[#745641] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10"
             >
               Sign In
             </Button>
@@ -146,7 +146,7 @@ const Login = () => {
           <div className="mt-8 text-center">
             <p className="text-sm text-foreground/80">
               Don't have an account?{" "}
-              <Link to="/register" className="text-primary font-medium hover:underline">
+              <Link to="/register" className="text-[#bd8770] font-medium hover:underline">
                 Create an account
               </Link>
             </p>

@@ -62,6 +62,12 @@ export default {
 					oceanBlue: '#0EA5E9',
 					skyBlue: '#33C3F0',
 					turquoiseLight: '#A5D8E2',
+					// Earth tone palette
+					sage: '#658579',
+					orangeBrown: '#bd8770',
+					taupe: '#aea795',
+					brown: '#745641',
+					cream: '#f7e2c8'
 				}
 			},
 			borderRadius: {
@@ -111,10 +117,13 @@ export default {
 			},
 			backgroundImage: {
 				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
-				'glass-gradient-2': 'linear-gradient(180deg, #FEC6A1 0%, #FEF7CD 100%)',
+				'glass-gradient-2': 'linear-gradient(180deg, #bd8770 0%, #f7e2c8 100%)',
 				'glass-gradient-3': 'linear-gradient(to top, #accbee 0%, #e7f0fd 100%)',
-				'glass-gradient-4': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
-				'glass-gradient-5': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
+				'glass-gradient-4': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
+				'glass-gradient-5': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
+				'earth-gradient-1': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
+				'earth-gradient-2': 'linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)',
+				'earth-gradient-3': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
 			}
 		}
 	},
