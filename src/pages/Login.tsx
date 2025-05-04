@@ -39,6 +39,15 @@ const Login = () => {
   
   return (
     <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
+      {/* Glass blobs overlay */}
+      <div className="glass-blobs-container">
+        <div className="glass-blob glass-blob-1"></div>
+        <div className="glass-blob glass-blob-2"></div>
+        <div className="glass-blob glass-blob-3"></div>
+        <div className="glass-blob glass-blob-4"></div>
+        <div className="glass-blob glass-blob-5"></div>
+      </div>
+      
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
           <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
