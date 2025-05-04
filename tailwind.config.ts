@@ -58,10 +58,10 @@ export default {
 					yellow: '#FEF7CD',
 					green: '#F2FCE2',
 					turquoise: '#D3E4FD',
-					brightOrange: '#F97316',
-					oceanBlue: '#0EA5E9',
-					skyBlue: '#33C3F0',
-					turquoiseLight: '#A5D8E2',
+					brightOrange: '#F97316',    // Added more vibrant orange
+					oceanBlue: '#0EA5E9',       // Added more vibrant blue
+					skyBlue: '#33C3F0',         // Kept existing vibrant blue
+					turquoiseLight: '#A5D8E2',  // Kept existing turquoise
 					// Earth tone palette
 					sage: '#658579',
 					orangeBrown: '#bd8770',
@@ -124,6 +124,10 @@ export default {
 				'earth-gradient-1': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
 				'earth-gradient-2': 'linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)',
 				'earth-gradient-3': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
+				// New vibrant gradients
+				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
+				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
+				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
 			}
 		}
 	},
