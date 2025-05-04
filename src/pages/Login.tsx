@@ -15,11 +15,6 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, we would handle authentication here with Supabase
-    // Example:
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //   email,
-    //   password,
-    // });
     
     if (!email || !password) {
       toast({
@@ -50,6 +45,21 @@ const Login = () => {
         <div className="glass-blob glass-blob-highlight"></div>
         <div className="glass-blob glass-blob-shadow"></div>
         <div className="glass-blob glass-blob-earthtone"></div>
+        
+        {/* New animated floating blobs with organic shapes */}
+        <div className="floating-blob floating-blob-1"></div>
+        <div className="floating-blob floating-blob-2"></div>
+        <div className="floating-blob floating-blob-3"></div>
+        <div className="floating-blob floating-blob-4"></div>
+        <div className="floating-blob floating-blob-5"></div>
+        
+        {/* New animated light sources */}
+        <div className="light-source light-source-1"></div>
+        <div className="light-source light-source-2"></div>
+        
+        {/* New animated dark areas */}
+        <div className="dark-area dark-area-1"></div>
+        <div className="dark-area dark-area-2"></div>
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
@@ -61,11 +71,11 @@ const Login = () => {
         </Link>
         
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold relative z-10 gradient-text-dark text-shadow-lg">
+          <h1 className="text-3xl font-bold relative z-30 gradient-text-dark text-shadow-lg">
             Sign In
           </h1>
           
-          <p className="mt-2 relative z-10 gradient-text-dark text-shadow-sm">
+          <p className="mt-2 relative z-30 gradient-text-dark text-shadow-sm">
             Welcome back to the GlassFuse Studio
           </p>
         </div>
@@ -105,7 +115,7 @@ const Login = () => {
             
             <Button 
               type="submit" 
-              className="w-full h-11 bg-gradient-to-r from-[#745641] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10"
+              className="w-full h-11 bg-[#F97316]/70 hover:bg-[#F97316]/80 transition-all shadow-md hover:shadow-lg backdrop-blur-md"
             >
               Sign In
             </Button>

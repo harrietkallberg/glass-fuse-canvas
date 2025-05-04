@@ -18,22 +18,37 @@ const Landing = () => {
         <div className="glass-blob glass-blob-highlight"></div>
         <div className="glass-blob glass-blob-shadow"></div>
         <div className="glass-blob glass-blob-earthtone"></div>
+        
+        {/* New animated floating blobs with organic shapes */}
+        <div className="floating-blob floating-blob-1"></div>
+        <div className="floating-blob floating-blob-2"></div>
+        <div className="floating-blob floating-blob-3"></div>
+        <div className="floating-blob floating-blob-4"></div>
+        <div className="floating-blob floating-blob-5"></div>
+        
+        {/* New animated light sources */}
+        <div className="light-source light-source-1"></div>
+        <div className="light-source light-source-2"></div>
+        
+        {/* New animated dark areas */}
+        <div className="dark-area dark-area-1"></div>
+        <div className="dark-area dark-area-2"></div>
       </div>
       
       <div className="container relative z-10 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text - increased z-index */}
-        <div className="text-center mb-8 relative">
+        <div className="text-center mb-8 relative z-20">
           <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold relative z-20 gradient-text-dark text-shadow-lg">
+            <h1 className="text-5xl sm:text-6xl font-bold relative z-30 gradient-text-dark text-shadow-lg">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 relative z-20 gradient-text-dark text-shadow-sm">
+            <p className="text-xl mt-4 relative z-30 gradient-text-dark text-shadow-sm">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
           
-          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block z-20 relative">
+          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block z-30 relative">
             Join a community of passionate glass fusion artists
           </p>
         </div>

@@ -47,6 +47,21 @@ const Register = () => {
         <div className="glass-blob glass-blob-highlight"></div>
         <div className="glass-blob glass-blob-shadow"></div>
         <div className="glass-blob glass-blob-earthtone"></div>
+        
+        {/* New animated floating blobs with organic shapes */}
+        <div className="floating-blob floating-blob-1"></div>
+        <div className="floating-blob floating-blob-2"></div>
+        <div className="floating-blob floating-blob-3"></div>
+        <div className="floating-blob floating-blob-4"></div>
+        <div className="floating-blob floating-blob-5"></div>
+        
+        {/* New animated light sources */}
+        <div className="light-source light-source-1"></div>
+        <div className="light-source light-source-2"></div>
+        
+        {/* New animated dark areas */}
+        <div className="dark-area dark-area-1"></div>
+        <div className="dark-area dark-area-2"></div>
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
@@ -58,11 +73,11 @@ const Register = () => {
         </Link>
         
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold relative z-10 gradient-text-dark text-shadow-lg">
+          <h1 className="text-3xl font-bold relative z-30 gradient-text-dark text-shadow-lg">
             Create an Account
           </h1>
           
-          <p className="mt-2 relative z-10 gradient-text-dark text-shadow-sm">
+          <p className="mt-2 relative z-30 gradient-text-dark text-shadow-sm">
             Join the glass fusion community
           </p>
         </div>
@@ -121,7 +136,7 @@ const Register = () => {
             
             <Button 
               type="submit" 
-              className="w-full h-11 bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all"
+              className="w-full h-11 bg-[#F97316]/70 hover:bg-[#F97316]/80 transition-all"
             >
               Create Account
             </Button>
