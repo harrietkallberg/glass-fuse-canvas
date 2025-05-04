@@ -21,26 +21,26 @@ const FloatingEyes: React.FC = () => {
       const eyeCount = 5;
       
       for (let i = 0; i < eyeCount; i++) {
-        // Create eye container
+        // Create eye container - using yellowing green for eye whites
         const eyeContainer = document.createElement('div');
         eyeContainer.className = 'absolute';
         eyeContainer.style.width = '40px';
         eyeContainer.style.height = '40px';
         eyeContainer.style.borderRadius = '50%';
-        eyeContainer.style.backgroundColor = '#5B81B1'; // Pale blue alien eyes
-        eyeContainer.style.boxShadow = '0 0 10px rgba(91, 129, 177, 0.7)';
+        eyeContainer.style.backgroundColor = '#C8E0B8'; // Yellowing green alien eyes
+        eyeContainer.style.boxShadow = '0 0 10px rgba(200, 224, 184, 0.7)';
         eyeContainer.style.left = `${Math.random() * 80 + 10}%`;
         eyeContainer.style.top = `${Math.random() * 80 + 10}%`;
         eyeContainer.style.opacity = '0.7';
         eyeContainer.style.zIndex = '5';
         
-        // Create eye pupil (red)
+        // Create eye pupil (black)
         const pupil = document.createElement('div');
         pupil.className = 'absolute';
         pupil.style.width = '15px';
         pupil.style.height = '15px';
         pupil.style.borderRadius = '50%';
-        pupil.style.backgroundColor = '#991B1B'; // Red pupil
+        pupil.style.backgroundColor = '#333'; // Black pupil
         pupil.style.left = '50%';
         pupil.style.top = '50%';
         pupil.style.transform = 'translate(-50%, -50%)';

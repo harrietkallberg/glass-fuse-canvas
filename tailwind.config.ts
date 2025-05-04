@@ -57,20 +57,24 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				glass: {
-					orange: '#FEC6A1',
-					yellow: '#FEF7CD',
-					green: '#F2FCE2',
-					turquoise: '#D3E4FD',
-					brightOrange: '#F97316',    // Added more vibrant orange
-					oceanBlue: '#0EA5E9',       // Added more vibrant blue
-					skyBlue: '#33C3F0',         // Kept existing vibrant blue
-					turquoiseLight: '#A5D8E2',  // Kept existing turquoise
-					// Earth tone palette
-					sage: '#658579',
-					orangeBrown: '#bd8770',
-					taupe: '#aea795',
-					brown: '#745641',
-					cream: '#f7e2c8'
+					orange: '#FEC6A1',       // Soft orange
+					yellow: '#FEF7CD',       // Soft yellow
+					green: '#F2FCE2',        // Soft green
+					turquoise: '#D3E4FD',    // Keeping this but less emphasis
+					brightOrange: '#F97316', // More vibrant orange
+					oceanBlue: '#0EA5E9',    // Changed - less emphasis
+					skyBlue: '#33C3F0',      // Changed - less emphasis
+					turquoiseLight: '#A5D8E2', // Changed - less emphasis
+					// Earth tone palette - enhanced
+					sage: '#8BA888',         // More vibrant sage green
+					orangeBrown: '#D2946B',  // Brighter orange-brown
+					taupe: '#C2B8A3',        // Lighter taupe
+					brown: '#A67F5D',        // Lighter brown
+					cream: '#FCF0D9',        // Warmer cream
+					moss: '#606B56',         // New: moss green
+					clay: '#CB8F7E',         // New: clay color
+					sand: '#E6D2B5',         // New: sand color
+					leaf: '#A0C1A3'          // New: leaf green
 				}
 			},
 			borderRadius: {
@@ -119,18 +123,18 @@ export default {
 				'pulse-soft': 'pulse-soft 4s ease-in-out infinite'
 			},
 			backgroundImage: {
-				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
-				'glass-gradient-2': 'linear-gradient(180deg, #bd8770 0%, #f7e2c8 100%)',
-				'glass-gradient-3': 'linear-gradient(to top, #accbee 0%, #e7f0fd 100%)',
-				'glass-gradient-4': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
-				'glass-gradient-5': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
-				'earth-gradient-1': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
-				'earth-gradient-2': 'linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)',
-				'earth-gradient-3': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
-				// New vibrant gradients
-				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
-				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
-				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
+				'glass-gradient-1': 'linear-gradient(135deg, #FCF0D9 0%, #D2946B 100%)',
+				'glass-gradient-2': 'linear-gradient(180deg, #D2946B 0%, #FCF0D9 100%)',
+				'glass-gradient-3': 'linear-gradient(to top, #C2B8A3 0%, #FCF0D9 100%)',
+				'glass-gradient-4': 'linear-gradient(135deg, #A67F5D 0%, #D2946B 100%)',
+				'glass-gradient-5': 'linear-gradient(135deg, #8BA888 0%, #C2B8A3 100%)',
+				'earth-gradient-1': 'linear-gradient(135deg, #8BA888 0%, #C2B8A3 100%)',
+				'earth-gradient-2': 'linear-gradient(135deg, #D2946B 0%, #FCF0D9 100%)',
+				'earth-gradient-3': 'linear-gradient(135deg, #A67F5D 0%, #D2946B 100%)',
+				// New earthy gradients
+				'earthy-gradient-1': 'linear-gradient(135deg, #A0C1A3 0%, #F2FCE2 100%)',
+				'earthy-gradient-2': 'linear-gradient(135deg, #CB8F7E 0%, #FEC6A1 100%)',
+				'earthy-gradient-3': 'linear-gradient(135deg, #8BA888 0%, #E6D2B5 100%)',
 			}
 		}
 	},

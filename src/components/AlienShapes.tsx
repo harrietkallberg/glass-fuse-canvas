@@ -9,14 +9,14 @@ const AlienShapes: React.FC = () => {
     const container = containerRef.current;
     if (!container) return;
     
-    // Create multiple shapes with different colors and sizes
+    // Create multiple shapes with different colors and sizes - updated to earthy tones
     const colors = [
-      '#5B81B1', // light blue (alien skin)
-      '#792D54', // burgundy
-      '#D0A659', // mustard/gold
-      '#9B6D4C', // brown
-      '#9B596D', // mauve
-      '#4D6D82', // blue-gray
+      '#C8E0B8', // yellowing green
+      '#A0C1A3', // leaf green
+      '#D2A976', // warm sand
+      '#A67F5D', // earthy brown
+      '#CB8F7E', // clay color
+      '#8BA888', // sage green
     ];
     
     const createShape = () => {

@@ -69,7 +69,7 @@ const TypingAnimation: React.FC = () => {
   }, [text, isTyping, currentSnippet, charIndex]);
 
   return (
-    <div className="fixed top-4 left-4 font-mono text-[#5B81B1] text-lg z-50">
+    <div className="fixed top-4 left-4 font-mono text-[#A0C1A3] text-lg z-50">
       <span>{text}</span>
       <span className="blink-text">█</span>
     </div>
