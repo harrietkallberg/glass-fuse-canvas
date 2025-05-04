@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -125,10 +124,10 @@
     filter: blur(72px); /* Increased blur for more ethereal effect */
   }
 
-  /* New morphing background with multiple blobs */
+  /* New morphing background with multiple blobs - lightened */
   .morphing-bg {
     position: relative;
-    background-color: rgba(255, 255, 255, 0.6);
+    background-color: rgba(255, 255, 255, 0.8); /* Lightened background */
     overflow: hidden;
     min-height: 100vh;
   }
@@ -141,7 +140,7 @@
     right: 0;
     bottom: 0;
     z-index: 1;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1); /* Lightened overlay */
     backdrop-filter: blur(20px);
   }
 
@@ -164,7 +163,7 @@
     --blob-size-6: 35vw;
   }
 
-  /* Add gradient text styling */
+  /* Add gradient text styling with increased z-index */
   .gradient-text-dark {
     background: linear-gradient(135deg, rgba(189,75,0,1) 0%, rgba(11,145,190,1) 100%);
     background-size: 400% 400%;
@@ -174,7 +173,7 @@
     color: transparent;
     filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.2)); /* Better text edge definition */
     position: relative;
-    z-index: 15; /* Ensure text stays above all background elements */
+    z-index: 20; /* Increased z-index to ensure text stays above all background elements */
   }
 
   /* Add text shadow utility */
@@ -194,7 +193,7 @@
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 5;
+    z-index: 5; /* Lower z-index than the title */
     overflow: hidden;
   }
 
@@ -208,13 +207,13 @@
     z-index: 5;
   }
 
-  /* Original blobs with updated colors */
+  /* Original blobs with updated, lighter colors */
   .glass-blob-1 {
     width: 40vw;
     height: 40vw;
     top: 10%;
     left: 5%;
-    background: radial-gradient(circle at center, rgba(51, 195, 240, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(51, 195, 240, 0.4) 0%, transparent 70%); /* Lightened */
     animation: blob-float-1 20s ease-in-out infinite alternate, blob-morph 18s ease-in-out infinite;
   }
 
@@ -223,7 +222,7 @@
     height: 35vw;
     top: 60%;
     left: 60%;
-    background: radial-gradient(circle at center, rgba(249, 115, 22, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(249, 115, 22, 0.4) 0%, transparent 70%); /* Lightened */
     animation: blob-float-2 18s ease-in-out infinite alternate, blob-morph 15s ease-in-out infinite;
   }
 
@@ -232,7 +231,7 @@
     height: 25vw;
     top: 70%;
     left: 15%;
-    background: radial-gradient(circle at center, rgba(247, 226, 200, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(247, 226, 200, 0.4) 0%, transparent 70%); /* Lightened */
     animation: blob-float-3 26s ease-in-out infinite alternate, blob-morph 17s ease-in-out infinite;
   }
 
@@ -241,7 +240,7 @@
     height: 30vw;
     top: 20%;
     left: 65%;
-    background: radial-gradient(circle at center, rgba(101, 133, 121, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(101, 133, 121, 0.4) 0%, transparent 70%); /* Lightened */
     animation: blob-float-4 24s ease-in-out infinite alternate, blob-morph 16s ease-in-out infinite;
   }
 
@@ -250,17 +249,17 @@
     height: 20vw;
     top: 40%;
     left: 40%;
-    background: radial-gradient(circle at center, rgba(174, 167, 149, 0.5) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(174, 167, 149, 0.4) 0%, transparent 70%); /* Lightened */
     animation: blob-float-5 22s ease-in-out infinite alternate, blob-morph 14s ease-in-out infinite;
   }
 
-  /* New blobs with varied lighting and earthy tones */
+  /* New blobs with lighter, varied lighting and earthy tones */
   .glass-blob-highlight {
     width: 30vw;
     height: 30vw;
     top: 15%;
     left: 30%;
-    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.6) 0%, transparent 80%); /* Lightened */
     mix-blend-mode: soft-light;
     filter: blur(30px);
     animation: blob-float-highlight 28s ease-in-out infinite alternate, blob-pulse 12s ease-in-out infinite;
@@ -272,7 +271,7 @@
     height: 35vw;
     top: 55%;
     left: 25%;
-    background: radial-gradient(circle at center, rgba(51, 51, 51, 0.3) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(51, 51, 51, 0.2) 0%, transparent 70%); /* Lightened */
     mix-blend-mode: multiply;
     filter: blur(25px);
     animation: blob-float-shadow 32s ease-in-out infinite alternate, blob-morph 20s ease-in-out infinite;
@@ -284,7 +283,7 @@
     height: 38vw;
     top: 40%;
     left: 50%;
-    background: radial-gradient(circle at center, rgba(101, 143, 72, 0.4) 0%, transparent 80%);
+    background: radial-gradient(circle at center, rgba(101, 143, 72, 0.3) 0%, transparent 80%); /* Lightened */
     mix-blend-mode: color-burn;
     filter: blur(25px);
     animation: blob-float-earthtone 30s ease-in-out infinite alternate, blob-morph 22s ease-in-out infinite;
@@ -292,27 +291,27 @@
   }
 }
 
-/* New morphing blobs with more random and circular movements */
+/* New morphing blobs with more random and circular movements - lightened colors */
 .morphing-bg::before {
-  /* Add multiple moving blobs with pseudo-elements with enhanced earthy tones and more contrast */
+  /* Add multiple moving blobs with pseudo-elements with enhanced, lighter earthy tones */
   background: 
-    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.8) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.8) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 40% 70%, rgba(249,115,22,0.7) 0%, transparent 40%) 0% 0%,
-    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.8) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.8) 0%, transparent 35%) 0% 0%,
-    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.7) 0%, transparent 40%) 0% 0%,
-    /* Added new earthy tones */
-    radial-gradient(circle at 30% 50%, rgba(101,143,72,0.5) 0%, transparent 45%) 0% 0%,
-    radial-gradient(circle at 70% 60%, rgba(85,107,47,0.4) 0%, transparent 40%) 0% 0%,
-    /* Added dark areas */
-    radial-gradient(circle at 25% 35%, rgba(30,30,30,0.2) 0%, transparent 40%) 0% 0%,
-    radial-gradient(circle at 75% 20%, rgba(30,30,30,0.15) 0%, transparent 35%) 0% 0%,
-    /* Added light sources */
-    radial-gradient(circle at 45% 15%, rgba(255,255,255,0.8) 0%, transparent 30%) 0% 0%,
-    radial-gradient(circle at 85% 45%, rgba(255,255,255,0.7) 0%, transparent 25%) 0% 0%;
+    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.5) 0%, transparent 50%) 0% 0%, /* Lightened */
+    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.5) 0%, transparent 50%) 0% 0%, /* Lightened */
+    radial-gradient(circle at 40% 70%, rgba(249,115,22,0.4) 0%, transparent 40%) 0% 0%, /* Lightened */
+    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.5) 0%, transparent 50%) 0% 0%, /* Lightened */
+    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.5) 0%, transparent 35%) 0% 0%, /* Lightened */
+    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.4) 0%, transparent 40%) 0% 0%, /* Lightened */
+    /* Added new earthy tones - lightened */
+    radial-gradient(circle at 30% 50%, rgba(101,143,72,0.3) 0%, transparent 45%) 0% 0%,
+    radial-gradient(circle at 70% 60%, rgba(85,107,47,0.2) 0%, transparent 40%) 0% 0%,
+    /* Added dark areas - lightened */
+    radial-gradient(circle at 25% 35%, rgba(30,30,30,0.1) 0%, transparent 40%) 0% 0%,
+    radial-gradient(circle at 75% 20%, rgba(30,30,30,0.08) 0%, transparent 35%) 0% 0%,
+    /* Added light sources - slightly enhanced */
+    radial-gradient(circle at 45% 15%, rgba(255,255,255,0.9) 0%, transparent 30%) 0% 0%,
+    radial-gradient(circle at 85% 45%, rgba(255,255,255,0.8) 0%, transparent 25%) 0% 0%;
   background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%, 
-                    190% 190%, 185% 185%, 175% 175%, 165% 165%, 155% 155%, 145% 145%;
+                   190% 190%, 185% 185%, 175% 175%, 165% 165%, 155% 155%, 145% 145%;
   animation: 
     blob-move-1 25s ease infinite alternate,
     blob-morph 30s ease infinite;

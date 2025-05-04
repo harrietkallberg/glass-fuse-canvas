@@ -21,19 +21,19 @@ const Landing = () => {
       </div>
       
       <div className="container relative z-10 max-w-2xl w-full px-4">
-        {/* Title directly on background with gradient text */}
+        {/* Title directly on background with gradient text - increased z-index */}
         <div className="text-center mb-8 relative">
           <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold relative z-10 gradient-text-dark text-shadow-lg">
+            <h1 className="text-5xl sm:text-6xl font-bold relative z-20 gradient-text-dark text-shadow-lg">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 relative z-10 gradient-text-dark text-shadow-sm">
+            <p className="text-xl mt-4 relative z-20 gradient-text-dark text-shadow-sm">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
           
-          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
+          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block z-20 relative">
             Join a community of passionate glass fusion artists
           </p>
         </div>
@@ -63,7 +63,7 @@ const Landing = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link to="/login">
-              <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
+              <Button className="w-full sm:w-auto gap-2 h-12 bg-[#F97316]/70 hover:bg-[#F97316]/80 transition-all shadow-md hover:shadow-lg backdrop-blur-md">
                 Sign In
                 <ArrowRight className="w-4 h-4" />
               </Button>
