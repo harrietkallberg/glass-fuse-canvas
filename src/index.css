@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -207,12 +208,13 @@
     z-index: 5;
   }
 
+  /* Original blobs with updated colors */
   .glass-blob-1 {
     width: 40vw;
     height: 40vw;
     top: 10%;
     left: 5%;
-    background: radial-gradient(circle at center, rgba(51, 195, 240, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(51, 195, 240, 0.5) 0%, transparent 70%);
     animation: blob-float-1 20s ease-in-out infinite alternate, blob-morph 18s ease-in-out infinite;
   }
 
@@ -221,7 +223,7 @@
     height: 35vw;
     top: 60%;
     left: 60%;
-    background: radial-gradient(circle at center, rgba(249, 115, 22, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(249, 115, 22, 0.5) 0%, transparent 70%);
     animation: blob-float-2 18s ease-in-out infinite alternate, blob-morph 15s ease-in-out infinite;
   }
 
@@ -239,7 +241,7 @@
     height: 30vw;
     top: 20%;
     left: 65%;
-    background: radial-gradient(circle at center, rgba(101, 133, 121, 0.4) 0%, transparent 70%);
+    background: radial-gradient(circle at center, rgba(101, 133, 121, 0.5) 0%, transparent 70%);
     animation: blob-float-4 24s ease-in-out infinite alternate, blob-morph 16s ease-in-out infinite;
   }
 
@@ -251,19 +253,66 @@
     background: radial-gradient(circle at center, rgba(174, 167, 149, 0.5) 0%, transparent 70%);
     animation: blob-float-5 22s ease-in-out infinite alternate, blob-morph 14s ease-in-out infinite;
   }
+
+  /* New blobs with varied lighting and earthy tones */
+  .glass-blob-highlight {
+    width: 30vw;
+    height: 30vw;
+    top: 15%;
+    left: 30%;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.8) 0%, transparent 80%);
+    mix-blend-mode: soft-light;
+    filter: blur(30px);
+    animation: blob-float-highlight 28s ease-in-out infinite alternate, blob-pulse 12s ease-in-out infinite;
+    z-index: 4;
+  }
+
+  .glass-blob-shadow {
+    width: 35vw;
+    height: 35vw;
+    top: 55%;
+    left: 25%;
+    background: radial-gradient(circle at center, rgba(51, 51, 51, 0.3) 0%, transparent 70%);
+    mix-blend-mode: multiply;
+    filter: blur(25px);
+    animation: blob-float-shadow 32s ease-in-out infinite alternate, blob-morph 20s ease-in-out infinite;
+    z-index: 3;
+  }
+
+  .glass-blob-earthtone {
+    width: 38vw;
+    height: 38vw;
+    top: 40%;
+    left: 50%;
+    background: radial-gradient(circle at center, rgba(101, 143, 72, 0.4) 0%, transparent 80%);
+    mix-blend-mode: color-burn;
+    filter: blur(25px);
+    animation: blob-float-earthtone 30s ease-in-out infinite alternate, blob-morph 22s ease-in-out infinite;
+    z-index: 4;
+  }
 }
 
 /* New morphing blobs with more random and circular movements */
 .morphing-bg::before {
-  /* Add multiple moving blobs with pseudo-elements */
+  /* Add multiple moving blobs with pseudo-elements with enhanced earthy tones and more contrast */
   background: 
-    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.7) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.8) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.8) 0%, transparent 50%) 0% 0%,
     radial-gradient(circle at 40% 70%, rgba(249,115,22,0.7) 0%, transparent 40%) 0% 0%,
-    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.7) 0%, transparent 35%) 0% 0%,
-    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.7) 0%, transparent 40%) 0% 0%;
-  background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%;
+    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.8) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.8) 0%, transparent 35%) 0% 0%,
+    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.7) 0%, transparent 40%) 0% 0%,
+    /* Added new earthy tones */
+    radial-gradient(circle at 30% 50%, rgba(101,143,72,0.5) 0%, transparent 45%) 0% 0%,
+    radial-gradient(circle at 70% 60%, rgba(85,107,47,0.4) 0%, transparent 40%) 0% 0%,
+    /* Added dark areas */
+    radial-gradient(circle at 25% 35%, rgba(30,30,30,0.2) 0%, transparent 40%) 0% 0%,
+    radial-gradient(circle at 75% 20%, rgba(30,30,30,0.15) 0%, transparent 35%) 0% 0%,
+    /* Added light sources */
+    radial-gradient(circle at 45% 15%, rgba(255,255,255,0.8) 0%, transparent 30%) 0% 0%,
+    radial-gradient(circle at 85% 45%, rgba(255,255,255,0.7) 0%, transparent 25%) 0% 0%;
+  background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%, 
+                    190% 190%, 185% 185%, 175% 175%, 165% 165%, 155% 155%, 145% 145%;
   animation: 
     blob-move-1 25s ease infinite alternate,
     blob-morph 30s ease infinite;
@@ -278,6 +327,12 @@
       0% 0%,
       0% 0%,
       0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
       0% 0%;
   }
   100% {
@@ -287,8 +342,113 @@
       30% 80%,
       80% 30%,
       50% 90%,
-      20% 60%;
+      20% 60%,
+      60% 40%,
+      40% 70%,
+      75% 25%,
+      25% 75%,
+      65% 35%,
+      35% 65%;
   }
+}
+
+/* New blob animation keyframes */
+@keyframes blob-float-highlight {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.7;
+  }
+  33% {
+    transform: translate(-15px, -25px) scale(1.1);
+    opacity: 0.8;
+  }
+  66% {
+    transform: translate(20px, -15px) scale(0.95);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translate(5px, 10px) scale(1.05);
+    opacity: 0.75;
+  }
+}
+
+@keyframes blob-float-shadow {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  33% {
+    transform: translate(20px, 15px) scale(1.15);
+    opacity: 0.25;
+  }
+  66% {
+    transform: translate(-15px, 25px) scale(0.9);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(-5px, -10px) scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+@keyframes blob-float-earthtone {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.4;
+  }
+  33% {
+    transform: translate(-25px, 10px) scale(1.05);
+    opacity: 0.45;
+  }
+  66% {
+    transform: translate(15px, -20px) scale(0.95);
+    opacity: 0.35;
+  }
+  100% {
+    transform: translate(10px, -5px) scale(1.1);
+    opacity: 0.4;
+  }
+}
+
+@keyframes blob-pulse {
+  0% {
+    opacity: 0.6;
+    filter: blur(30px);
+  }
+  50% {
+    opacity: 0.8;
+    filter: blur(25px);
+  }
+  100% {
+    opacity: 0.6;
+    filter: blur(30px);
+  }
+}
+
+/* Add these keyframes for individual blob movements */
+@keyframes blob-float-1 {
+  0% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(-30px, 20px) rotate(5deg); }
+}
+
+@keyframes blob-float-2 {
+  0% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(25px, -15px) rotate(-8deg); }
+}
+
+@keyframes blob-float-3 {
+  0% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(-20px, -25px) rotate(10deg); }
+}
+
+@keyframes blob-float-4 {
+  0% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(15px, 30px) rotate(-5deg); }
+}
+
+@keyframes blob-float-5 {
+  0% { transform: translate(0, 0) rotate(0); }
+  100% { transform: translate(-10px, -15px) rotate(8deg); }
 }
 
 @keyframes blob-morph {

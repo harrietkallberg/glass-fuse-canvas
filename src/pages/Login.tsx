@@ -46,6 +46,10 @@ const Login = () => {
         <div className="glass-blob glass-blob-3"></div>
         <div className="glass-blob glass-blob-4"></div>
         <div className="glass-blob glass-blob-5"></div>
+        {/* Added new blobs with varied lighting */}
+        <div className="glass-blob glass-blob-highlight"></div>
+        <div className="glass-blob glass-blob-shadow"></div>
+        <div className="glass-blob glass-blob-earthtone"></div>
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
