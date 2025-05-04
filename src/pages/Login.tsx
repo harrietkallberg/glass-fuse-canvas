@@ -12,8 +12,9 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // In a real app, we would handle authentication here
     
     if (!email || !password) {
       toast({
@@ -24,21 +25,6 @@ const Login = () => {
       return;
     }
     
-    // In a real app with Supabase integration, we would authenticate here
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //   email,
-    //   password
-    // });
-    
-    // if (error) {
-    //   toast({
-    //     title: "Authentication error",
-    //     description: error.message,
-    //     variant: "destructive"
-    //   });
-    //   return;
-    // }
-    
     toast({
       title: "Welcome back!",
       description: "Successfully logged in to GlassFuse",
@@ -47,49 +33,31 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-      {/* Animated fluid background shapes with more intense colors */}
-      <div className="absolute inset-0 z-0">
-        <div 
-          className="fluid-shape w-[800px] h-[800px] absolute top-[-100px] left-[-100px] animate-float-slow" 
-          style={{
-            background: "linear-gradient(135deg, #FF8A3D 0%, #FEC6A1 100%)",
-            borderRadius: "60% 40% 70% 30% / 40% 50% 50% 60%"
-          }}
-        />
-        
-        <div 
-          className="fluid-shape w-[600px] h-[600px] absolute bottom-[-100px] right-[-50px] animate-float-medium" 
-          style={{
-            background: "linear-gradient(135deg, #0EA5E9 0%, #33C3F0 100%)",
-            borderRadius: "30% 70% 50% 50% / 60% 30% 70% 40%"
-          }}
-        />
-        
-        <div 
-          className="fluid-shape w-[500px] h-[500px] absolute bottom-[10%] left-[5%] animate-float-reverse" 
-          style={{
-            background: "linear-gradient(135deg, #F2FCE2 0%, #FEF7CD 100%)",
-            borderRadius: "40% 60% 30% 70% / 50% 60% 40% 50%"
-          }}
-        />
-
-        <div 
-          className="fluid-shape w-[400px] h-[400px] absolute top-[15%] right-[10%] animate-pulse-float" 
-          style={{
-            background: "linear-gradient(135deg, #00B4D8 0%, #90E0EF 100%)",
-            borderRadius: "50% 50% 30% 70% / 40% 40% 60% 60%"
-          }}
-        />
-        
-        <div 
-          className="fluid-shape w-[350px] h-[350px] absolute bottom-[20%] right-[25%] animate-float-slow-reverse" 
-          style={{
-            background: "linear-gradient(135deg, #F97316 0%, #FDBA74 100%)",
-            borderRadius: "70% 30% 50% 50% / 30% 60% 40% 70%"
-          }}
-        />
-      </div>
+    <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
+      {/* Fluid background shapes */}
+      <div 
+        className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px]" 
+        style={{
+          background: "linear-gradient(135deg, #FEC6A1 0%, #FEF7CD 100%)",
+          borderRadius: "60% 40% 70% 30% / 40% 50% 50% 60%"
+        }}
+      />
+      
+      <div 
+        className="fluid-shape w-[600px] h-[600px] bottom-[-100px] right-[-50px] animate-float-slow" 
+        style={{
+          background: "linear-gradient(135deg, #D3E4FD 0%, #F2FCE2 100%)",
+          borderRadius: "30% 70% 50% 50% / 60% 30% 70% 40%"
+        }}
+      />
+      
+      <div 
+        className="fluid-shape w-[500px] h-[500px] bottom-[10%] left-[5%] animate-float-reverse" 
+        style={{
+          background: "linear-gradient(135deg, #F2FCE2 0%, #FEF7CD 100%)",
+          borderRadius: "40% 60% 30% 70% / 50% 60% 40% 50%"
+        }}
+      />
       
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
