@@ -3,10 +3,11 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, TerminalSquare, Lock } from "lucide-react";
+import { ArrowLeft, Moon, Star } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import TypingAnimation from "@/components/TypingAnimation";
+import AlienShapes from "@/components/AlienShapes";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -19,7 +20,7 @@ const Login = () => {
     if (!email || !password) {
       toast({
         title: "ERROR_",
-        description: "AUTHENTICATION FAILED: MISSING CREDENTIALS",
+        description: "ENTITY VERIFICATION FAILED: INCOMPLETE DATA PATTERN",
         variant: "destructive"
       });
       return;
@@ -27,93 +28,100 @@ const Login = () => {
     
     toast({
       title: "ACCESS_GRANTED",
-      description: "CONNECTING TO SYSTEM MAINFRAME...",
+      description: "ESTABLISHING NEURAL INTERFACE CONNECTION...",
     });
     navigate("/dashboard");
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#1A1A1A] relative overflow-hidden">
-      {/* Tech grid background */}
-      <div className="tech-grid-bg"></div>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#1A1F2C] via-[#221F26] to-[#221C24] relative overflow-hidden">
+      {/* Strange alien shapes in the background */}
+      <AlienShapes />
       
-      {/* Scanlines overlay */}
-      <div className="screen-scanline"></div>
+      {/* Additional bizarre organic elements */}
+      <div className="alien-organism w-[250px] h-[250px] top-[10%] left-[20%] opacity-40"></div>
+      <div className="alien-organism w-[300px] h-[300px] bottom-[5%] right-[15%] opacity-50"></div>
+      
+      {/* Atmospheric overlay */}
+      <div className="planet-atmosphere"></div>
+      
+      {/* Scanline effect */}
+      <div className="planet-scanline"></div>
       
       {/* Animated typing in top corner */}
       <TypingAnimation />
       
       {/* Top status bar */}
-      <div className="fixed top-0 left-0 right-0 bg-[#2A2A2A] border-b border-red-500/30 p-1 flex justify-between items-center z-30 font-mono text-xs">
+      <div className="fixed top-0 left-0 right-0 bg-[#1A1F2C] border-b border-[#5B81B1]/30 p-1 flex justify-between items-center z-30 font-mono text-xs">
         <div className="flex items-center">
-          <span className="text-red-500 mx-2">SYS:</span>
-          <span className="text-green-500">ONLINE</span>
+          <span className="text-[#5B81B1] mx-2">ENTITY:</span>
+          <span className="text-[#A1C4F0]">UNIDENTIFIED</span>
         </div>
-        <div className="text-gray-400">{new Date().toLocaleTimeString()} - AUTH MODULE v2.3.1</div>
+        <div className="text-[#5B81B1]">{new Date().toLocaleTimeString()} - AUTHENTICATION MODULE</div>
         <div className="flex items-center">
-          <span className="text-red-500 mr-1">CPU:</span>
-          <span className="text-gray-400">24%</span>
+          <span className="text-[#5B81B1] mr-1">COSMIC ENERGY:</span>
+          <span className="text-[#A1C4F0]">24%</span>
         </div>
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
-          <Button variant="ghost" size="sm" className="font-mono text-xs text-gray-300 hover:text-red-500 hover:bg-[#2A2A2A] flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="font-mono text-xs text-[#A1C4F0] hover:text-[#5B81B1] hover:bg-[#403E43] flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             RETURN_TO_MAIN
           </Button>
         </Link>
         
-        <div className="crt-frame p-6">
-          <div className="crt-screen p-4">
+        <div className="bizarre-frame p-6">
+          <div className="bizarre-screen p-4">
             <div className="mb-6 text-center">
-              <div className="inline-block border-2 border-red-500 p-1 mb-4">
-                <Lock className="h-8 w-8 text-red-500 mx-auto" />
+              <div className="inline-block border-2 border-[#5B81B1] p-1 mb-4">
+                <Star className="h-8 w-8 text-[#5B81B1] mx-auto" />
               </div>
-              <h1 className="text-2xl font-mono uppercase text-red-500 tracking-widest retro-shadow">
-                System Access
+              <h1 className="text-2xl font-mono uppercase text-[#5B81B1] tracking-widest alien-shadow">
+                Entity Access
               </h1>
               
-              <div className="mt-2 font-mono text-xs text-gray-300 flex items-center justify-center">
-                <span className="led"></span>
-                SECURE CONNECTION ESTABLISHED
+              <div className="mt-2 font-mono text-xs text-[#A1C4F0] flex items-center justify-center">
+                <span className="alien-eye"></span>
+                CONSCIOUSNESS LINK AVAILABLE
               </div>
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="tech-display p-3 bg-[#2A2A2A]">
+              <div className="alien-display p-3">
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-300 font-mono text-xs uppercase block mb-1">
-                    USER_ID
+                  <Label htmlFor="email" className="text-[#A1C4F0] font-mono text-xs uppercase block mb-1">
+                    ENTITY_ID
                   </Label>
                   <div className="flex">
-                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
-                      <TerminalSquare size={16} />
+                    <div className="bg-[#403E43] text-[#5B81B1] p-2 flex items-center justify-center border-r border-[#1A1F2C]">
+                      <Moon size={16} />
                     </div>
                     <Input 
                       id="email" 
                       type="email" 
-                      placeholder="user@domain.ext" 
+                      placeholder="identity@cosmic.ext" 
                       required 
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
+                      className="alien-input flex-1 font-mono text-sm bg-[#1A1F2C] text-[#A1C4F0]"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2 mt-4">
                   <div className="flex justify-between items-center">
-                    <Label htmlFor="password" className="text-gray-300 font-mono text-xs uppercase">
-                      ACCESS_KEY
+                    <Label htmlFor="password" className="text-[#A1C4F0] font-mono text-xs uppercase">
+                      CONSCIOUSNESS_KEY
                     </Label>
-                    <Link to="/forgot-password" className="text-xs text-red-500/70 hover:text-red-500 transition-colors font-mono">
+                    <Link to="/forgot-password" className="text-xs text-[#5B81B1]/70 hover:text-[#5B81B1] transition-colors font-mono">
                       RESET_KEY?
                     </Link>
                   </div>
                   <div className="flex">
-                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
-                      <Lock size={16} />
+                    <div className="bg-[#403E43] text-[#5B81B1] p-2 flex items-center justify-center border-r border-[#1A1F2C]">
+                      <Star size={16} />
                     </div>
                     <Input 
                       id="password" 
@@ -122,7 +130,7 @@ const Login = () => {
                       required 
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
+                      className="alien-input flex-1 font-mono text-sm bg-[#1A1F2C] text-[#A1C4F0]"
                     />
                   </div>
                 </div>
@@ -130,18 +138,18 @@ const Login = () => {
               
               <Button 
                 type="submit" 
-                className="tech-button w-full h-12 font-mono uppercase tracking-widest text-sm bg-red-600 hover:bg-red-700 shadow-[0_0_10px_rgba(255,0,0,0.5)]"
+                className="alien-button w-full h-12 font-mono uppercase tracking-widest text-sm shadow-[0_0_15px_rgba(91,129,177,0.5)]"
               >
-                AUTHENTICATE <span className="ml-2 blink-text">█</span>
+                NEURAL LINK <span className="ml-2 blink-text">█</span>
               </Button>
             </form>
             
-            <div className="tech-display mt-8 p-3 bg-[#2A2A2A]">
+            <div className="alien-display mt-8 p-3">
               <div className="text-center">
-                <p className="text-xs text-gray-300 font-mono">
-                  NEW_USER? 
-                  <Link to="/register" className="text-red-500 ml-2 hover:underline font-mono">
-                    CREATE_ACCOUNT
+                <p className="text-xs text-[#A1C4F0] font-mono">
+                  NEW_ENTITY? 
+                  <Link to="/register" className="text-[#5B81B1] ml-2 hover:underline font-mono">
+                    INITIALIZE_PROFILE
                   </Link>
                 </p>
               </div>
@@ -149,8 +157,8 @@ const Login = () => {
           </div>
         </div>
         
-        <div className="mt-4 text-center font-mono text-xs text-gray-400">
-          © 2025 TECHNODYNE SYSTEMS • ALL RIGHTS RESERVED
+        <div className="mt-4 text-center font-mono text-xs text-[#5B81B1]">
+          © 2025 FANTASTIC PLANET SYSTEMS • ALL DIMENSIONS PRESERVED
         </div>
       </div>
     </div>

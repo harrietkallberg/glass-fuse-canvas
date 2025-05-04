@@ -5,44 +5,45 @@
 
 @layer base {
   :root {
-    --background: 0 0% 15%;
-    --foreground: 0 0% 95%;
+    --background: 220 22% 18%;      /* Dark blue-gray */
+    --foreground: 210 40% 85%;      /* Pale blue-white */
 
-    --card: 0 0% 18%;
-    --card-foreground: 0 0% 95%;
+    --card: 220 20% 22%;            /* Slightly lighter dark blue-gray */
+    --card-foreground: 210 40% 85%; /* Pale blue-white */
 
-    --popover: 0 0% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 224 35% 15%;         /* Deep blue-purple */
+    --popover-foreground: 210 40% 85%; /* Pale blue-white */
 
-    --primary: 0 85% 50%;
-    --primary-foreground: 0 0% 95%;
+    --primary: 348 70% 44%;         /* Deep burgundy red */
+    --primary-foreground: 210 40% 85%; /* Pale blue-white */
 
-    --secondary: 0 0% 22%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 221 30% 25%;       /* Muted blue */
+    --secondary-foreground: 210 40% 85%; /* Pale blue-white */
 
-    --muted: 0 0% 25%;
-    --muted-foreground: 0 0% 70%;
+    --muted: 220 20% 30%;           /* Medium blue-gray */
+    --muted-foreground: 220 10% 70%; /* Lighter blue-gray */
 
-    --accent: 0 80% 45%;
-    --accent-foreground: 0 0% 95%;
+    --accent: 41 80% 65%;           /* Mustard gold */
+    --accent-foreground: 224 35% 15%; /* Deep blue-purple */
 
-    --destructive: 0 85% 50%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive: 348 70% 44%;     /* Same as primary, deep burgundy */
+    --destructive-foreground: 210 40% 85%; /* Pale blue-white */
 
-    --border: 0 0% 30%;
-    --input: 0 0% 30%;
-    --ring: 0 85% 50%;
+    --border: 220 25% 35%;          /* Medium-dark blue-gray border */
+    --input: 220 25% 35%;           /* Medium-dark blue-gray input */
+    --ring: 348 70% 44%;            /* Same as primary */
 
     --radius: 0.125rem;
     
-    /* Retro tech theme color variables */
-    --tech-red: 0 85% 50%;      /* #F10F0F */
-    --tech-dark-red: 0 75% 40%; /* #CC0D0D */
-    --tech-gray: 0 0% 80%;      /* #CCCCCC */
-    --tech-dark-gray: 0 0% 40%; /* #666666 */
-    --tech-black: 0 0% 15%;     /* #262626 */
-    --tech-light-red: 0 70% 65%; /* #F66868 */
-    --tech-yellow: 50 100% 60%; /* #FFD700 - More Kraftwerk-like accent */
+    /* Fantastic Planet theme colors */
+    --alien-blue: 220 40% 67%;      /* #5B81B1 - Alien skin blue */
+    --alien-dark-blue: 220 40% 37%; /* Darker alien skin */
+    --alien-red: 0 70% 35%;         /* #991B1B - Alien red eye */
+    --planet-brown: 30 35% 45%;     /* #9B6D4C - Planet terrain */
+    --draag-purple: 320 45% 32%;    /* #792D54 - Draag color */
+    --om-yellow: 42 55% 58%;        /* #D0A659 - Om color */
+    --bizarre-purple: 330 25% 48%;  /* #9B596D - Another organic color */
+    --alien-blue-gray: 200 25% 40%; /* #4D6D82 - Muted blue-gray */
   }
 
   * {
@@ -51,102 +52,130 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "VT323", "Courier New", monospace;
+    font-family: "Courier New", monospace;
+    overflow-x: hidden;
   }
 }
 
 @layer components {
-  /* Tech panel styling */
-  .tech-panel {
-    @apply bg-[#2A2A2A] border border-[#FF0000]/40 shadow-[0_0_10px_rgba(255,0,0,0.3)] rounded-none;
+  /* Alien panel styling */
+  .alien-panel {
+    @apply bg-[#1F2937] border border-[#5B81B1]/40 shadow-[0_0_15px_rgba(91,129,177,0.3)] rounded-md;
+    position: relative;
+    overflow: hidden;
   }
   
-  .tech-display {
-    @apply bg-[#2A2A2A] border-2 border-[#444444] shadow-inner p-4 font-mono;
-  }
-  
-  .tech-button {
-    @apply bg-[#3A3A3A] hover:bg-[#4A4A4A] text-[#FF0000] border border-[#FF0000]/50 
-    rounded-none transition-all font-mono uppercase tracking-wider
-    shadow-[0_0_5px_rgba(255,0,0,0.3)] hover:shadow-[0_0_8px_rgba(255,0,0,0.5)];
-  }
-  
-  .tech-input {
-    @apply bg-[#222222] border border-[#444444] focus:border-[#FF0000]/70 
-    text-[#CCCCCC] rounded-none font-mono shadow-inner;
-  }
-
-  .screen-overlay {
-    @apply fixed inset-0 bg-[url('/grid-pattern.png')] opacity-10 pointer-events-none z-10;
-  }
-  
-  .screen-scanline {
-    @apply fixed inset-0 bg-[linear-gradient(to_bottom,rgba(255,0,0,0)_0%,rgba(255,0,0,0.08)_50%,rgba(0,0,0,0.1)_51%,rgba(0,0,0,0)_100%)] 
-    bg-[length:100%_4px] pointer-events-none z-20 opacity-15;
-    background-repeat: repeat;
-    animation: scan 8s linear infinite;
-  }
-
-  .tech-grid-bg {
-    @apply fixed inset-0 bg-[#1A1A1A] bg-[linear-gradient(rgba(255,0,0,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,0,0,0.05)_1px,transparent_1px)] 
-    bg-[size:20px_20px] pointer-events-none z-0;
-  }
-
-  .crt-frame {
-    @apply relative rounded-none border-t-4 border-l-4 border-r-4 border-b-[15px] border-[#444444] 
-    bg-[#262626] shadow-[0_0_20px_rgba(255,0,0,0.2)];
-  }
-
-  .crt-screen {
-    @apply relative bg-[#1A1A1A] overflow-hidden;
-  }
-  
-  .crt-screen::before {
+  .alien-panel::before {
     content: "";
-    @apply absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.12)_50%)] 
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(91,129,177,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  
+  .alien-display {
+    @apply bg-[#1A1F2C] border-2 border-[#403E43] shadow-inner p-4 font-mono;
+    position: relative;
+  }
+  
+  .alien-button {
+    @apply bg-[#403E43] hover:bg-[#4D6D82] text-[#5B81B1] border border-[#5B81B1]/50 
+    rounded-md transition-all font-mono uppercase tracking-wider
+    shadow-[0_0_8px_rgba(91,129,177,0.4)] hover:shadow-[0_0_12px_rgba(91,129,177,0.6)];
+  }
+  
+  .alien-input {
+    @apply bg-[#1A1F2C] border border-[#403E43] focus:border-[#5B81B1]/70 
+    text-[#A1C4F0] rounded-md font-mono shadow-inner;
+  }
+
+  .planet-overlay {
+    @apply fixed inset-0 pointer-events-none z-10;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(155, 109, 76, 0.08) 0%, transparent 40%),
+      radial-gradient(circle at 80% 20%, rgba(121, 45, 84, 0.08) 0%, transparent 40%);
+  }
+  
+  .planet-scanline {
+    @apply fixed inset-0 bg-[linear-gradient(to_bottom,rgba(91,129,177,0)_0%,rgba(91,129,177,0.05)_50%,rgba(0,0,0,0.05)_51%,rgba(0,0,0,0)_100%)] 
+    bg-[length:100%_4px] pointer-events-none z-20 opacity-30;
+    background-repeat: repeat;
+    animation: scan 12s linear infinite;
+  }
+
+  .planet-atmosphere {
+    @apply fixed inset-0 pointer-events-none z-5;
+    background: linear-gradient(135deg, rgba(155, 109, 76, 0.1), rgba(121, 45, 84, 0.1), rgba(91, 129, 177, 0.1));
+    opacity: 0.6;
+  }
+
+  .bizarre-frame {
+    @apply relative border-2 border-[#403E43] 
+    bg-[#1A1F2C] shadow-[0_0_20px_rgba(91,129,177,0.2)];
+    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
+    animation: morphFrame 30s ease-in-out infinite alternate;
+  }
+
+  .bizarre-screen {
+    @apply relative bg-[#1A1F2C] overflow-hidden;
+    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
+    animation: morphScreen 30s ease-in-out infinite alternate;
+  }
+  
+  .bizarre-screen::before {
+    content: "";
+    @apply absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.08)_50%)] 
     bg-[size:100%_4px] pointer-events-none z-10;
   }
   
-  .crt-screen::after {
+  .bizarre-screen::after {
     content: "";
-    @apply absolute inset-0 rounded-sm bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.3)_100%)];
+    @apply absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.2)_100%)];
   }
 
-  .crt-glitch {
-    animation: glitch 5s infinite;
+  .alien-glitch {
+    animation: alienGlitch 8s infinite;
   }
 
   .blink-text {
     animation: blink 1s steps(1) infinite;
   }
 
-  .retro-heading {
-    @apply font-mono uppercase tracking-widest text-[#FF0000] shadow-[0_0_10px_rgba(255,0,0,0.5)];
+  .alien-heading {
+    @apply font-mono uppercase tracking-widest text-[#5B81B1] shadow-[0_0_10px_rgba(91,129,177,0.5)];
   }
 
-  .retro-text {
-    @apply font-mono text-[#CCCCCC];
-  }
-
-  .digital-counter {
-    @apply font-mono bg-[#222222] text-[#FF0000] px-2 py-1 border border-[#444444];
+  .bizarre-text {
+    @apply font-mono text-[#A1C4F0];
   }
 
   .control-panel {
-    @apply grid grid-cols-1 md:grid-cols-4 gap-2 bg-[#2A2A2A] p-4 border-t-2 border-[#444444];
+    @apply grid grid-cols-1 md:grid-cols-4 gap-2 bg-[#1A1F2C] p-4 border-t-2 border-[#403E43];
   }
 
-  .led {
-    @apply inline-block w-2 h-2 rounded-full bg-[#FF0000] shadow-[0_0_5px_rgba(255,0,0,0.8)] 
-    mr-2 animate-[pulse_2s_infinite];
+  .alien-eye {
+    @apply inline-block w-3 h-3 rounded-full bg-[#991B1B] shadow-[0_0_5px_rgba(153,27,27,0.8)] 
+    mr-2 animate-[pulse_4s_ease-in-out_infinite];
   }
 
-  .led-off {
-    @apply inline-block w-2 h-2 rounded-full bg-[#4D0000] mr-2;
+  .alien-eye-dim {
+    @apply inline-block w-3 h-3 rounded-full bg-[#441111] mr-2;
   }
   
   .terminal-text {
-    @apply font-mono text-[#33FF33];
+    @apply font-mono text-[#5B81B1];
+  }
+
+  /* Alien organism */
+  .alien-organism {
+    position: absolute;
+    background-color: rgba(91, 129, 177, 0.2);
+    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
+    filter: blur(2px);
+    animation: organism 30s ease-in-out infinite alternate;
   }
 }
 
@@ -168,41 +197,113 @@
   }
 }
 
-@keyframes glitch {
+@keyframes alienGlitch {
   0%, 91%, 94%, 100% {
     transform: translate(0, 0) skew(0);
+    filter: hue-rotate(0deg);
   }
   92% {
-    transform: translate(-2px, 0) skew(0.5deg);
+    transform: translate(-3px, 0) skew(0.5deg);
+    filter: hue-rotate(90deg);
   }
   93% {
-    transform: translate(2px, 0) skew(-0.5deg);
+    transform: translate(3px, 0) skew(-0.5deg);
+    filter: hue-rotate(-90deg);
   }
   95%, 96% {
     transform: translate(0, 0) skew(0);
+    filter: hue-rotate(0deg);
   }
   97% {
-    transform: translate(3px, 0) skew(-0.75deg);
+    transform: translate(4px, 0) skew(-0.75deg);
+    filter: saturate(200%) hue-rotate(45deg);
   }
   98% {
-    transform: translate(-3px, 0) skew(0.75deg);
+    transform: translate(-4px, 0) skew(0.75deg);
+    filter: saturate(200%) hue-rotate(-45deg);
   }
   99% {
     transform: translate(0, 0) skew(0);
+    filter: hue-rotate(0deg);
+  }
+}
+
+@keyframes morphFrame {
+  0% {
+    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
+  }
+  25% {
+    border-radius: 51% 49% 58% 42% / 42% 55% 45% 58%;
+  }
+  50% {
+    border-radius: 42% 58% 37% 63% / 57% 44% 56% 43%;
+  }
+  75% {
+    border-radius: 54% 46% 50% 50% / 49% 52% 48% 51%;
+  }
+  100% {
+    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
+  }
+}
+
+@keyframes morphScreen {
+  0% {
+    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
+  }
+  25% {
+    border-radius: 49% 51% 54% 46% / 44% 53% 47% 56%;
+  }
+  50% {
+    border-radius: 40% 60% 35% 65% / 59% 42% 58% 41%;
+  }
+  75% {
+    border-radius: 52% 48% 48% 52% / 47% 50% 50% 53%;
+  }
+  100% {
+    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
+  }
+}
+
+@keyframes organism {
+  0% {
+    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
+    transform: scale(1) translate(0, 0) rotate(0deg);
+    background-color: rgba(91, 129, 177, 0.2);
+  }
+  25% {
+    border-radius: 30% 70% 50% 50% / 60% 30% 70% 40%;
+    transform: scale(1.05) translate(5px, -10px) rotate(2deg);
+    background-color: rgba(121, 45, 84, 0.2);
+  }
+  50% {
+    border-radius: 50% 50% 30% 70% / 40% 60% 30% 70%;
+    transform: scale(0.95) translate(15px, 10px) rotate(-2deg);
+    background-color: rgba(155, 109, 76, 0.2);
+  }
+  75% {
+    border-radius: 70% 30% 50% 50% / 30% 40% 60% 70%;
+    transform: scale(1.1) translate(-10px, 5px) rotate(1deg);
+    background-color: rgba(91, 129, 177, 0.2);
+  }
+  100% {
+    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
+    transform: scale(1) translate(0, 0) rotate(0deg);
+    background-color: rgba(208, 166, 89, 0.2);
   }
 }
 
 @layer utilities {
-  .retro-shadow {
-    text-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+  .alien-shadow {
+    text-shadow: 0 0 5px rgba(91, 129, 177, 0.8);
   }
   
-  .retro-glow {
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+  .alien-glow {
+    box-shadow: 0 0 15px rgba(91, 129, 177, 0.6);
   }
   
-  .tech-noise::before {
+  .planet-noise::before {
     content: "";
-    @apply fixed inset-0 bg-[url('/noise.png')] opacity-5 pointer-events-none z-5 mix-blend-overlay;
+    @apply fixed inset-0 opacity-5 pointer-events-none z-5 mix-blend-overlay;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/f53mer/M8f/Z9P/d9P7dt+76u67tt23ld13ld13lZlnNd13NZlnNd1/Pz+Tz3fT/9fB97juO496z7tef253mez+/Ent/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
   }
 }

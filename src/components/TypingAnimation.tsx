@@ -1,20 +1,22 @@
 
 import React, { useState, useEffect } from "react";
 
-// Collection of retro code snippets that will be typed out
+// Collection of weird, alien-sounding code snippets
 const codeSnippets = [
-  "LOAD DATA: PHASE 1",
-  "10 PRINT \"HELLO WORLD\"",
-  "20 GOTO 10",
-  "RUN PROGRAM >",
-  "CALCULATING COEFFICIENTS...",
-  "DATA TRANSFER: SECTOR 7",
-  "int main() { return 0; }",
-  "SYS 64738",
-  "POKE 53280,0",
-  "LET X = 42",
-  "IF TEMP > 500 THEN GOTO 230",
-  "[SYSTEM INITIALIZED]",
+  "ENTITY SCANNING: NEGATIVE",
+  "INITIATING DRAAG TELEPATHY SEQUENCE",
+  "OM CONSCIOUSNESS TRANSFER: 38%",
+  "MORPHING TISSUE ANALYSIS COMPLETE",
+  "SYMBIOSIS PROBABILITY: UNSTABLE",
+  "PLANET SAVAGE: ATMOSPHERE BREATHABLE",
+  "VOID SIGNAL DETECTED FROM SECTOR 7",
+  "TERRAIN FLORA: INCOMPATIBLE WITH HUMANOIDS",
+  "DRAAG MEDITATION CYCLE: ACTIVE",
+  "WARNING: TERR RESISTANCE INCREASING",
+  "PSYCHOSPHERE STABILITY: CRITICAL",
+  "INITIATING COLLECTIVE DREAMSCAPE",
+  "DIMENSIONAL SEPARATION COLLAPSING",
+  "COSMIC AWARENESS MATRIX INITIALIZED",
 ];
 
 const TypingAnimation: React.FC = () => {
@@ -32,19 +34,19 @@ const TypingAnimation: React.FC = () => {
         timer = setTimeout(() => {
           setText(text + codeSnippets[currentSnippet][charIndex]);
           setCharIndex(charIndex + 1);
-        }, 50 + Math.random() * 100); // Random typing speed for realistic effect
+        }, 100 + Math.random() * 150); // Slightly irregular typing speed for unsettling effect
       } else {
         // Finished typing current snippet, pause before erasing
         timer = setTimeout(() => {
           setIsTyping(false);
-        }, 1500);
+        }, 2000);
       }
     } else {
       if (text.length > 0) {
         // Erasing animation
         timer = setTimeout(() => {
           setText(text.slice(0, -1));
-        }, 30);
+        }, 40);
       } else {
         // Move to next code snippet
         setCurrentSnippet((currentSnippet + 1) % codeSnippets.length);
@@ -57,7 +59,7 @@ const TypingAnimation: React.FC = () => {
   }, [text, isTyping, currentSnippet, charIndex]);
 
   return (
-    <div className="fixed top-4 left-4 font-mono text-red-500 text-lg z-50">
+    <div className="fixed top-4 left-4 font-mono text-[#5B81B1] text-lg z-50">
       <span>{text}</span>
       <span className="blink-text">█</span>
     </div>
