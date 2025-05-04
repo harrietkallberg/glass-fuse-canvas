@@ -1,10 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Plus, Trash2, Save, ChartBar } from 'lucide-react';
+import { ChartContainer } from '@/components/ui/chart';
+import glassData from '../tables.json';
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  ReferenceLine
+} from 'recharts';
 
 interface Phase {
   id: string;
@@ -26,6 +39,73 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
   );
   
   const [activeTab, setActiveTab] = useState('chart');
+  const [selectedGlass, setSelectedGlass] = useState<string>(glassData.Glassorter[0].namn);
+  const [roomTemp, setRoomTemp] = useState<number>(20);
+  const [glassLayers, setGlassLayers] = useState<string>("1");
+  const [glassRadius, setGlassRadius] = useState<string>("10");
+  const [firingType, setFiringType] = useState<string>("f");
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  // Find selected glass info
+  const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
+
+  useEffect(() => {
+    generateChartData();
+  }, [phases]);
+
+  // Generate data for the chart
+  const generateChartData = () => {
+    let data = [];
+    let currentTime = 0;
+    let currentTemp = roomTemp;
+    
+    // Add starting point
+    data.push({
+      time: currentTime,
+      temperature: currentTemp,
+      phase: "Start"
+    });
+    
+    // Process each phase
+    phases.forEach((phase, index) => {
+      // Calculate rise time
+      if (phase.duration > 0) {
+        const timePoints = Math.min(10, phase.duration); // Max 10 points per phase for smooth visualization
+        const timeIncrement = phase.duration / timePoints;
+        const tempIncrement = (phase.targetTemp - currentTemp) / timePoints;
+        
+        for (let i = 1; i <= timePoints; i++) {
+          currentTime += timeIncrement;
+          currentTemp += tempIncrement;
+          data.push({
+            time: currentTime,
+            temperature: currentTemp,
+            phase: `Phase ${index + 1} Rise`
+          });
+        }
+      }
+      
+      // Hold time
+      if (phase.holdTime > 0) {
+        // Start of hold
+        data.push({
+          time: currentTime,
+          temperature: phase.targetTemp,
+          phase: `Phase ${index + 1} Hold Start`
+        });
+        
+        // End of hold
+        currentTime += phase.holdTime;
+        data.push({
+          time: currentTime,
+          temperature: phase.targetTemp,
+          phase: `Phase ${index + 1} Hold End`
+        });
+      }
+    });
+    
+    setChartData(data);
+  };
 
   const addPhase = () => {
     const lastPhase = phases[phases.length - 1];
@@ -55,91 +135,174 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
     if (onSave) onSave(phases);
   };
 
+  // Calculate total time
+  const calculateTotalTime = () => {
+    return phases.reduce((total, phase) => total + phase.duration + phase.holdTime, 0);
+  };
+
+  // Apply template based on glass info
+  const applyGlassTemplate = () => {
+    if (!selectedGlassInfo) return;
+    
+    let toppTemp;
+    
+    // Select proper top temperature based on firing type
+    if (firingType === "f") {
+      toppTemp = Math.round((selectedGlassInfo.f_topptemp[0] + selectedGlassInfo.f_topptemp[1]) / 2);
+    } else if (firingType === "s") {
+      toppTemp = Math.round((selectedGlassInfo.s_topptemp[0] + selectedGlassInfo.s_topptemp[1]) / 2);
+    } else {
+      toppTemp = selectedGlassInfo.t_topptemp;
+    }
+
+    // Get matching table for the selected glass category and oven type
+    const uppvarmningTable = glassData["Tider for uppvarmning"].find(
+      item => item.kategori === selectedGlassInfo.kategori && item.ugn === "t"
+    );
+    
+    const halltiderTable = glassData["Halltider"].find(
+      item => item.kategori === selectedGlassInfo.kategori
+    );
+    
+    const avspanningTable = glassData["Avspanningstider"].find(
+      item => item.kategori === selectedGlassInfo.kategori
+    );
+
+    // Extract times from tables
+    const getTimeFromTable = (table: any, radius: string, layers: string) => {
+      const radiusRow = table.tabell.find((row: any) => radius in row);
+      return radiusRow ? radiusRow[radius][layers] : 30; // Default to 30 if not found
+    };
+
+    const uppvarmningTime = uppvarmningTable ? 
+      getTimeFromTable(uppvarmningTable, glassRadius, glassLayers) : 30;
+    
+    const halltiderTime = halltiderTable ? 
+      getTimeFromTable(halltiderTable, glassRadius, glassLayers) : 20;
+    
+    const avspanningTime = avspanningTable ? 
+      getTimeFromTable(avspanningTable, glassRadius, glassLayers) : 60;
+
+    // Create phases based on the firing curve algorithm in the Python script
+    const inledandeSmaltpunkt = glassData["Inledande_smaltpunkt"];
+    const oAstemp = selectedGlassInfo.o_astemp;
+    const nAstemp = selectedGlassInfo.n_astemp;
+
+    // Calculate velocities (converted from hourly to per-minute)
+    const firstHeatingVelocity = Math.min(
+      999, 
+      Math.floor(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime)
+    );
+    
+    const firstCoolingVelocity = Math.floor(60 * (oAstemp - toppTemp) / halltiderTime);
+    const secondCoolingVelocity = Math.floor(60 * (nAstemp - oAstemp) / avspanningTime);
+    
+    // Create the new phases
+    const newPhases = [
+      { 
+        id: '1', 
+        targetTemp: inledandeSmaltpunkt, 
+        duration: uppvarmningTime, 
+        holdTime: 0 
+      },
+      { 
+        id: '2', 
+        targetTemp: toppTemp, 
+        duration: 15, // Fast rise to top temp
+        holdTime: 10 // Default hold time
+      },
+      { 
+        id: '3', 
+        targetTemp: oAstemp, 
+        duration: halltiderTime, 
+        holdTime: 0 
+      },
+      { 
+        id: '4', 
+        targetTemp: nAstemp, 
+        duration: avspanningTime, 
+        holdTime: 0 
+      },
+      { 
+        id: '5', 
+        targetTemp: roomTemp, 
+        duration: 60, // Slow cooling to room temp
+        holdTime: 0 
+      }
+    ];
+    
+    setPhases(newPhases);
+  };
+
   const renderChart = () => {
+    // Find key temperatures from the selected glass for reference lines
+    const referenceTemps = selectedGlassInfo ? [
+      { temp: selectedGlassInfo.o_astemp, label: 'Upper Annealing' },
+      { temp: selectedGlassInfo.n_astemp, label: 'Lower Annealing' }
+    ] : [];
+    
+    // Custom colors for the chart
+    const chartColors = {
+      line: '#FEC6A1',
+      grid: '#F2FCE2',
+      text: '#333333'
+    };
+    
     return (
-      <div className="h-[300px] w-full bg-muted/30 rounded-lg relative flex items-center justify-center">
-        <div className="absolute inset-0 p-4">
-          <div className="h-full w-full relative">
-            {/* Horizontal lines - temperature indicators */}
-            {[0, 25, 50, 75, 100].map((percent) => (
-              <div 
-                key={percent} 
-                className="absolute w-full border-t border-muted-foreground/20"
-                style={{ top: `${100 - percent}%` }}
-              >
-                <span className="absolute -left-6 -top-2 text-xs text-muted-foreground">
-                  {Math.round((percent / 100) * 1000)}°C
-                </span>
-              </div>
-            ))}
+      <div className="h-[400px] w-full bg-glass-100/20 rounded-lg p-4">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart 
+            data={chartData}
+            margin={{ top: 5, right: 20, left: 20, bottom: 30 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+            <XAxis 
+              dataKey="time" 
+              label={{ value: 'Time (minutes)', position: 'insideBottomRight', offset: -10 }}
+              stroke={chartColors.text}
+            />
+            <YAxis 
+              label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
+              domain={[0, 'auto']}
+              stroke={chartColors.text}
+            />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(255,255,255,0.9)', 
+                borderColor: chartColors.line,
+                borderRadius: '8px',
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+              }}
+              formatter={(value, name) => [
+                `${Math.round(Number(value))}${name === 'temperature' ? '°C' : ' min'}`, 
+                name === 'temperature' ? 'Temperature' : 'Time'
+              ]}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="temperature" 
+              stroke={chartColors.line} 
+              strokeWidth={3}
+              dot={{ fill: '#FFDEE2', strokeWidth: 2, r: 4, strokeDasharray: '' }}
+              activeDot={{ r: 6, fill: '#FDE1D3' }}
+            />
             
-            {/* Draw the curve */}
-            <svg className="h-full w-full">
-              <path
-                d={`
-                  M 0,${300 - (phases[0].targetTemp / 1000) * 300} 
-                  ${phases.map((phase, index) => {
-                    const previousPhases = phases.slice(0, index);
-                    const totalPreviousDuration = previousPhases.reduce(
-                      (acc, p) => acc + p.duration + p.holdTime, 0
-                    );
-                    
-                    const phaseStartX = (totalPreviousDuration / 200) * 100;
-                    const phaseRiseEndX = phaseStartX + (phase.duration / 200) * 100;
-                    const phaseEndX = phaseRiseEndX + (phase.holdTime / 200) * 100;
-                    
-                    const y = 300 - (phase.targetTemp / 1000) * 300;
-                    
-                    return `
-                      L ${phaseRiseEndX}%,${y} 
-                      L ${phaseEndX}%,${y}
-                    `;
-                  }).join(' ')}
-                `}
-                fill="none"
-                stroke="hsl(var(--primary))"
-                strokeWidth="2"
+            {/* Reference lines for annealing temperatures */}
+            {referenceTemps.map((temp, index) => (
+              <ReferenceLine 
+                key={index}
+                y={temp.temp} 
+                stroke="#E5DEFF" 
+                strokeDasharray="3 3" 
+                label={{ 
+                  value: `${temp.label}: ${temp.temp}°C`, 
+                  fill: '#683bfa',
+                  position: 'right'
+                }}
               />
-            </svg>
-            
-            {/* Phase points */}
-            {phases.map((phase, index) => {
-              const previousPhases = phases.slice(0, index);
-              const totalPreviousDuration = previousPhases.reduce(
-                (acc, p) => acc + p.duration + p.holdTime, 0
-              );
-              
-              const phaseStartX = (totalPreviousDuration / 200) * 100;
-              const phaseRiseEndX = phaseStartX + (phase.duration / 200) * 100;
-              const phaseEndX = phaseRiseEndX + (phase.holdTime / 200) * 100;
-              
-              const y = 300 - (phase.targetTemp / 1000) * 300;
-              
-              return (
-                <React.Fragment key={phase.id}>
-                  <div 
-                    className="absolute h-2 w-2 bg-primary rounded-full transform -translate-x-1 -translate-y-1"
-                    style={{ 
-                      left: `${phaseRiseEndX}%`, 
-                      top: `${(y / 300) * 100}%` 
-                    }}
-                  />
-                  <div 
-                    className="absolute h-2 w-2 bg-primary rounded-full transform -translate-x-1 -translate-y-1"
-                    style={{ 
-                      left: `${phaseEndX}%`, 
-                      top: `${(y / 300) * 100}%` 
-                    }}
-                  />
-                </React.Fragment>
-              );
-            })}
-          </div>
-        </div>
-        
-        {phases.length === 0 && (
-          <p className="text-muted-foreground">Add phases to see the curve</p>
-        )}
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
       </div>
     );
   };
@@ -210,21 +373,132 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
   };
 
   return (
-    <div className="glass p-6 rounded-2xl">
-      <Tabs defaultValue="chart" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="chart">Visual Curve</TabsTrigger>
-          <TabsTrigger value="table">Table View</TabsTrigger>
-        </TabsList>
+    <div className="space-y-6">
+      {/* Glass Selection and Parameters */}
+      <div className="glass p-6 rounded-2xl bg-glass-100/20">
+        <h3 className="text-lg font-medium mb-4">Glass Settings</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <div>
+            <Label htmlFor="glass-type">Glass Type</Label>
+            <Select 
+              value={selectedGlass} 
+              onValueChange={setSelectedGlass}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select glass type" />
+              </SelectTrigger>
+              <SelectContent>
+                {glassData.Glassorter.map((glass) => (
+                  <SelectItem key={glass.namn} value={glass.namn}>
+                    {glass.namn} ({glass.kategori})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="room-temp">Room Temperature (°C)</Label>
+            <Input
+              id="room-temp"
+              type="number"
+              value={roomTemp}
+              onChange={(e) => setRoomTemp(parseInt(e.target.value) || 20)}
+              className="mt-1"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="firing-type">Firing Type</Label>
+            <Select 
+              value={firingType} 
+              onValueChange={setFiringType}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select firing type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="f">Full Fusing</SelectItem>
+                <SelectItem value="s">Slumping</SelectItem>
+                <SelectItem value="t">Tack Fusing</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="glass-layers">Glass Layers</Label>
+            <Select 
+              value={glassLayers} 
+              onValueChange={setGlassLayers}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select layers" />
+              </SelectTrigger>
+              <SelectContent>
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} {num === 1 ? 'Layer' : 'Layers'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="glass-radius">Max Radius (cm)</Label>
+            <Select 
+              value={glassRadius} 
+              onValueChange={setGlassRadius}
+            >
+              <SelectTrigger className="mt-1">
+                <SelectValue placeholder="Select max radius" />
+              </SelectTrigger>
+              <SelectContent>
+                {[5, 10, 20, 30, 40, 50, 60].map((num) => (
+                  <SelectItem key={num} value={num.toString()}>
+                    {num} cm
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex items-end">
+            <Button 
+              onClick={applyGlassTemplate} 
+              className="w-full gap-1"
+            >
+              <ChartBar className="h-4 w-4" />
+              Generate Curve
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      {/* Curve Editor */}
+      <div className="glass p-6 rounded-2xl">
+        <div className="flex justify-between mb-4">
+          <h3 className="text-lg font-medium">Firing Curve</h3>
+          <div className="text-sm text-muted-foreground">
+            Total time: {calculateTotalTime()} min
+          </div>
+        </div>
         
-        <TabsContent value="chart" className="mt-0">
-          {renderChart()}
-        </TabsContent>
-        
-        <TabsContent value="table" className="mt-0">
-          {renderTable()}
-        </TabsContent>
-      </Tabs>
+        <Tabs defaultValue="chart" value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="mb-4">
+            <TabsTrigger value="chart">Visual Curve</TabsTrigger>
+            <TabsTrigger value="table">Table View</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="chart" className="mt-0">
+            {renderChart()}
+          </TabsContent>
+          
+          <TabsContent value="table" className="mt-0">
+            {renderTable()}
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 };
