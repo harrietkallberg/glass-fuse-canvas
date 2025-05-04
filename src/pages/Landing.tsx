@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
-      {/* Enhanced fluid background shapes with wave animation and more intense colors */}
+      {/* Flowing gradient background shapes */}
       <div 
         className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px] animate-float-slow animate-wave" 
         style={{
@@ -51,20 +51,23 @@ const Landing = () => {
       />
       
       <div className="container relative z-10 max-w-2xl w-full px-4">
+        {/* Frosted glass title container with carved text effect */}
         <div className="text-center mb-8 relative">
-          {/* Glass title effect - translucent cutout showing background */}
-          <h1 className="text-5xl sm:text-6xl font-bold relative inline-block">
-            <span className="absolute inset-0 bg-clip-text text-transparent backdrop-blur-sm bg-white/20" style={{ WebkitBackgroundClip: "text" }}>
+          <div className="frosted-glass-container rounded-2xl p-6 mb-4 backdrop-blur-sm bg-white/15 relative overflow-hidden shadow-lg">
+            {/* Dark overlay for the title area */}
+            <div className="absolute inset-0 bg-black/20 backdrop-blur-[4px] z-0"></div>
+            
+            <h1 className="text-5xl sm:text-6xl font-bold relative z-10 frosted-title">
               GlassFuse Studio
-            </span>
-            <span className="relative text-white/70 mix-blend-overlay">
-              GlassFuse Studio
-            </span>
-          </h1>
+            </h1>
+            
+            <p className="text-xl text-white/90 mt-4 relative z-10">
+              Create, share, and perfect your glass fusion firing curves
+            </p>
+          </div>
           
           <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
-            Create, share, and perfect your glass fusion firing curves within 
-            a community of passionate artists.
+            Join a community of passionate glass fusion artists
           </p>
         </div>
         

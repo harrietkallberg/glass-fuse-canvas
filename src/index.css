@@ -80,26 +80,31 @@
     filter: blur(72px);
   }
 
-  .glass-title {
+  /* Enhanced frosted glass title styling */
+  .frosted-glass-container {
     position: relative;
-    color: transparent;
-    background-clip: text;
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
-    text-shadow: 0 1px 1px rgba(255,255,255,0.3);
+    overflow: hidden;
+    isolation: isolate;
   }
 
-  .glass-title::before {
+  .frosted-glass-container::before {
     content: "";
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(255,255,255,0.15);
-    z-index: -1;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    inset: 0;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 0;
+    border-radius: inherit;
+  }
+  
+  .frosted-title {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: relative;
+    z-index: 2;
   }
 
   .glass-surface {

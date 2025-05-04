@@ -88,19 +88,21 @@ const Login = () => {
           </Button>
         </Link>
         
-        <div className="glass-surface p-8">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold relative inline-block">
-              <span className="absolute inset-0 bg-clip-text text-transparent backdrop-blur-sm bg-white/20" style={{ WebkitBackgroundClip: "text" }}>
-                Sign In
-              </span>
-              <span className="relative text-white/70 mix-blend-overlay">
-                Sign In
-              </span>
-            </h1>
-            <p className="text-foreground/80 mt-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg inline-block">Welcome back to the GlassFuse Studio</p>
-          </div>
+        {/* Frosted glass title container with carved text effect */}
+        <div className="frosted-glass-container rounded-2xl p-6 mb-6 backdrop-blur-sm bg-white/15 relative overflow-hidden shadow-lg">
+          {/* Dark overlay for the title area */}
+          <div className="absolute inset-0 bg-black/20 backdrop-blur-[4px] z-0"></div>
           
+          <h1 className="text-3xl font-bold relative z-10 frosted-title text-center">
+            Sign In
+          </h1>
+          
+          <p className="text-white/90 mt-2 relative z-10 text-center">
+            Welcome back to the GlassFuse Studio
+          </p>
+        </div>
+        
+        <div className="glass-surface p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="email" className="text-foreground/90">Email</Label>
