@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,13 +47,12 @@ const Login = () => {
           </Button>
         </Link>
         
-        {/* Title with diagonal wave background effect */}
-        <div className="title-container-diagonal rounded-2xl p-6 mb-6">
-          <h1 className="text-3xl font-bold relative z-10 text-white text-center">
+        <div className="mb-6 text-center">
+          <h1 className="text-3xl font-bold relative z-10 gradient-text-dark">
             Sign In
           </h1>
           
-          <p className="text-white/90 mt-2 relative z-10 text-center">
+          <p className="mt-2 relative z-10 gradient-text-dark">
             Welcome back to the GlassFuse Studio
           </p>
         </div>
