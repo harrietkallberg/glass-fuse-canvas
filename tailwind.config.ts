@@ -58,6 +58,10 @@ export default {
 					yellow: '#FEF7CD',
 					green: '#F2FCE2',
 					turquoise: '#D3E4FD',
+					brightOrange: '#F97316',
+					oceanBlue: '#0EA5E9',
+					skyBlue: '#33C3F0',
+					turquoiseLight: '#A5D8E2',
 				}
 			},
 			borderRadius: {
@@ -109,6 +113,8 @@ export default {
 				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
 				'glass-gradient-2': 'linear-gradient(180deg, #FEC6A1 0%, #FEF7CD 100%)',
 				'glass-gradient-3': 'linear-gradient(to top, #accbee 0%, #e7f0fd 100%)',
+				'glass-gradient-4': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
+				'glass-gradient-5': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
 			}
 		}
 	},

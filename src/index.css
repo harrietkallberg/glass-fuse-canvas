@@ -76,7 +76,7 @@
   }
   
   .fluid-shape {
-    @apply absolute blur-3xl opacity-50 animate-float;
+    @apply absolute blur-3xl opacity-50;
     filter: blur(72px);
   }
 }
@@ -90,6 +90,15 @@
   }
 }
 
+@keyframes float-medium {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-2deg);
+  }
+}
+
 @keyframes float-reverse {
   0%, 100% {
     transform: translateY(0) rotate(0);
@@ -99,12 +108,73 @@
   }
 }
 
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+  50% {
+    transform: translateY(15px) rotate(-3deg) scale(1.03);
+  }
+}
+
+@keyframes pulse-float {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.5;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 @layer utilities {
   .animate-float-slow {
     animation: float-slow 18s ease-in-out infinite;
   }
   
+  .animate-float-medium {
+    animation: float-medium 12s ease-in-out infinite;
+  }
+  
   .animate-float-reverse {
     animation: float-reverse 15s ease-in-out infinite;
+  }
+  
+  .animate-float-slow-reverse {
+    animation: float-slow-reverse 20s ease-in-out infinite;
+  }
+  
+  .animate-pulse-float {
+    animation: pulse-float 10s ease-in-out infinite;
+  }
+  
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 8s ease infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 1.2s ease-out;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
