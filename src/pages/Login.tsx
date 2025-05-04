@@ -36,15 +36,17 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
       {/* Glass blobs overlay */}
       <div className="glass-blobs-container">
-        <div className="glass-blob glass-blob-1"></div>
-        <div className="glass-blob glass-blob-2"></div>
-        <div className="glass-blob glass-blob-3"></div>
-        <div className="glass-blob glass-blob-4"></div>
-        <div className="glass-blob glass-blob-5"></div>
-        {/* Added new blobs with varied lighting */}
-        <div className="glass-blob glass-blob-highlight"></div>
-        <div className="glass-blob glass-blob-shadow"></div>
-        <div className="glass-blob glass-blob-earthtone"></div>
+        {/* Sharp-edged glass blobs */}
+        <div className="sharp-glass-blob sharp-glass-blob-1"></div>
+        <div className="sharp-glass-blob sharp-glass-blob-2"></div>
+        <div className="sharp-glass-blob sharp-glass-blob-3"></div>
+        <div className="sharp-glass-blob sharp-glass-blob-4"></div>
+        <div className="sharp-glass-blob sharp-glass-blob-5"></div>
+        
+        {/* Small glass fragments */}
+        <div className="sharp-glass-fragment sharp-glass-fragment-1"></div>
+        <div className="sharp-glass-fragment sharp-glass-fragment-2"></div>
+        <div className="sharp-glass-fragment sharp-glass-fragment-3"></div>
         
         {/* New animated floating blobs with organic shapes */}
         <div className="floating-blob floating-blob-1"></div>
@@ -53,11 +55,13 @@ const Login = () => {
         <div className="floating-blob floating-blob-4"></div>
         <div className="floating-blob floating-blob-5"></div>
         
-        {/* New animated light sources */}
+        {/* Enhanced animated light sources */}
         <div className="light-source light-source-1"></div>
         <div className="light-source light-source-2"></div>
+        <div className="light-source light-source-3"></div>
+        <div className="light-source light-source-4"></div>
         
-        {/* New animated dark areas */}
+        {/* Animated dark areas */}
         <div className="dark-area dark-area-1"></div>
         <div className="dark-area dark-area-2"></div>
       </div>
