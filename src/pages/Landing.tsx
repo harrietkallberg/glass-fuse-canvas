@@ -2,7 +2,7 @@
 import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Planet, Cloud, Star, Moon } from "lucide-react";
+import { ArrowRight, Plane, Cloud, Star, Moon } from "lucide-react";
 import TypingAnimation from "@/components/TypingAnimation";
 import AlienShapes from "@/components/AlienShapes";
 import FloatingEyes from "@/components/FloatingEyes";
@@ -89,7 +89,7 @@ const Landing = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
               <div className="alien-panel p-4 flex items-start space-x-3">
-                <Planet className="text-[#5B81B1] mt-1" size={20} />
+                <Plane className="text-[#5B81B1] mt-1" size={20} />
                 <div>
                   <h3 className="font-mono uppercase text-[#5B81B1] tracking-wider text-lg">Parameters</h3>
                   <p className="font-mono text-[#A1C4F0] text-sm mt-1">Design precise temperature curves for alien glass fusion</p>

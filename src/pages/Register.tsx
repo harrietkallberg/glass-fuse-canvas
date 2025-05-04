@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Planet, Moon, Star, Cloud } from "lucide-react";
+import { ArrowLeft, Plane, Moon, Star, Cloud } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import TypingAnimation from "@/components/TypingAnimation";
@@ -78,7 +78,7 @@ const Register = () => {
           <div className="bizarre-screen p-4">
             <div className="mb-6 text-center">
               <div className="inline-block border-2 border-[#5B81B1] p-1 mb-4 rounded-full">
-                <Planet className="h-8 w-8 text-[#5B81B1] mx-auto" />
+                <Plane className="h-8 w-8 text-[#5B81B1] mx-auto" />
               </div>
               <h1 className="text-2xl font-mono uppercase text-[#5B81B1] tracking-widest alien-shadow">
                 New Entity
