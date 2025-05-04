@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft, User, Lock, Mail, FileCode } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import TypingAnimation from "@/components/TypingAnimation";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -34,12 +35,15 @@ const Register = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-[#1A1A1A] relative overflow-hidden">
       {/* Tech grid background */}
       <div className="tech-grid-bg"></div>
       
       {/* Scanlines overlay */}
       <div className="screen-scanline"></div>
+      
+      {/* Animated typing in top corner */}
+      <TypingAnimation />
       
       {/* Code-like animation in the background */}
       <div className="fixed inset-0 flex flex-wrap overflow-hidden pointer-events-none opacity-10 z-0">
@@ -56,7 +60,7 @@ const Register = () => {
       
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
-          <Button variant="ghost" size="sm" className="font-mono text-xs text-gray-400 hover:text-red-500 hover:bg-[#1A1A1A] flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="font-mono text-xs text-gray-300 hover:text-red-500 hover:bg-[#2A2A2A] flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
             RETURN_TO_MAIN
           </Button>
@@ -72,22 +76,22 @@ const Register = () => {
                 New Account
               </h1>
               
-              <div className="mt-2 font-mono text-xs text-gray-400">
+              <div className="mt-2 font-mono text-xs text-gray-300">
                 INITIALIZING USER DATABASE CONNECTION...
               </div>
             </div>
             
-            <div className="tech-display p-3 mb-6">
+            <div className="tech-display p-3 mb-6 bg-[#2A2A2A]">
               <div className="font-mono text-xs text-green-500 mb-1">&gt; USER_CREATION_MODULE</div>
-              <div className="h-[1px] bg-[#333] w-full mb-2"></div>
+              <div className="h-[1px] bg-[#444] w-full mb-2"></div>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name" className="text-gray-400 font-mono text-xs uppercase">
+                  <Label htmlFor="name" className="text-gray-300 font-mono text-xs uppercase">
                     NAME
                   </Label>
                   <div className="flex">
-                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
                       <User size={16} />
                     </div>
                     <Input 
@@ -96,17 +100,17 @@ const Register = () => {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       required 
-                      className="tech-input flex-1 font-mono text-sm"
+                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-gray-400 font-mono text-xs uppercase">
+                  <Label htmlFor="username" className="text-gray-300 font-mono text-xs uppercase">
                     USERNAME
                   </Label>
                   <div className="flex">
-                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
                       <span className="font-mono text-red-500">@</span>
                     </div>
                     <Input 
@@ -115,17 +119,17 @@ const Register = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required 
-                      className="tech-input flex-1 font-mono text-sm"
+                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="email" className="text-gray-400 font-mono text-xs uppercase">
+                  <Label htmlFor="email" className="text-gray-300 font-mono text-xs uppercase">
                     EMAIL
                   </Label>
                   <div className="flex">
-                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
                       <Mail size={16} />
                     </div>
                     <Input 
@@ -135,17 +139,17 @@ const Register = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       required 
-                      className="tech-input flex-1 font-mono text-sm"
+                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-400 font-mono text-xs uppercase">
+                  <Label htmlFor="password" className="text-gray-300 font-mono text-xs uppercase">
                     PASSWORD
                   </Label>
                   <div className="flex">
-                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                    <div className="bg-[#333] text-red-500 p-2 flex items-center justify-center border-r border-[#444]">
                       <Lock size={16} />
                     </div>
                     <Input 
@@ -155,23 +159,23 @@ const Register = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       required 
-                      className="tech-input flex-1 font-mono text-sm"
+                      className="tech-input flex-1 font-mono text-sm bg-[#222] text-gray-300"
                     />
                   </div>
                 </div>
                 
                 <Button 
                   type="submit" 
-                  className="tech-button w-full h-12 mt-4 font-mono uppercase tracking-widest text-sm bg-red-600/80 hover:bg-red-600"
+                  className="tech-button w-full h-12 mt-4 font-mono uppercase tracking-widest text-sm bg-red-600 hover:bg-red-700 shadow-[0_0_10px_rgba(255,0,0,0.5)]"
                 >
                   INITIALIZE ACCOUNT <span className="ml-2 blink-text">█</span>
                 </Button>
               </form>
             </div>
             
-            <div className="tech-display p-3">
+            <div className="tech-display p-3 bg-[#2A2A2A]">
               <div className="text-center">
-                <p className="text-xs text-gray-400 font-mono">
+                <p className="text-xs text-gray-300 font-mono">
                   ALREADY REGISTERED? 
                   <Link to="/login" className="text-red-500 ml-2 hover:underline font-mono">
                     LOGIN
@@ -182,7 +186,7 @@ const Register = () => {
           </div>
         </div>
         
-        <div className="flex justify-between items-center mt-4 font-mono text-[10px] text-gray-500">
+        <div className="flex justify-between items-center mt-4 font-mono text-[10px] text-gray-400">
           <div>SYSTEM v2.5.1</div>
           <div>MEMORY: 64MB</div>
           <div>I/O PORT: ACTIVE</div>
