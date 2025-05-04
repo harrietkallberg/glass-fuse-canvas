@@ -35,32 +35,7 @@ const Register = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
-      {/* Fluid background shapes */}
-      <div 
-        className="fluid-shape w-[800px] h-[800px] top-[-100px] right-[-100px]" 
-        style={{
-          background: "linear-gradient(135deg, #D3E4FD 0%, #F2FCE2 100%)",
-          borderRadius: "60% 40% 70% 30% / 40% 50% 50% 60%"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[600px] h-[600px] bottom-[-100px] left-[-50px] animate-float-slow" 
-        style={{
-          background: "linear-gradient(135deg, #FEC6A1 0%, #FEF7CD 100%)",
-          borderRadius: "30% 70% 50% 50% / 60% 30% 70% 40%"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[500px] h-[500px] top-[10%] right-[5%] animate-float-reverse" 
-        style={{
-          background: "linear-gradient(135deg, #FEF7CD 0%, #F2FCE2 100%)",
-          borderRadius: "40% 60% 30% 70% / 50% 60% 40% 50%"
-        }}
-      />
-      
+    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
           <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
@@ -69,12 +44,17 @@ const Register = () => {
           </Button>
         </Link>
         
-        <div className="glass-card p-8 backdrop-blur-xl border border-white/50 shadow-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Create an Account</h1>
-            <p className="text-muted-foreground mt-2">Join the glass fusion community</p>
-          </div>
+        <div className="title-container-diagonal rounded-2xl p-6 mb-6">
+          <h1 className="text-3xl font-bold relative z-10 text-white text-center">
+            Create an Account
+          </h1>
           
+          <p className="text-white/90 mt-2 relative z-10 text-center">
+            Join the glass fusion community
+          </p>
+        </div>
+        
+        <div className="glass-card p-8 backdrop-blur-xl border border-white/50 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-foreground/80">Full Name</Label>

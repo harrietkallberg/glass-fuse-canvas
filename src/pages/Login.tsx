@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,48 +37,7 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
-      {/* Fluid background shapes with earth tone palette */}
-      <div 
-        className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px] animate-float-slow animate-wave" 
-        style={{
-          background: "linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)",
-          opacity: "0.7"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[600px] h-[600px] bottom-[-100px] right-[-50px] animate-float-medium animate-wave" 
-        style={{
-          background: "linear-gradient(135deg, #658579 0%, #97b5ad 100%)",
-          opacity: "0.75"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[550px] h-[550px] bottom-[10%] left-[5%] animate-float-reverse animate-wave" 
-        style={{
-          background: "linear-gradient(135deg, #f7e2c8 0%, #f9eee2 100%)",
-          opacity: "0.65"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[500px] h-[500px] top-[10%] right-[5%] animate-pulse-float animate-wave" 
-        style={{
-          background: "linear-gradient(135deg, #658579 0%, #8eaaa1 100%)",
-          opacity: "0.6"
-        }}
-      />
-      
-      <div 
-        className="fluid-shape w-[450px] h-[450px] bottom-[20%] right-[25%] animate-float-slow-reverse animate-wave" 
-        style={{
-          background: "linear-gradient(135deg, #745641 0%, #aea795 100%)",
-          opacity: "0.65"
-        }}
-      />
-      
+    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
           <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
@@ -88,12 +46,9 @@ const Login = () => {
           </Button>
         </Link>
         
-        {/* Frosted glass title container with carved text effect */}
-        <div className="frosted-glass-container rounded-2xl p-6 mb-6 backdrop-blur-sm bg-white/15 relative overflow-hidden shadow-lg">
-          {/* Dark overlay for the title area */}
-          <div className="absolute inset-0 bg-black/20 backdrop-blur-[4px] z-0"></div>
-          
-          <h1 className="text-3xl font-bold relative z-10 frosted-title text-center">
+        {/* Title with diagonal wave background effect */}
+        <div className="title-container-diagonal rounded-2xl p-6 mb-6">
+          <h1 className="text-3xl font-bold relative z-10 text-white text-center">
             Sign In
           </h1>
           
