@@ -54,7 +54,7 @@ const Register = () => {
           </p>
         </div>
         
-        <div className="glass-card p-8 backdrop-blur-xl border border-white/50 shadow-xl">
+        <div className="glass-surface p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-foreground/80">Full Name</Label>
@@ -64,7 +64,7 @@ const Register = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required 
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
@@ -76,7 +76,7 @@ const Register = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required 
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
@@ -89,7 +89,7 @@ const Register = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required 
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
@@ -102,7 +102,7 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required 
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             

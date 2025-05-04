@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -170,9 +171,9 @@
   /* Updated fluid background with diagonal movement */
   .fluid-bg-diagonal {
     @apply relative overflow-hidden;
-    background: url('/lovable-uploads/506cdb05-e93f-4f77-8c35-561a1396b069.png');
-    background-size: 150% 150%;
-    background-position: center;
+    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
+    background-size: 400% 400%;
+    animation: diagonal-wave 15s ease infinite;
     position: relative;
   }
 
@@ -180,12 +181,12 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('/lovable-uploads/506cdb05-e93f-4f77-8c35-561a1396b069.png');
-    background-size: 150% 150%;
-    filter: blur(60px);
-    animation: diagonal-wave 20s linear infinite;
+    background: linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%);
+    background-size: 400% 400%;
+    filter: blur(50px);
+    animation: diagonal-wave 20s ease infinite reverse;
     z-index: 0;
-    opacity: 0.9;
+    opacity: 0.8;
   }
 
   .fluid-bg-diagonal::after {
@@ -209,10 +210,10 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: url('/lovable-uploads/506cdb05-e93f-4f77-8c35-561a1396b069.png');
-    background-size: 150% 150%;
-    filter: blur(30px);
-    animation: diagonal-wave 20s linear infinite;
+    background: linear-gradient(135deg, rgba(249,115,22,0.85) 0%, rgba(51,195,240,0.85) 100%);
+    background-size: 400% 400%;
+    filter: blur(0px);
+    animation: diagonal-wave 15s ease infinite;
     z-index: -2;
     opacity: 0.9;
   }
@@ -222,7 +223,6 @@
     position: absolute;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.2); /* 20% darker overlay */
-    backdrop-filter: blur(4px);
     z-index: -1;
   }
 }
