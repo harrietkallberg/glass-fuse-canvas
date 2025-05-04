@@ -20,7 +20,13 @@ export default {
 		},
 		extend: {
 			zIndex: {
+				'0': '0',
 				'5': '5',
+				'10': '10',
+				'20': '20',
+				'30': '30',
+				'40': '40',
+				'50': '50',
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -74,7 +80,10 @@ export default {
 					moss: '#606B56',         // New: moss green
 					clay: '#CB8F7E',         // New: clay color
 					sand: '#E6D2B5',         // New: sand color
-					leaf: '#A0C1A3'          // New: leaf green
+					leaf: '#A0C1A3',         // New: leaf green
+					rust: '#7E4D3A',         // New: rust color
+					darkMoss: '#304D25',     // New: dark moss green
+					soil: '#73594C'          // New: soil color
 				}
 			},
 			borderRadius: {
@@ -135,6 +144,8 @@ export default {
 				'earthy-gradient-1': 'linear-gradient(135deg, #A0C1A3 0%, #F2FCE2 100%)',
 				'earthy-gradient-2': 'linear-gradient(135deg, #CB8F7E 0%, #FEC6A1 100%)',
 				'earthy-gradient-3': 'linear-gradient(135deg, #8BA888 0%, #E6D2B5 100%)',
+				'rusty-gradient-1': 'linear-gradient(135deg, #7E4D3A 0%, #D2946B 100%)',
+				'moss-gradient-1': 'linear-gradient(135deg, #304D25 0%, #8BA888 100%)',
 			}
 		}
 	},

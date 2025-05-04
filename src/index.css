@@ -35,7 +35,7 @@
 
     --radius: 0.125rem;
     
-    /* Fantastic Planet theme colors - adjusted to be more earthy */
+    /* Chernobyl-inspired theme colors */
     --alien-skin: 95 55% 80%;        /* #C8E0B8 - Yellowy-green alien skin */
     --alien-dark: 95 35% 50%;        /* Darker yellowy-green */
     --alien-eye: 0 0% 20%;           /* #333333 - Black pupil */
@@ -44,6 +44,8 @@
     --organic-brown: 30 50% 65%;     /* #D2A976 - Organic brown */
     --bizarre-green: 120 25% 48%;    /* #6D9B6E - Another organic color */
     --pale-sand: 40 50% 85%;         /* #F0DDB8 - Pale sand color */
+    --rust-color: 14 38% 35%;        /* #7E4D3A - Rusty metal color */
+    --moss-green: 100 25% 25%;       /* #304D25 - Deep moss */
   }
 
   * {
@@ -54,11 +56,18 @@
     @apply bg-background text-foreground;
     font-family: "Courier New", monospace;
     overflow-x: hidden;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/f53mer/M8f/Z9P7dt+76u67tt23ld13lZlnNd13NZlnNd13NZlvPz+Tz3fT/9fB97juO496z7tef253mez+/Enu/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
+    background-repeat: repeat;
+  }
+
+  /* Add vertical writing mode for runes/symbols */
+  .writing-tb {
+    writing-mode: vertical-lr;
   }
 }
 
 @layer components {
-  /* Alien panel styling - updated colors */
+  /* Organic panel styling - updated colors */
   .alien-panel {
     @apply bg-[#362D22] border border-[#A0C1A3]/40 shadow-[0_0_15px_rgba(160,193,163,0.3)] rounded-md;
     position: relative;
@@ -76,15 +85,54 @@
     pointer-events: none;
   }
   
+  /* Add moss/rust overlay */
+  .alien-panel::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='moss' patternUnits='userSpaceOnUse' width='100' height='100'%3E%3Cpath fill='%23304D25' fill-opacity='0.2' d='M0,0 L100,0 L50,100 z' /%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23moss)' /%3E%3C/svg%3E");
+    opacity: 0.3;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+  }
+  
   .alien-display {
     @apply bg-[#2C2822] border-2 border-[#A67F5D] shadow-inner p-4 font-mono;
     position: relative;
   }
   
+  /* Organic button style */
   .alien-button {
-    @apply bg-[#A67F5D] hover:bg-[#C2B8A3] text-[#F2FCE2] border border-[#8BA888]/50 
-    rounded-md transition-all font-mono uppercase tracking-wider
-    shadow-[0_0_8px_rgba(160,193,163,0.4)] hover:shadow-[0_0_12px_rgba(160,193,163,0.6)];
+    @apply bg-[#A67F5D] hover:bg-[#C2B8A3] text-[#F2FCE2] 
+    rounded-md transition-all font-mono tracking-wider;
+    position: relative;
+    border: none;
+    background-image: linear-gradient(to bottom, #A67F5D, #7E4D3A);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
+                0 1px 3px rgba(0, 0, 0, 0.2),
+                inset 0 0 3px rgba(255, 255, 255, 0.3);
+    /* Organic, uneven border */
+    border-radius: 47% 53% 47% 53% / 51% 49% 51% 49%;
+    overflow: hidden;
+  }
+
+  .alien-button:hover {
+    background-image: linear-gradient(to bottom, #C2B8A3, #A67F5D);
+  }
+  
+  .alien-button:before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='woodgrain' patternUnits='userSpaceOnUse' width='200' height='200'%3E%3Cpath fill='none' stroke='%23A0C1A3' stroke-width='1' stroke-opacity='0.2' d='M0,0 C50,40 150,40 200,0 M0,100 C50,140 150,140 200,100 M0,200 C50,160 150,160 200,200' /%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23woodgrain)' /%3E%3C/svg%3E");
+    opacity: 0.4;
+    pointer-events: none;
   }
   
   .alien-input {
@@ -93,36 +141,58 @@
   }
 
   .planet-overlay {
-    @apply fixed inset-0 pointer-events-none z-5;
+    @apply fixed inset-0 pointer-events-none;
     background: 
       radial-gradient(circle at 20% 80%, rgba(210, 148, 107, 0.08) 0%, transparent 40%),
       radial-gradient(circle at 80% 20%, rgba(139, 168, 136, 0.08) 0%, transparent 40%);
+    z-index: 5;
   }
   
   .planet-scanline {
     @apply fixed inset-0 bg-[linear-gradient(to_bottom,rgba(160,193,163,0)_0%,rgba(160,193,163,0.05)_50%,rgba(0,0,0,0.05)_51%,rgba(0,0,0,0)_100%)] 
-    bg-[length:100%_4px] pointer-events-none z-20 opacity-30;
+    bg-[length:100%_4px] pointer-events-none opacity-30;
     background-repeat: repeat;
+    z-index: 20;
     animation: scan 12s linear infinite;
   }
 
   .planet-atmosphere {
-    @apply fixed inset-0 pointer-events-none z-5;
+    @apply fixed inset-0 pointer-events-none;
     background: linear-gradient(135deg, rgba(210, 148, 107, 0.1), rgba(139, 168, 136, 0.1), rgba(194, 184, 163, 0.1));
     opacity: 0.6;
+    z-index: 5;
   }
 
+  /* Ruins-style frame with organic elements */
   .bizarre-frame {
     @apply relative border-2 border-[#A67F5D] 
     bg-[#2C2822] shadow-[0_0_20px_rgba(160,193,163,0.2)];
     border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
     animation: morphFrame 30s ease-in-out infinite alternate;
+    position: relative;
+  }
+  
+  /* Add rust/moss details to frame */
+  .bizarre-frame::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(126, 77, 58, 0.4) 0%, transparent 20%),
+      radial-gradient(circle at 70% 65%, rgba(48, 77, 37, 0.3) 0%, transparent 25%);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
   }
 
   .bizarre-screen {
     @apply relative bg-[#2C2822] overflow-hidden;
     border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
     animation: morphScreen 30s ease-in-out infinite alternate;
+    z-index: 2;
   }
   
   .bizarre-screen::before {
@@ -169,13 +239,39 @@
     @apply font-mono text-[#A0C1A3];
   }
 
-  /* Alien organism - updated colors */
+  /* Alien organism */
   .alien-organism {
     position: absolute;
     background-color: rgba(160, 193, 163, 0.2);
     border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
     filter: blur(2px);
     animation: organism 30s ease-in-out infinite alternate;
+  }
+
+  /* Small vines/roots */
+  .small-vine {
+    position: absolute;
+    height: 40px;
+    width: 2px;
+    background-color: #8BA888;
+    transform-origin: top center;
+  }
+
+  /* Small vine branch */
+  .small-branch {
+    position: absolute;
+    height: 15px;
+    width: 1px;
+    background-color: #8BA888;
+    transform-origin: left center;
+  }
+  
+  /* Smoke effect for industrial elements */
+  .smoke-particle {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(230, 230, 230, 0.2);
+    filter: blur(8px);
   }
 }
 
@@ -292,6 +388,31 @@
   }
 }
 
+/* Smoke rising animation */
+@keyframes smokeRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-100px) scale(2);
+    opacity: 0;
+  }
+}
+
+/* Creature movement animation */
+@keyframes creatureCrawl {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 @layer utilities {
   .alien-shadow {
     text-shadow: 0 0 5px rgba(160, 193, 163, 0.8);
@@ -303,7 +424,44 @@
   
   .planet-noise::before {
     content: "";
-    @apply fixed inset-0 opacity-5 pointer-events-none z-5 mix-blend-overlay;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/v53mer/M8f/Z9P/d9P7dt+76u67tt23ld13ld13lZlnNd13Nd13NZlnNd13Nd1/Pz+Tz3fT/9fB97juO496z7tef253mez+/Enu/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
+    @apply fixed inset-0 opacity-5 pointer-events-none mix-blend-overlay;
+    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/f53mer/M8f/Z9P7dt+76u67tt23ld13lZlnNd13NZlnNd13NZlvPz+Tz3fT/9fB97juO496z7tef253mez+/Enu/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
+    z-index: 5;
+  }
+  
+  /* Metal texture */
+  .metal-texture {
+    background-image: linear-gradient(45deg, 
+      rgba(0,0,0,0.2) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(0,0,0,0.2) 75%),
+    linear-gradient(45deg, 
+      rgba(0,0,0,0.2) 25%, 
+      transparent 25%, 
+      transparent 75%, 
+      rgba(0,0,0,0.2) 75%);
+    background-size: 4px 4px;
+    background-position: 0 0, 2px 2px;
+  }
+  
+  /* Moss overlay */
+  .moss-overlay {
+    position: relative;
+  }
+  
+  .moss-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+      circle at 30% 20%,
+      rgba(139, 168, 136, 0.4) 0%,
+      transparent 40%
+    );
+    pointer-events: none;
   }
 }
