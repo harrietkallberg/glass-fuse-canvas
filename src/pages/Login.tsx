@@ -14,7 +14,12 @@ const Login = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here
+    // In a real app, we would handle authentication here with Supabase
+    // Example:
+    // const { data, error } = await supabase.auth.signInWithPassword({
+    //   email,
+    //   password,
+    // });
     
     if (!email || !password) {
       toast({
@@ -34,28 +39,44 @@ const Login = () => {
   
   return (
     <div className="min-h-screen flex items-center justify-center fluid-bg overflow-hidden">
-      {/* Fluid background shapes */}
+      {/* Fluid background shapes with wave animation and more intense colors */}
       <div 
-        className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px]" 
+        className="fluid-shape w-[800px] h-[800px] top-[-100px] left-[-100px] animate-float-slow animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #FEC6A1 0%, #FEF7CD 100%)",
-          borderRadius: "60% 40% 70% 30% / 40% 50% 50% 60%"
+          background: "linear-gradient(135deg, #FF8A50 0%, #FEC6A1 100%)",
+          opacity: "0.7"
         }}
       />
       
       <div 
-        className="fluid-shape w-[600px] h-[600px] bottom-[-100px] right-[-50px] animate-float-slow" 
+        className="fluid-shape w-[600px] h-[600px] bottom-[-100px] right-[-50px] animate-float-medium animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #D3E4FD 0%, #F2FCE2 100%)",
-          borderRadius: "30% 70% 50% 50% / 60% 30% 70% 40%"
+          background: "linear-gradient(135deg, #1EAEDB 0%, #A5D8E2 100%)",
+          opacity: "0.75"
         }}
       />
       
       <div 
-        className="fluid-shape w-[500px] h-[500px] bottom-[10%] left-[5%] animate-float-reverse" 
+        className="fluid-shape w-[550px] h-[550px] bottom-[10%] left-[5%] animate-float-reverse animate-wave" 
         style={{
-          background: "linear-gradient(135deg, #F2FCE2 0%, #FEF7CD 100%)",
-          borderRadius: "40% 60% 30% 70% / 50% 60% 40% 50%"
+          background: "linear-gradient(135deg, #FFBB00 0%, #FEF7CD 100%)",
+          opacity: "0.65"
+        }}
+      />
+      
+      <div 
+        className="fluid-shape w-[500px] h-[500px] top-[10%] right-[5%] animate-pulse-float animate-wave" 
+        style={{
+          background: "linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)",
+          opacity: "0.6"
+        }}
+      />
+      
+      <div 
+        className="fluid-shape w-[450px] h-[450px] bottom-[20%] right-[25%] animate-float-slow-reverse animate-wave" 
+        style={{
+          background: "linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)",
+          opacity: "0.65"
         }}
       />
       
@@ -67,15 +88,22 @@ const Login = () => {
           </Button>
         </Link>
         
-        <div className="glass-card p-8 backdrop-blur-xl border border-white/50 shadow-xl">
+        <div className="glass-surface p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Sign In</h1>
-            <p className="text-muted-foreground mt-2">Welcome back to the GlassFuse Studio</p>
+            <h1 className="text-3xl font-bold relative inline-block">
+              <span className="absolute inset-0 bg-clip-text text-transparent backdrop-blur-sm bg-white/20" style={{ WebkitBackgroundClip: "text" }}>
+                Sign In
+              </span>
+              <span className="relative text-white/70 mix-blend-overlay">
+                Sign In
+              </span>
+            </h1>
+            <p className="text-foreground/80 mt-2 backdrop-blur-sm bg-white/10 px-3 py-1 rounded-lg inline-block">Welcome back to the GlassFuse Studio</p>
           </div>
           
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground/80">Email</Label>
+              <Label htmlFor="email" className="text-foreground/90">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
@@ -83,13 +111,13 @@ const Login = () => {
                 required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
             <div className="space-y-2">
               <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-foreground/80">Password</Label>
+                <Label htmlFor="password" className="text-foreground/90">Password</Label>
                 <Link to="/forgot-password" className="text-sm text-primary hover:text-primary/80 transition-colors">
                   Forgot password?
                 </Link>
@@ -101,20 +129,20 @@ const Login = () => {
                 required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/50 border-white/30 focus:border-primary/50 h-11"
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
             <Button 
               type="submit" 
-              className="w-full h-11 bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all"
+              className="w-full h-11 bg-gradient-to-r from-primary to-primary/80 hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10"
             >
               Sign In
             </Button>
           </form>
           
           <div className="mt-8 text-center">
-            <p className="text-sm text-foreground/70">
+            <p className="text-sm text-foreground/80">
               Don't have an account?{" "}
               <Link to="/register" className="text-primary font-medium hover:underline">
                 Create an account
