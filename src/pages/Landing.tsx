@@ -6,16 +6,16 @@ import { ArrowRight } from "lucide-react";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
       <div className="container relative z-10 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text */}
         <div className="text-center mb-8 relative">
           <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold relative z-10 gradient-text-dark">
+            <h1 className="text-5xl sm:text-6xl font-bold relative z-10 gradient-text-dark text-shadow-lg">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 relative z-10 gradient-text-dark">
+            <p className="text-xl mt-4 relative z-10 gradient-text-dark text-shadow-sm">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>

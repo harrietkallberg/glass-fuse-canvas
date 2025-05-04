@@ -38,7 +38,7 @@ const Login = () => {
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
           <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
@@ -48,11 +48,11 @@ const Login = () => {
         </Link>
         
         <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold relative z-10 gradient-text-dark">
+          <h1 className="text-3xl font-bold relative z-10 gradient-text-dark text-shadow-lg">
             Sign In
           </h1>
           
-          <p className="mt-2 relative z-10 gradient-text-dark">
+          <p className="mt-2 relative z-10 gradient-text-dark text-shadow-sm">
             Welcome back to the GlassFuse Studio
           </p>
         </div>
