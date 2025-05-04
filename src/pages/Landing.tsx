@@ -2,97 +2,112 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Terminal, Server, Database, HardDrive } from "lucide-react";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
-      {/* Glass blobs overlay */}
-      <div className="glass-blobs-container">
-        {/* Sharp-edged glass blobs */}
-        <div className="sharp-glass-blob sharp-glass-blob-1"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-2"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-3"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-4"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-5"></div>
-        
-        {/* Small glass fragments */}
-        <div className="sharp-glass-fragment sharp-glass-fragment-1"></div>
-        <div className="sharp-glass-fragment sharp-glass-fragment-2"></div>
-        <div className="sharp-glass-fragment sharp-glass-fragment-3"></div>
-        
-        {/* New animated floating blobs with organic shapes */}
-        <div className="floating-blob floating-blob-1"></div>
-        <div className="floating-blob floating-blob-2"></div>
-        <div className="floating-blob floating-blob-3"></div>
-        <div className="floating-blob floating-blob-4"></div>
-        <div className="floating-blob floating-blob-5"></div>
-        
-        {/* Enhanced animated light sources */}
-        <div className="light-source light-source-1"></div>
-        <div className="light-source light-source-2"></div>
-        <div className="light-source light-source-3"></div>
-        <div className="light-source light-source-4"></div>
-        
-        {/* Animated dark areas */}
-        <div className="dark-area dark-area-1"></div>
-        <div className="dark-area dark-area-2"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] relative overflow-hidden">
+      {/* Tech grid background */}
+      <div className="tech-grid-bg"></div>
+      
+      {/* Scanlines overlay */}
+      <div className="screen-scanline"></div>
+      
+      {/* Red blinking cursor in top corner */}
+      <div className="fixed top-4 left-4 font-mono text-red-500 text-lg blink-text">█</div>
+      
+      {/* Status indicators */}
+      <div className="fixed top-4 right-4 flex gap-4 items-center">
+        <div className="flex items-center">
+          <span className="led"></span>
+          <span className="font-mono text-xs text-gray-400">SYS</span>
+        </div>
+        <div className="flex items-center">
+          <span className="led"></span>
+          <span className="font-mono text-xs text-gray-400">NET</span>
+        </div>
+        <div className="flex items-center">
+          <span className="led-off"></span>
+          <span className="font-mono text-xs text-gray-400">AUX</span>
+        </div>
       </div>
       
-      <div className="container relative z-10 max-w-2xl w-full px-4">
-        {/* Title directly on background with gradient text - increased z-index */}
-        <div className="text-center mb-8 relative z-20">
-          <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold relative z-30 gradient-text-dark text-shadow-lg">
-              GlassFuse Studio
-            </h1>
-            
-            <p className="text-xl mt-4 relative z-30 gradient-text-dark text-shadow-sm">
-              Create, share, and perfect your glass fusion firing curves
-            </p>
-          </div>
-          
-          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block z-30 relative">
-            Join a community of passionate glass fusion artists
-          </p>
-        </div>
-        
-        <div className="glass-surface p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
-              <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
+      <div className="container relative z-10 max-w-4xl w-full px-4 py-12">
+        <div className="crt-frame p-8">
+          <div className="crt-screen p-6">
+            {/* Header with tech style */}
+            <div className="mb-8 text-center">
+              <h1 className="text-6xl font-mono text-red-500 retro-shadow tracking-wider uppercase crt-glitch">
+                GlassFuse_
+              </h1>
+              <div className="flex items-center justify-center mt-2 mb-6">
+                <div className="h-[1px] bg-red-500/50 w-16"></div>
+                <span className="font-mono text-red-500 mx-3 text-xs">v1.0.2</span>
+                <div className="h-[1px] bg-red-500/50 w-16"></div>
+              </div>
+              <p className="font-mono text-gray-400 mt-1 crt-glitch">
+                &gt; PRECISION GLASS FUSION CONTROL SYSTEM
+              </p>
             </div>
             
-            <div className="glass-vibrant-cream p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Document Your Process</h3>
-              <p className="text-foreground/80">Track your results with images and maintain version history</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+              <div className="tech-panel p-4 flex items-start space-x-3">
+                <Terminal className="text-red-500 mt-1" size={20} />
+                <div>
+                  <h3 className="font-mono uppercase text-red-500 tracking-wider text-lg">Parameters</h3>
+                  <p className="font-mono text-gray-400 text-sm mt-1">Design precise temperature curves with engineered control systems</p>
+                </div>
+              </div>
+              
+              <div className="tech-panel p-4 flex items-start space-x-3">
+                <Server className="text-red-500 mt-1" size={20} />
+                <div>
+                  <h3 className="font-mono uppercase text-red-500 tracking-wider text-lg">Archive</h3>
+                  <p className="font-mono text-gray-400 text-sm mt-1">Document firing results with image database functionality</p>
+                </div>
+              </div>
+              
+              <div className="tech-panel p-4 flex items-start space-x-3">
+                <Database className="text-red-500 mt-1" size={20} />
+                <div>
+                  <h3 className="font-mono uppercase text-red-500 tracking-wider text-lg">Network</h3>
+                  <p className="font-mono text-gray-400 text-sm mt-1">Connect with other glass fusion technicians worldwide</p>
+                </div>
+              </div>
+              
+              <div className="tech-panel p-4 flex items-start space-x-3">
+                <HardDrive className="text-red-500 mt-1" size={20} />
+                <div>
+                  <h3 className="font-mono uppercase text-red-500 tracking-wider text-lg">Analytics</h3>
+                  <p className="font-mono text-gray-400 text-sm mt-1">Refine techniques through iteration and data analysis</p>
+                </div>
+              </div>
             </div>
             
-            <div className="glass-vibrant-sage p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Connect with Artists</h3>
-              <p className="text-foreground/80">Share your work and learn from other glass fusion enthusiasts</p>
+            <div className="text-center tech-display mb-6">
+              <div className="font-mono text-xs text-gray-500 mb-2">
+                SYSTEM STATUS: <span className="text-green-500">ONLINE</span> | USERS: <span className="text-red-500">724</span> | LAST UPDATE: <span className="text-gray-400">{new Date().toLocaleDateString()}</span>
+              </div>
             </div>
             
-            <div className="glass-vibrant-taupe p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Perfect Your Craft</h3>
-              <p className="text-foreground/80">Refine your techniques through iteration and community feedback</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link to="/login">
+                <Button className="tech-button w-full sm:w-auto gap-2 h-12 bg-red-600/80 hover:bg-red-600">
+                  ACCESS_SYSTEM
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              </Link>
+              
+              <Link to="/register">
+                <Button variant="outline" className="tech-button w-full sm:w-auto h-12 bg-[#222222] border-red-600/50 hover:bg-[#333333]">
+                  CREATE_ACCOUNT
+                </Button>
+              </Link>
             </div>
-          </div>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/login">
-              <Button className="w-full sm:w-auto gap-2 h-12 bg-[#F97316]/70 hover:bg-[#F97316]/80 transition-all shadow-md hover:shadow-lg backdrop-blur-md">
-                Sign In
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
             
-            <Link to="/register">
-              <Button variant="outline" className="w-full sm:w-auto h-12 bg-white/20 border-white/30 hover:bg-white/30 shadow-md hover:shadow-lg transition-all backdrop-blur-md">
-                Create Account
-              </Button>
-            </Link>
+            <div className="mt-8 font-mono text-xs text-center text-gray-500">
+              &gt; <span className="blink-text">_</span>
+            </div>
           </div>
         </div>
       </div>

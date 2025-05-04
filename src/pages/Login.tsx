@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, TerminalSquare, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 
@@ -14,125 +14,139 @@ const Login = () => {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here with Supabase
     
     if (!email || !password) {
       toast({
-        title: "Missing information",
-        description: "Please fill in all required fields",
+        title: "ERROR_",
+        description: "AUTHENTICATION FAILED: MISSING CREDENTIALS",
         variant: "destructive"
       });
       return;
     }
     
     toast({
-      title: "Welcome back!",
-      description: "Successfully logged in to GlassFuse",
+      title: "ACCESS_GRANTED",
+      description: "CONNECTING TO SYSTEM MAINFRAME...",
     });
     navigate("/dashboard");
   };
   
   return (
-    <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
-      {/* Glass blobs overlay */}
-      <div className="glass-blobs-container">
-        {/* Sharp-edged glass blobs */}
-        <div className="sharp-glass-blob sharp-glass-blob-1"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-2"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-3"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-4"></div>
-        <div className="sharp-glass-blob sharp-glass-blob-5"></div>
-        
-        {/* Small glass fragments */}
-        <div className="sharp-glass-fragment sharp-glass-fragment-1"></div>
-        <div className="sharp-glass-fragment sharp-glass-fragment-2"></div>
-        <div className="sharp-glass-fragment sharp-glass-fragment-3"></div>
-        
-        {/* New animated floating blobs with organic shapes */}
-        <div className="floating-blob floating-blob-1"></div>
-        <div className="floating-blob floating-blob-2"></div>
-        <div className="floating-blob floating-blob-3"></div>
-        <div className="floating-blob floating-blob-4"></div>
-        <div className="floating-blob floating-blob-5"></div>
-        
-        {/* Enhanced animated light sources */}
-        <div className="light-source light-source-1"></div>
-        <div className="light-source light-source-2"></div>
-        <div className="light-source light-source-3"></div>
-        <div className="light-source light-source-4"></div>
-        
-        {/* Animated dark areas */}
-        <div className="dark-area dark-area-1"></div>
-        <div className="dark-area dark-area-2"></div>
+    <div className="min-h-screen flex items-center justify-center bg-[#0A0A0A] relative overflow-hidden">
+      {/* Tech grid background */}
+      <div className="tech-grid-bg"></div>
+      
+      {/* Scanlines overlay */}
+      <div className="screen-scanline"></div>
+      
+      {/* Top status bar */}
+      <div className="fixed top-0 left-0 right-0 bg-[#1A1A1A] border-b border-red-500/30 p-1 flex justify-between items-center z-30 font-mono text-xs">
+        <div className="flex items-center">
+          <span className="text-red-500 mx-2">SYS:</span>
+          <span className="text-green-500">ONLINE</span>
+        </div>
+        <div className="text-gray-500">{new Date().toLocaleTimeString()} - AUTH MODULE v2.3.1</div>
+        <div className="flex items-center">
+          <span className="text-red-500 mr-1">CPU:</span>
+          <span className="text-gray-400">24%</span>
+        </div>
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
         <Link to="/" className="inline-block mb-6">
-          <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
+          <Button variant="ghost" size="sm" className="font-mono text-xs text-gray-400 hover:text-red-500 hover:bg-[#1A1A1A] flex items-center gap-2">
             <ArrowLeft className="h-4 w-4" />
-            Back to Home
+            RETURN_TO_MAIN
           </Button>
         </Link>
         
-        <div className="mb-6 text-center">
-          <h1 className="text-3xl font-bold relative z-30 gradient-text-dark text-shadow-lg">
-            Sign In
-          </h1>
-          
-          <p className="mt-2 relative z-30 gradient-text-dark text-shadow-sm">
-            Welcome back to the GlassFuse Studio
-          </p>
+        <div className="crt-frame p-6">
+          <div className="crt-screen p-4">
+            <div className="mb-6 text-center">
+              <div className="inline-block border-2 border-red-500 p-1 mb-4">
+                <Lock className="h-8 w-8 text-red-500 mx-auto" />
+              </div>
+              <h1 className="text-2xl font-mono uppercase text-red-500 tracking-widest retro-shadow">
+                System Access
+              </h1>
+              
+              <div className="mt-2 font-mono text-xs text-gray-400 flex items-center justify-center">
+                <span className="led"></span>
+                SECURE CONNECTION ESTABLISHED
+              </div>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="tech-display p-3">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-gray-400 font-mono text-xs uppercase block mb-1">
+                    USER_ID
+                  </Label>
+                  <div className="flex">
+                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                      <TerminalSquare size={16} />
+                    </div>
+                    <Input 
+                      id="email" 
+                      type="email" 
+                      placeholder="user@domain.ext" 
+                      required 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="tech-input flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mt-4">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="password" className="text-gray-400 font-mono text-xs uppercase">
+                      ACCESS_KEY
+                    </Label>
+                    <Link to="/forgot-password" className="text-xs text-red-500/70 hover:text-red-500 transition-colors font-mono">
+                      RESET_KEY?
+                    </Link>
+                  </div>
+                  <div className="flex">
+                    <div className="bg-[#222] text-red-500 p-2 flex items-center justify-center border-r border-[#333]">
+                      <Lock size={16} />
+                    </div>
+                    <Input 
+                      id="password" 
+                      type="password" 
+                      placeholder="************" 
+                      required 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="tech-input flex-1 font-mono text-sm"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <Button 
+                type="submit" 
+                className="tech-button w-full h-12 font-mono uppercase tracking-widest text-sm bg-red-600/80 hover:bg-red-600"
+              >
+                AUTHENTICATE <span className="ml-2 blink-text">█</span>
+              </Button>
+            </form>
+            
+            <div className="tech-display mt-8 p-3">
+              <div className="text-center">
+                <p className="text-xs text-gray-400 font-mono">
+                  NEW_USER? 
+                  <Link to="/register" className="text-red-500 ml-2 hover:underline font-mono">
+                    CREATE_ACCOUNT
+                  </Link>
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="glass-surface p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground/90">Email</Label>
-              <Input 
-                id="email" 
-                type="email" 
-                placeholder="you@example.com" 
-                required 
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-foreground/90">Password</Label>
-                <Link to="/forgot-password" className="text-sm text-[#bd8770] hover:text-[#745641]/80 transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
-              <Input 
-                id="password" 
-                type="password" 
-                placeholder="••••••••" 
-                required 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
-              />
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full h-11 bg-[#F97316]/70 hover:bg-[#F97316]/80 transition-all shadow-md hover:shadow-lg backdrop-blur-md"
-            >
-              Sign In
-            </Button>
-          </form>
-          
-          <div className="mt-8 text-center">
-            <p className="text-sm text-foreground/80">
-              Don't have an account?{" "}
-              <Link to="/register" className="text-[#bd8770] font-medium hover:underline">
-                Create an account
-              </Link>
-            </p>
-          </div>
+        <div className="mt-4 text-center font-mono text-xs text-gray-500">
+          © 2025 TECHNODYNE SYSTEMS • ALL RIGHTS RESERVED
         </div>
       </div>
     </div>
