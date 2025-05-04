@@ -44,6 +44,7 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
   const [glassLayers, setGlassLayers] = useState<string>("1");
   const [glassRadius, setGlassRadius] = useState<string>("10");
   const [firingType, setFiringType] = useState<string>("f");
+  const [topTempMinutes, setTopTempMinutes] = useState<string>("10");
   const [chartData, setChartData] = useState<any[]>([]);
 
   // Find selected glass info
@@ -188,15 +189,9 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
     const oAstemp = selectedGlassInfo.o_astemp;
     const nAstemp = selectedGlassInfo.n_astemp;
 
-    // Calculate velocities (converted from hourly to per-minute)
-    const firstHeatingVelocity = Math.min(
-      999, 
-      Math.floor(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime)
-    );
-    
-    const firstCoolingVelocity = Math.floor(60 * (oAstemp - toppTemp) / halltiderTime);
-    const secondCoolingVelocity = Math.floor(60 * (nAstemp - oAstemp) / avspanningTime);
-    
+    // Parse the user-provided top temperature hold time
+    const topTempHoldTime = parseInt(topTempMinutes) || 10;
+
     // Create the new phases
     const newPhases = [
       { 
@@ -209,7 +204,7 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
         id: '2', 
         targetTemp: toppTemp, 
         duration: 15, // Fast rise to top temp
-        holdTime: 10 // Default hold time
+        holdTime: topTempHoldTime // User specified hold time
       },
       { 
         id: '3', 
@@ -461,6 +456,19 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div>
+            <Label htmlFor="top-temp-minutes">Top Temp Hold (min)</Label>
+            <Input
+              id="top-temp-minutes"
+              type="number"
+              value={topTempMinutes}
+              min="1"
+              max="60"
+              onChange={(e) => setTopTempMinutes(e.target.value)}
+              className="mt-1"
+            />
           </div>
 
           <div className="flex items-end">

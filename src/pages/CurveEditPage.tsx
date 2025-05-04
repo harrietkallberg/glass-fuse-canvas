@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -26,10 +25,10 @@ interface Phase {
   holdTime: number;
 }
 
-// Default phases for new curves
+// Default phases for new curves, now with explicit hold time for top temperature
 const defaultPhases = [
   { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
-  { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
+  { id: "2", targetTemp: 800, duration: 30, holdTime: 10 }, // Top temp with hold time
   { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
   { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
   { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
