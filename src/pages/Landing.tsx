@@ -16,14 +16,14 @@ const Landing = () => {
       </div>
       
       <div className="container relative max-w-2xl w-full px-4 flex flex-col items-center pt-0 md:pt-4" style={{ zIndex: 30 }}>
-        {/* Title section in a glass card similar to the feature tiles */}
+        {/* Title section with transparent background but gradient text */}
         <div className="text-center w-full mb-6 relative">
-          <div className="glass-vibrant-orange p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
-            <h1 className="text-5xl sm:text-6xl font-bold mb-3">
+          <div className="bg-transparent p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
+            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark mb-3">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl">
+            <p className="text-xl gradient-text-dark">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
