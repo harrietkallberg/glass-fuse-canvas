@@ -25,43 +25,42 @@ const Landing = () => {
           </p>
         </div>
         
-        <div className="glass-surface p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
-              <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
-            </div>
-            
-            <div className="glass-vibrant-cream p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Document Your Process</h3>
-              <p className="text-foreground/80">Track your results with images and maintain version history</p>
-            </div>
-            
-            <div className="glass-vibrant-sage p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Connect with Artists</h3>
-              <p className="text-foreground/80">Share your work and learn from other glass fusion enthusiasts</p>
-            </div>
-            
-            <div className="glass-vibrant-taupe p-6 rounded-xl hover:scale-[1.02] transition-transform">
-              <h3 className="font-medium text-lg mb-2">Perfect Your Craft</h3>
-              <p className="text-foreground/80">Refine your techniques through iteration and community feedback</p>
-            </div>
+        {/* Feature grid directly on the blob background, without the glass-surface wrapper */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
+            <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
+            <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
           </div>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/login">
-              <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
-                Sign In
-                <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
-            
-            <Link to="/register">
-              <Button variant="outline" className="w-full sm:w-auto h-12 bg-white/20 border-white/30 hover:bg-white/30 shadow-md hover:shadow-lg transition-all backdrop-blur-md">
-                Create Account
-              </Button>
-            </Link>
+          <div className="glass-vibrant-cream p-6 rounded-xl hover:scale-[1.02] transition-transform">
+            <h3 className="font-medium text-lg mb-2">Document Your Process</h3>
+            <p className="text-foreground/80">Track your results with images and maintain version history</p>
           </div>
+          
+          <div className="glass-vibrant-sage p-6 rounded-xl hover:scale-[1.02] transition-transform">
+            <h3 className="font-medium text-lg mb-2">Connect with Artists</h3>
+            <p className="text-foreground/80">Share your work and learn from other glass fusion enthusiasts</p>
+          </div>
+          
+          <div className="glass-vibrant-taupe p-6 rounded-xl hover:scale-[1.02] transition-transform">
+            <h3 className="font-medium text-lg mb-2">Perfect Your Craft</h3>
+            <p className="text-foreground/80">Refine your techniques through iteration and community feedback</p>
+          </div>
+        </div>
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link to="/login">
+            <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
+              Sign In
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+          </Link>
+          
+          <Link to="/register">
+            <Button variant="outline" className="w-full sm:w-auto h-12 bg-white/20 border-white/30 hover:bg-white/30 shadow-md hover:shadow-lg transition-all backdrop-blur-md">
+              Create Account
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
