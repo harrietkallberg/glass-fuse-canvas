@@ -24,7 +24,7 @@ const Landing = () => {
                 GlassFuse Studio
               </h1>
               
-              <p className="text-xl text-[#3A8080] relative" style={{ textShadow: '1px 2px 3px rgba(0,0,0,0.1)' }}>
+              <p className="text-xl text-[#1D4848] relative" style={{ textShadow: '1px 2px 3px rgba(0,0,0,0.1)' }}>
                 Create, share, and perfect your glass fusion firing curves
               </p>
             </div>
