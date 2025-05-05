@@ -4,20 +4,22 @@
   position: fixed;
   inset: 0;
   overflow: hidden;
-  z-index: 10; /* Increased z-index to ensure elements appear over gradients */
-  background-color: transparent; /* Changed from semi-transparent white to transparent */
+  z-index: 10; /* Ensure elements appear over gradients */
+  background-color: transparent; /* Transparent background */
+  pointer-events: none; /* Make sure it doesn't interfere with clicks */
 }
 
 .fluid-blob {
   position: absolute;
   border-radius: 50%;
-  mix-blend-mode: screen; /* Changed from multiply to screen for better visibility */
+  mix-blend-mode: screen; /* Makes them blend nicely with background */
   pointer-events: none;
-  filter: blur(5px);
+  filter: blur(0px); /* Removed blur for crystal clear edges */
   will-change: transform;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5); /* Added subtle glow */
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Subtle glow */
+  z-index: 20; /* Ensure they appear on top */
 }
 
 .fluid-particle {
@@ -28,22 +30,26 @@
   will-change: transform, opacity;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
-  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); /* Added subtle glow */
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.3); /* Subtle glow */
+  z-index: 15; /* Layer between blobs and streamlines */
 }
 
 .fluid-streamline {
   position: absolute;
   height: 3px;
-  width: 150px;
+  width: 250px; /* Increased width for longer streamlines */
   transform-origin: center;
-  opacity: 0.8; /* Increased opacity for better visibility */
+  opacity: 0.7;
   filter: blur(2px);
   pointer-events: none;
-  will-change: transform, opacity, background-position;
-  background-size: 200% 100%;
+  will-change: transform, opacity, background-position, height;
+  background-size: 300% 100%;
+  animation-name: streamline-flow, streamline-wave, streamline-thickness; /* Multiple animations */
   animation-iteration-count: infinite;
   animation-timing-function: ease;
-  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Added subtle glow */
+  animation-duration: 25s, 10s, 12s; /* Different durations for each animation */
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2); /* Subtle glow */
+  z-index: 12; /* Ensure proper layering */
 }
 
 .fluid-morph-bubble {
@@ -53,7 +59,8 @@
   pointer-events: none;
   animation: morph-bubble 15s ease-in-out infinite alternate;
   will-change: transform, border-radius;
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); /* Added subtle glow */
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); /* Subtle glow */
+  z-index: 15;
 }
 
 /* Animation classes for blobs */
@@ -100,16 +107,13 @@
 
 /* Animation classes for streamlines */
 .animate-streamline-flow-slow {
-  animation-name: streamline-flow;
-  animation-duration: 25s;
+  animation-duration: 25s, 15s, 12s; /* Flow, wave, thickness */
 }
 
 .animate-streamline-flow-medium {
-  animation-name: streamline-flow;
-  animation-duration: 18s;
+  animation-duration: 18s, 12s, 10s; /* Flow, wave, thickness */
 }
 
 .animate-streamline-flow-fast {
-  animation-name: streamline-flow;
-  animation-duration: 12s;
+  animation-duration: 12s, 8s, 6s; /* Flow, wave, thickness */
 }

@@ -49,21 +49,21 @@
   --blob-size-6: 35vw;
 }
 
-/* New morphing blobs with more random and circular movements */
+/* Enhanced morphing blobs with more varied colors and intensities */
 .morphing-bg::before {
-  /* Add multiple moving blobs with pseudo-elements */
+  /* Add multiple moving blobs with pseudo-elements - expanded color palette */
   background: 
     radial-gradient(circle at 20% 20%, rgba(249,115,22,0.7) 0%, transparent 50%) 0% 0%,
     radial-gradient(circle at 80% 40%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
-    radial-gradient(circle at 40% 70%, rgba(255,146,43,0.7) 0%, transparent 40%) 0% 0%, /* Added darker orange tone */
-    radial-gradient(circle at 60% 10%, rgba(14,165,233,0.7) 0%, transparent 50%) 0% 0%, /* Added ocean blue tone */
-    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.7) 0%, transparent 35%) 0% 0%,
-    radial-gradient(circle at 90% 80%, rgba(0,169,181,0.7) 0%, transparent 40%) 0% 0%, /* Added medium teal tone */
-    radial-gradient(circle at 30% 50%, rgba(251,146,60,0.6) 0%, transparent 45%) 0% 0%, /* Added softer orange tone */
-    radial-gradient(circle at 70% 60%, rgba(20,184,166,0.6) 0%, transparent 45%) 0% 0%; /* Added another teal tone */
+    radial-gradient(circle at 40% 70%, rgba(255,146,43,0.7) 0%, transparent 40%) 0% 0%, /* Darker orange tone */
+    radial-gradient(circle at 60% 10%, rgba(14,165,233,0.7) 0%, transparent 50%) 0% 0%, /* Ocean blue tone */
+    radial-gradient(circle at 10% 90%, rgba(255,155,43,0.7) 0%, transparent 35%) 0% 0%, /* New orange tone */
+    radial-gradient(circle at 90% 80%, rgba(0,169,181,0.7) 0%, transparent 40%) 0% 0%, /* Medium teal tone */
+    radial-gradient(circle at 30% 50%, rgba(253,141,20,0.6) 0%, transparent 45%) 0% 0%, /* Added new orange tone */
+    radial-gradient(circle at 70% 60%, rgba(8,145,178,0.6) 0%, transparent 45%) 0% 0%; /* Added darker blue-teal tone */
   background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%, 190% 190%, 175% 175%;
   animation: 
     blob-move-1 25s ease infinite alternate,
     blob-morph 30s ease infinite,
-    gradient-intensity 20s ease-in-out infinite alternate; /* Added animation for intensity variation */
+    gradient-intensity 20s ease-in-out infinite alternate; /* Animation for intensity variation */
 }

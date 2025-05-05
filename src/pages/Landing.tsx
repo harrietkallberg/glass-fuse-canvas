@@ -13,50 +13,70 @@ const randomPosition = () => ({
   top: `${random(5, 95)}%`,
 });
 
+// Helper to check if a position would overlap with the center content area
+const isOverlappingContent = (left: string, top: string) => {
+  const leftNum = parseFloat(left);
+  const topNum = parseFloat(top);
+  
+  // Avoid the center of the screen where content is located
+  return (leftNum > 30 && leftNum < 70 && topNum > 30 && topNum < 70);
+};
+
 const FluidArtBackground = () => {
   // Create arrays for our fluid art elements
-  const whiteBlobs = Array.from({ length: 30 }, (_, i) => ({
-    id: `white-blob-${i}`,
-    size: `${random(15, 180)}px`,
-    ...randomPosition(),
-    opacity: random(0.65, 0.95),
-    animationDelay: `${random(0, 10)}s`,
-    blur: `${random(3, 10)}px`,
-    zIndex: Math.floor(random(5, 15))
-  }));
+  const whiteBlobs = Array.from({ length: 15 }, (_, i) => {
+    let position;
+    // Generate positions until we find one that doesn't overlap with content
+    do {
+      position = randomPosition();
+    } while (isOverlappingContent(position.left, position.top));
+    
+    return {
+      id: `white-blob-${i}`,
+      size: `${random(15, 60)}px`, // Smaller sizes to be less intrusive
+      ...position,
+      opacity: random(0.65, 0.95),
+      animationDelay: `${random(0, 10)}s`,
+      zIndex: 25 // Higher z-index to ensure they're on top
+    };
+  });
 
-  const particles = Array.from({ length: 80 }, (_, i) => {
-    // More varied color palette with additional tones
+  const particles = Array.from({ length: 50 }, (_, i) => {
+    // More subtle color palette with only orange, white and teal/turquoise
     const colors = [
       "#FFFFFF", // White
-      "#FF7A00", // Vibrant orange
+      "#FFF5EE", // Almost white
       "#FF9B2B", // Light orange
       "#F97316", // Bright orange
       "#FD8D14", // Medium orange
       "#00A9B5", // Medium teal
       "#0EA5E9", // Ocean blue
       "#33C3F0", // Sky blue
-      "#14B8A6", // Another teal tone
-      "#0891B2", // Dark teal
     ];
     
-    const sizeMin = i % 3 === 0 ? 8 : 3;
-    const sizeMax = i % 3 === 0 ? 25 : 15;
+    let position;
+    // Generate positions until we find one that doesn't overlap with content
+    do {
+      position = randomPosition();
+    } while (isOverlappingContent(position.left, position.top));
+    
+    const sizeMin = i % 3 === 0 ? 6 : 3;
+    const sizeMax = i % 3 === 0 ? 15 : 10;
     
     return {
       id: `particle-${i}`,
       size: `${random(sizeMin, sizeMax)}px`,
-      ...randomPosition(),
+      ...position,
       color: colors[Math.floor(random(0, colors.length))],
-      opacity: random(0.6, 1),
+      opacity: random(0.6, 0.9),
       animationDelay: `${random(0, 5)}s`,
-      blur: `${random(0, 3)}px`,
-      zIndex: Math.floor(random(5, 15))
+      blur: `${random(0, 2)}px`, // Minimal blur
+      zIndex: Math.floor(random(15, 20))
     };
   });
 
-  const streamlines = Array.from({ length: 25 }, (_, i) => {
-    // More varied streamline colors
+  const streamlines = Array.from({ length: 35 }, (_, i) => {
+    // Streamline colors limited to teal and orange tones
     const types = [
       "dark-teal", // #00757F
       "medium-teal", // #00A9B5
@@ -70,42 +90,43 @@ const FluidArtBackground = () => {
     
     return {
       id: `streamline-${i}`,
-      width: `${random(100, 350)}px`,
-      ...randomPosition(),
-      angle: `${random(0, 360)}deg`,
+      width: `${random(200, 450)}px`, // Much longer streamlines
+      ...randomPosition(), // Random positions all over
+      angle: `${random(25, 45)}deg`, // Diagonal angles
       type: type,
       animationDelay: `${random(0, 8)}s`,
       animationClass: random(0, 1) > 0.3 ? "slow" : random(0, 1) > 0.5 ? "medium" : "fast",
-      zIndex: Math.floor(random(5, 15))
+      zIndex: Math.floor(random(10, 15))
     };
   });
 
-  // Create morphing large bubbles with more varied colors
-  const morphingBubbles = Array.from({ length: 12 }, (_, i) => {
+  // Create morphing large bubbles
+  const morphingBubbles = Array.from({ length: 8 }, (_, i) => {
     const colors = [
       "rgba(255,255,255,0.8)", // White
       "rgba(255,122,0,0.4)",   // Vibrant orange
       "rgba(249,115,22,0.4)",  // Bright orange
-      "rgba(251,146,60,0.4)",  // Softer orange
       "rgba(0,169,181,0.4)",   // Medium teal
-      "rgba(20,184,166,0.4)",  // Another teal tone
       "rgba(14,165,233,0.4)",  // Ocean blue
-      "rgba(51,195,240,0.4)",  // Sky blue
     ];
     
-    const isLarge = i < 4; // First four are larger bubbles
+    let position;
+    // Generate positions until we find one that doesn't overlap with content
+    do {
+      position = randomPosition();
+    } while (isOverlappingContent(position.left, position.top));
     
     return {
       id: `morph-bubble-${i}`,
-      size: isLarge ? `${random(120, 250)}px` : `${random(40, 100)}px`,
-      ...randomPosition(),
+      size: `${random(80, 120)}px`,
+      ...position,
       color: colors[Math.floor(random(0, colors.length))],
-      opacity: random(0.4, 0.9),
+      opacity: random(0.4, 0.7),
       animationDelay: `${random(0, 15)}s`,
       animationDuration: `${random(25, 40)}s`,
       transformScale: random(0.9, 1.1),
-      blur: `${random(5, 15)}px`,
-      zIndex: Math.floor(random(5, 15))
+      blur: `${random(3, 6)}px`,
+      zIndex: Math.floor(random(12, 15))
     };
   });
 
@@ -176,7 +197,7 @@ const FluidArtBackground = () => {
         );
       })}
 
-      {/* Render white blobs with improved visibility */}
+      {/* Render white blobs with crystal clear edges (no blur) */}
       {whiteBlobs.map((blob) => (
         <div
           key={blob.id}
@@ -190,7 +211,6 @@ const FluidArtBackground = () => {
             top: blob.top,
             opacity: blob.opacity,
             backgroundColor: "#FFFFFF",
-            filter: `blur(${blob.blur})`,
             animationDelay: `${random(0, 15)}s`,
             zIndex: blob.zIndex,
           }}
