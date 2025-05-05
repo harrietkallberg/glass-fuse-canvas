@@ -19,11 +19,11 @@ const Landing = () => {
         {/* Title section in a glass card similar to the feature tiles */}
         <div className="text-center w-full mb-6 relative">
           <div className="glass-vibrant-orange p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
-            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark inline-block mb-3">
+            <h1 className="text-5xl sm:text-6xl font-bold mb-3">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl gradient-text-dark inline-block">
+            <p className="text-xl">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
