@@ -44,9 +44,10 @@ const Landing = () => {
         ))}
       </div>
 
-      {/* Main content blob - with inward shadow only (no orange glow) */}
+      {/* Main content blob - completely opaque with dynamic gradient */}
       <div className="glass-blob-container relative z-10">
-        <div className="glass-blob glass-blob-inward-shadow-only">
+        {/* Using the new dynamic-gradient-blob class for the internal gradient animation */}
+        <div className="glass-blob glass-blob-inward-shadow-only opaque-blob dynamic-gradient-blob">
           <div className="container relative z-10 max-w-2xl w-full px-4">
             {/* Title directly on background with gradient text matching the dark to orange theme */}
             <div className="text-center mb-8 relative">
