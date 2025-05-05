@@ -6,7 +6,7 @@ import { ArrowRight } from "lucide-react";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center hot-oven-bg relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center gradient-bg-orange-teal relative overflow-hidden">
       {/* Hot oven sparkles - slowed down */}
       <div className="absolute inset-0 overflow-hidden z-0">
         {/* Generate orange sparkles/gnisters for the hot oven effect */}
@@ -44,9 +44,9 @@ const Landing = () => {
         ))}
       </div>
 
-      {/* Main content blob - with inward shadow only (no orange glow) */}
+      {/* Main content blob - with animated gradient and inward shadow only */}
       <div className="glass-blob-container relative z-10">
-        <div className="glass-blob glass-blob-inward-shadow-only">
+        <div className="glass-blob glass-blob-inward-shadow-only animated-gradient-blob">
           <div className="container relative z-10 max-w-2xl w-full px-4">
             {/* Title directly on background with gradient text matching the dark to orange theme */}
             <div className="text-center mb-8 relative">
