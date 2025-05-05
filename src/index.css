@@ -262,7 +262,7 @@
     aspect-ratio: 1.5 / 1;
   }
   
-  /* Updated glass blob with inward shadow */
+  /* Updated glass blob with animated gradient background */
   .glass-blob {
     width: 100%;
     height: 100%;
@@ -276,6 +276,29 @@
     z-index: 10;
     animation: blob-morph 20s ease-in-out infinite;
     overflow: hidden;
+  }
+  
+  /* Dynamic gradient blob */
+  .gradient-blob {
+    position: relative;
+  }
+  
+  .gradient-blob::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, 
+      rgba(249,115,22,0.3) 0%, 
+      rgba(153,27,27,0.3) 25%, 
+      rgba(180,83,9,0.3) 50%, 
+      rgba(234,88,12,0.3) 75%, 
+      rgba(249,115,22,0.3) 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-flow 15s ease infinite;
+    z-index: -1;
+    opacity: 0.7;
   }
   
   /* New inward shadow style for the glass blob */
@@ -547,41 +570,18 @@
   }
 }
 
-@keyframes blob-shift {
-    0%, 100% {
-      transform: scale(0.95) translate(-2%, -2%) rotate(-5deg);
-    }
-    33% {
-      transform: scale(1.05) translate(2%, 2%) rotate(5deg);
-    }
-    66% {
-      transform: scale(1) translate(0%, 0%) rotate(0deg);
-    }
+/* New animation for the gradient flow */
+@keyframes gradient-flow {
+  0% {
+    background-position: 0% 50%;
   }
-
-@keyframes blob-shift-reverse {
-    0%, 100% {
-      transform: scale(1) translate(0%, 0%) rotate(0deg);
-    }
-    33% {
-      transform: scale(0.95) translate(2%, -2%) rotate(5deg);
-    }
-    66% {
-      transform: scale(1.05) translate(-2%, 2%) rotate(-5deg);
-    }
+  50% {
+    background-position: 100% 50%;
   }
-
-@keyframes blob-shift-alt {
-    0%, 100% {
-      transform: scale(1.02) translate(1%, -1%) rotate(3deg);
-    }
-    33% {
-      transform: scale(0.98) translate(-1%, 1%) rotate(-3deg);
-    }
-    66% {
-      transform: scale(1) translate(0%, 0%) rotate(0deg);
-    }
+  100% {
+    background-position: 0% 50%;
   }
+}
 
 @layer utilities {
   .animate-float-slow {
