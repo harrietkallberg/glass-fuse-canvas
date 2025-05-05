@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -821,4 +822,133 @@
   }
   
   .animate-diagonal-reverse-wave {
-    animation: diagonal-reverse
+    animation: diagonal-reverse-wave 25s linear infinite;
+  }
+  
+  .animate-cross-diagonal-wave {
+    animation: cross-diagonal-wave 25s linear infinite;
+  }
+  
+  .animate-glass-morph {
+    animation: glass-flow-slow 30s ease-in-out infinite;
+  }
+  
+  .animate-glass-morph-reverse {
+    animation: glass-flow-reverse 30s ease-in-out infinite;
+  }
+  
+  .animate-glass-morph-alt {
+    animation: glass-flow-medium 25s ease-in-out infinite;
+  }
+  
+  .animate-glass-swirl {
+    animation: glass-swirl 45s ease-in-out infinite;
+  }
+  
+  .animate-glass-swirl-reverse {
+    animation: glass-swirl-reverse 45s ease-in-out infinite;
+  }
+  
+  .animate-fluid-morph {
+    animation: glass-flow-slow 35s ease-in-out infinite;
+  }
+  
+  .animate-fluid-morph-alt {
+    animation: glass-flow-reverse 35s ease-in-out infinite;
+  }
+  
+  .animate-fluid-morph-slow {
+    animation: glass-flow-medium 40s ease-in-out infinite;
+  }
+  
+  .animate-orb-float {
+    animation: orb-float 20s ease-in-out infinite;
+  }
+  
+  .animate-orb-float-reverse {
+    animation: orb-float-reverse 20s ease-in-out infinite;
+  }
+  
+  .animate-orb-pulse {
+    animation: orb-pulse 15s ease-in-out infinite;
+  }
+  
+  .animate-ripple {
+    animation: ripple 15s ease-in-out infinite;
+  }
+  
+  .animate-ripple-reverse {
+    animation: ripple-reverse 15s ease-in-out infinite;
+  }
+  
+  .animate-ripple-slow {
+    animation: ripple-slow 20s ease-in-out infinite;
+  }
+  
+  .animate-bubble-float {
+    animation: float-medium 25s ease-in-out infinite;
+  }
+  
+  .animate-bubble-float-small {
+    animation: float-slow 15s ease-in-out infinite;
+  }
+  
+  .animate-droplet-float {
+    animation: particle-float 10s ease-in-out infinite;
+  }
+  
+  .animate-color-swirl {
+    animation: glass-swirl 50s ease-in-out infinite;
+  }
+  
+  .animate-particle-pulse {
+    animation: particle-pulse 8s ease-in-out infinite;
+  }
+  
+  .animate-sparkle-effect {
+    animation: sparkle 4s ease-in-out infinite;
+  }
+  
+  .animate-edge-shine {
+    animation: edge-shine 8s ease-in-out infinite;
+  }
+  
+  .animate-color-blend {
+    animation: color-blend 15s ease-in-out infinite;
+  }
+  
+  .animate-shine-sweep {
+    background-size: 200% auto;
+    animation: shine 8s linear infinite;
+  }
+  
+  .bg-glass-shine {
+    background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
+  }
+  
+  .bg-glass-orange-blue {
+    background: radial-gradient(circle, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 70%);
+  }
+  
+  .bg-vibrant-gradient-1 {
+    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(255,255,255,0.3) 50%, rgba(51,195,240,0.8) 100%);
+  }
+  
+  .bg-vibrant-gradient-2 {
+    background: linear-gradient(135deg, rgba(51,195,240,0.8) 0%, rgba(255,255,255,0.3) 50%, rgba(249,115,22,0.8) 100%);
+  }
+  
+  .bg-vibrant-gradient-3 {
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(249,115,22,0.6) 50%, rgba(51,195,240,0.6) 100%);
+  }
+  
+  .bg-radial-subtle {
+    background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.8) 100%);
+  }
+}
+
+@keyframes shine {
+  to {
+    background-position: 200% center;
+  }
+}
