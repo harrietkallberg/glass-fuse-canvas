@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,52 +15,89 @@ const randomPosition = () => ({
 
 const FluidArtBackground = () => {
   // Create arrays for our fluid art elements
-  const whiteBlobs = Array.from({ length: 20 }, (_, i) => ({
+  const whiteBlobs = Array.from({ length: 30 }, (_, i) => ({
     id: `white-blob-${i}`,
-    size: `${random(15, 150)}px`,
+    size: `${random(15, 180)}px`,
     ...randomPosition(),
-    opacity: random(0.6, 0.95),
+    opacity: random(0.65, 0.95),
     animationDelay: `${random(0, 10)}s`,
-    blur: `${random(3, 8)}px`,
+    blur: `${random(3, 10)}px`,
+    zIndex: Math.floor(random(5, 15))
   }));
 
-  const particles = Array.from({ length: 60 }, (_, i) => {
-    const colors = ["#FFFFFF", "#FF7A00", "#00A9B5", "#33C3F0"];
+  const particles = Array.from({ length: 80 }, (_, i) => {
+    // More varied color palette with additional tones
+    const colors = [
+      "#FFFFFF", // White
+      "#FF7A00", // Vibrant orange
+      "#FF9B2B", // Light orange
+      "#F97316", // Bright orange
+      "#FD8D14", // Medium orange
+      "#00A9B5", // Medium teal
+      "#0EA5E9", // Ocean blue
+      "#33C3F0", // Sky blue
+      "#14B8A6", // Another teal tone
+      "#0891B2", // Dark teal
+    ];
+    
     const sizeMin = i % 3 === 0 ? 8 : 3;
-    const sizeMax = i % 3 === 0 ? 20 : 12;
+    const sizeMax = i % 3 === 0 ? 25 : 15;
     
     return {
       id: `particle-${i}`,
       size: `${random(sizeMin, sizeMax)}px`,
       ...randomPosition(),
       color: colors[Math.floor(random(0, colors.length))],
-      opacity: random(0.5, 1),
+      opacity: random(0.6, 1),
       animationDelay: `${random(0, 5)}s`,
-      blur: `${random(0, 2)}px`,
+      blur: `${random(0, 3)}px`,
+      zIndex: Math.floor(random(5, 15))
     };
   });
 
-  const streamlines = Array.from({ length: 15 }, (_, i) => {
-    const isTeal = i % 2 === 0;
+  const streamlines = Array.from({ length: 25 }, (_, i) => {
+    // More varied streamline colors
+    const types = [
+      "dark-teal", // #00757F
+      "medium-teal", // #00A9B5
+      "light-teal", // #14B8A6
+      "vibrant-orange", // #FF7A00
+      "bright-orange", // #F97316
+      "light-orange", // #FF9B2B
+    ];
+    
+    const type = types[Math.floor(random(0, types.length))];
     
     return {
       id: `streamline-${i}`,
-      width: `${random(100, 300)}px`,
+      width: `${random(100, 350)}px`,
       ...randomPosition(),
       angle: `${random(0, 360)}deg`,
-      type: isTeal ? "teal" : "orange",
+      type: type,
       animationDelay: `${random(0, 8)}s`,
+      animationClass: random(0, 1) > 0.3 ? "slow" : random(0, 1) > 0.5 ? "medium" : "fast",
+      zIndex: Math.floor(random(5, 15))
     };
   });
 
-  // Create new morphing large bubbles
-  const morphingBubbles = Array.from({ length: 8 }, (_, i) => {
-    const colors = ["rgba(255,255,255,0.8)", "rgba(255,122,0,0.4)", "rgba(0,169,181,0.4)", "rgba(51,195,240,0.4)"];
-    const isLarge = i < 3; // First three are larger bubbles
+  // Create morphing large bubbles with more varied colors
+  const morphingBubbles = Array.from({ length: 12 }, (_, i) => {
+    const colors = [
+      "rgba(255,255,255,0.8)", // White
+      "rgba(255,122,0,0.4)",   // Vibrant orange
+      "rgba(249,115,22,0.4)",  // Bright orange
+      "rgba(251,146,60,0.4)",  // Softer orange
+      "rgba(0,169,181,0.4)",   // Medium teal
+      "rgba(20,184,166,0.4)",  // Another teal tone
+      "rgba(14,165,233,0.4)",  // Ocean blue
+      "rgba(51,195,240,0.4)",  // Sky blue
+    ];
+    
+    const isLarge = i < 4; // First four are larger bubbles
     
     return {
       id: `morph-bubble-${i}`,
-      size: isLarge ? `${random(120, 200)}px` : `${random(40, 80)}px`,
+      size: isLarge ? `${random(120, 250)}px` : `${random(40, 100)}px`,
       ...randomPosition(),
       color: colors[Math.floor(random(0, colors.length))],
       opacity: random(0.4, 0.9),
@@ -67,6 +105,7 @@ const FluidArtBackground = () => {
       animationDuration: `${random(25, 40)}s`,
       transformScale: random(0.9, 1.1),
       blur: `${random(5, 15)}px`,
+      zIndex: Math.floor(random(5, 15))
     };
   });
 
@@ -88,36 +127,61 @@ const FluidArtBackground = () => {
             animationDelay: bubble.animationDelay,
             animationDuration: bubble.animationDuration,
             transform: `scale(${bubble.transformScale})`,
+            zIndex: bubble.zIndex,
           }}
         />
       ))}
 
       {/* Render flowing streamlines */}
-      {streamlines.map((streamline) => (
-        <div
-          key={streamline.id}
-          className={`fluid-streamline animate-streamline-flow-${
-            Math.random() > 0.5 ? "slow" : "medium"
-          }`}
-          style={{
-            width: streamline.width,
-            left: streamline.left,
-            top: streamline.top,
-            transform: `rotate(${streamline.angle})`,
-            animationDelay: streamline.animationDelay,
-            backgroundImage: streamline.type === "teal" 
-              ? "linear-gradient(90deg, rgba(0,117,127,0), rgba(0,117,127,0.7), rgba(0,117,127,0))" 
-              : "linear-gradient(90deg, rgba(255,122,0,0), rgba(255,122,0,0.7), rgba(255,122,0,0))",
-          }}
-        />
-      ))}
+      {streamlines.map((streamline) => {
+        // Create gradient based on the streamline type
+        let gradient;
+        switch(streamline.type) {
+          case "dark-teal":
+            gradient = "linear-gradient(90deg, rgba(0,117,127,0), rgba(0,117,127,0.8), rgba(0,117,127,0))";
+            break;
+          case "medium-teal":
+            gradient = "linear-gradient(90deg, rgba(0,169,181,0), rgba(0,169,181,0.8), rgba(0,169,181,0))";
+            break;
+          case "light-teal":
+            gradient = "linear-gradient(90deg, rgba(20,184,166,0), rgba(20,184,166,0.8), rgba(20,184,166,0))";
+            break;
+          case "vibrant-orange":
+            gradient = "linear-gradient(90deg, rgba(255,122,0,0), rgba(255,122,0,0.8), rgba(255,122,0,0))";
+            break;
+          case "bright-orange":
+            gradient = "linear-gradient(90deg, rgba(249,115,22,0), rgba(249,115,22,0.8), rgba(249,115,22,0))";
+            break;
+          case "light-orange":
+            gradient = "linear-gradient(90deg, rgba(255,155,43,0), rgba(255,155,43,0.8), rgba(255,155,43,0))";
+            break;
+          default:
+            gradient = "linear-gradient(90deg, rgba(0,117,127,0), rgba(0,117,127,0.8), rgba(0,117,127,0))";
+        }
+        
+        return (
+          <div
+            key={streamline.id}
+            className={`fluid-streamline animate-streamline-flow-${streamline.animationClass}`}
+            style={{
+              width: streamline.width,
+              left: streamline.left,
+              top: streamline.top,
+              transform: `rotate(${streamline.angle})`,
+              animationDelay: streamline.animationDelay,
+              backgroundImage: gradient,
+              zIndex: streamline.zIndex,
+            }}
+          />
+        );
+      })}
 
-      {/* Render white blobs */}
+      {/* Render white blobs with improved visibility */}
       {whiteBlobs.map((blob) => (
         <div
           key={blob.id}
           className={`fluid-blob animate-blob-float-${
-            Math.random() > 0.7 ? "slow" : Math.random() > 0.4 ? "medium" : "fast"
+            random(0, 1) > 0.7 ? "slow" : random(0, 1) > 0.4 ? "medium" : "fast"
           }`}
           style={{
             width: blob.size,
@@ -127,17 +191,18 @@ const FluidArtBackground = () => {
             opacity: blob.opacity,
             backgroundColor: "#FFFFFF",
             filter: `blur(${blob.blur})`,
-            animationDelay: blob.animationDelay,
+            animationDelay: `${random(0, 15)}s`,
+            zIndex: blob.zIndex,
           }}
         />
       ))}
 
-      {/* Render colored particles */}
+      {/* Render colored particles with enhanced visibility */}
       {particles.map((particle) => (
         <div
           key={particle.id}
           className={`fluid-particle animate-particle-pulse-${
-            Math.random() > 0.7 ? "slow" : Math.random() > 0.4 ? "medium" : "fast"
+            random(0, 1) > 0.7 ? "slow" : random(0, 1) > 0.4 ? "medium" : "fast"
           }`}
           style={{
             width: particle.size,
@@ -147,7 +212,8 @@ const FluidArtBackground = () => {
             backgroundColor: particle.color,
             opacity: particle.opacity,
             filter: `blur(${particle.blur})`,
-            animationDelay: particle.animationDelay,
+            animationDelay: `${random(0, 10)}s`,
+            zIndex: particle.zIndex,
           }}
         />
       ))}
