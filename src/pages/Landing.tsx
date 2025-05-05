@@ -44,9 +44,19 @@ const Landing = () => {
         ))}
       </div>
 
-      {/* Main content blob - with inward shadow only (no orange glow) */}
+      {/* Main content blob - with inward shadow only (no orange glow) and animated gradient blobs underneath */}
       <div className="glass-blob-container relative z-10">
-        <div className="glass-blob glass-blob-inward-shadow-only">
+        {/* Animated gradient blobs underneath */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <div className="absolute inset-0 glass-blob animate-blob-shift opacity-20 bg-gradient-to-br from-amber-500 to-orange-700"></div>
+          <div className="absolute inset-0 glass-blob animate-blob-shift-reverse opacity-20 bg-gradient-to-tr from-orange-600 to-amber-400" 
+               style={{ animationDelay: "-5s" }}></div>
+          <div className="absolute inset-0 glass-blob animate-blob-shift-alt opacity-20 bg-gradient-to-bl from-red-500 to-amber-600"
+               style={{ animationDelay: "-10s" }}></div>
+        </div>
+
+        {/* Main blob with inward shadow only */}
+        <div className="glass-blob glass-blob-inward-shadow-only relative z-1">
           <div className="container relative z-10 max-w-2xl w-full px-4">
             {/* Title directly on background with gradient text matching the dark to orange theme */}
             <div className="text-center mb-8 relative">
