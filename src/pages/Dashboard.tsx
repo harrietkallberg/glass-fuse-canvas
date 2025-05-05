@@ -192,8 +192,13 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Fluid background gradient matching the landing page style */}
-      <div className="absolute inset-0 fluid-bg-diagonal dashboard-bg-gradient" style={{ zIndex: -20 }} />
+      {/* Full screen gradient background without blob shape, matching the interior colors of landing page blob */}
+      <div className="fixed inset-0" style={{ 
+        background: 'linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%)',
+        backgroundSize: '400% 400%',
+        animation: 'gradient-circular-motion 15s ease infinite',
+        zIndex: -20
+      }} />
       
       {/* Particle background */}
       <ParticleBackground />
