@@ -192,7 +192,7 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Darkened for more contrast with sparkles */
+    background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     z-index: 1;
   }
@@ -295,21 +295,6 @@
   }
 }
 
-@keyframes sparkle-glow {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0) translateY(0);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.5) translateY(-5px);
-  }
-  70% {
-    opacity: 0.7;
-    transform: scale(1.2) translateY(-8px);
-  }
-}
-
 @keyframes wave-motion {
   0%, 100% {
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
@@ -396,18 +381,6 @@
   }
 }
 
-@keyframes gradient-pulse {
-  0%, 100% {
-    opacity: 0.3;
-  }
-  30% {
-    opacity: 0.5;
-  }
-  60% {
-    opacity: 0.2;
-  }
-}
-
 @layer utilities {
   .animate-float-slow {
     animation: float-slow 20s ease-in-out infinite;
@@ -431,10 +404,6 @@
   
   .animate-sparkle {
     animation: sparkle 5s ease-in-out infinite;
-  }
-  
-  .animate-sparkle-glow {
-    animation: sparkle-glow 5s ease-in-out infinite;
   }
   
   .animate-gradient {

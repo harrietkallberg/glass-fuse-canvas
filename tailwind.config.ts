@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -66,12 +67,7 @@ export default {
 					orangeBrown: '#bd8770',
 					taupe: '#aea795',
 					brown: '#745641',
-					cream: '#f7e2c8',
-					// New colors for sparkles and gradients
-					orangeGlow: '#FF8C38',
-					deepOrange: '#E25822',
-					tealLight: '#80CBC4',
-					tealDark: '#26A69A'
+					cream: '#f7e2c8'
 				}
 			},
 			borderRadius: {
@@ -111,40 +107,13 @@ export default {
 					'50%': {
 						opacity: '0.8'
 					}
-				},
-				'sparkle-glow': {
-					'0%, 100%': {
-						opacity: '0',
-						transform: 'scale(0) translateY(0)'
-					},
-					'50%': {
-						opacity: '1',
-						transform: 'scale(1.5) translateY(-5px)'
-					},
-					'70%': {
-						opacity: '0.7',
-						transform: 'scale(1.2) translateY(-8px)'
-					}
-				},
-				'gradient-pulse': {
-					'0%, 100%': {
-						opacity: '0.3'
-					},
-					'30%': {
-						opacity: '0.5'
-					},
-					'60%': {
-						opacity: '0.2'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
-				'sparkle-glow': 'sparkle-glow 5s ease-in-out infinite',
-				'gradient-pulse': 'gradient-pulse 8s ease-in-out infinite'
+				'pulse-soft': 'pulse-soft 4s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
@@ -159,10 +128,6 @@ export default {
 				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
 				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
 				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
-				// New orange-blue glow gradient
-				'orange-blue-glow': 'linear-gradient(135deg, #F97316 0%, #33C3F0 50%, #F97316 100%)',
-				// New orange-teal glow gradient
-				'orange-teal-glow': 'linear-gradient(135deg, #FF8C38 0%, #26A69A 100%)'
 			}
 		}
 	},

@@ -19,11 +19,8 @@ const Landing = () => {
         <div className="fluid-shape w-[18vw] h-[18vw] animate-wave animate-float-medium bg-[#FEC6A1]/15 left-[30vw] top-[15vh]"></div>
         <div className="fluid-shape w-[22vw] h-[22vw] rounded-full animate-float-reverse bg-[#bd8770]/15 right-[10vw] bottom-[20vh]"></div>
         
-        {/* Glowing gradient overlay with varying intensity */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#F97316]/40 via-[#33C3F0]/30 to-[#F97316]/40 mix-blend-soft-light animate-gradient-pulse z-10"></div>
-        
-        {/* Sparkle particles - original ones */}
-        <div className="absolute inset-0 z-20">
+        {/* Sparkle particles */}
+        <div className="absolute inset-0">
           {Array.from({ length: 30 }).map((_, index) => (
             <div 
               key={index}
@@ -49,30 +46,9 @@ const Landing = () => {
             />
           ))}
         </div>
-        
-        {/* NEW: Orange sparkly particles specifically for darker areas */}
-        <div className="absolute inset-0 z-20 pointer-events-none">
-          {Array.from({ length: 50 }).map((_, index) => (
-            <div 
-              key={`sparkle-${index}`}
-              className="absolute rounded-full animate-sparkle-glow"
-              style={{
-                width: `${1 + Math.random() * 2}px`,
-                height: `${1 + Math.random() * 2}px`,
-                background: `rgba(${249 + Math.random() * 6}, ${115 + Math.random() * 30}, ${22 + Math.random() * 10}, ${0.7 + Math.random() * 0.3})`,
-                boxShadow: `0 0 ${3 + Math.random() * 5}px rgba(249, 115, 22, ${0.6 + Math.random() * 0.4})`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                opacity: 0.9,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${3 + Math.random() * 7}s`
-              }}
-            />
-          ))}
-        </div>
       </div>
 
-      <div className="container relative z-30 max-w-2xl w-full px-4">
+      <div className="container relative z-10 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text */}
         <div className="text-center mb-8 relative">
           <div className="mb-4">
