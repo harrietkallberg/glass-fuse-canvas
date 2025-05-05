@@ -8,9 +8,9 @@ const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
       <div className="container relative z-10 max-w-2xl w-full px-4">
-        {/* Title directly on background with gradient text */}
+        {/* Title with improved visibility over the blob background */}
         <div className="text-center mb-8 relative">
-          <div className="mb-4">
+          <div className="mb-4 p-4 backdrop-blur-sm bg-white/20 rounded-xl inline-block w-full">
             <h1 className="text-5xl sm:text-6xl font-bold relative z-10 gradient-text-dark">
               GlassFuse Studio
             </h1>
