@@ -6,7 +6,48 @@ import { ArrowRight } from "lucide-react";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden relative">
+      {/* Background fluid shapes */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="fluid-shape w-[40vw] h-[40vw] rounded-full animate-float-slow bg-[#F97316]/20 left-[-10vw] top-[20vh]"></div>
+        <div className="fluid-shape w-[35vw] h-[35vw] rounded-full animate-float-medium bg-[#FEC6A1]/25 right-[-5vw] top-[10vh]"></div>
+        <div className="fluid-shape w-[30vw] h-[30vw] animate-float-reverse animate-wave bg-[#bd8770]/20 left-[60vw] bottom-[15vh]"></div>
+        <div className="fluid-shape w-[25vw] h-[25vw] animate-float-slow-reverse animate-wave bg-[#33C3F0]/15 left-[20vw] bottom-[-10vh]"></div>
+        
+        {/* Additional moving elements */}
+        <div className="fluid-shape w-[20vw] h-[20vw] rounded-full animate-pulse-float bg-[#F97316]/10 right-[25vw] top-[40vh]"></div>
+        <div className="fluid-shape w-[18vw] h-[18vw] animate-wave animate-float-medium bg-[#FEC6A1]/15 left-[30vw] top-[15vh]"></div>
+        <div className="fluid-shape w-[22vw] h-[22vw] rounded-full animate-float-reverse bg-[#bd8770]/15 right-[10vw] bottom-[20vh]"></div>
+        
+        {/* Sparkle particles */}
+        <div className="absolute inset-0">
+          {Array.from({ length: 30 }).map((_, index) => (
+            <div 
+              key={index}
+              className="absolute w-1 h-1 rounded-full bg-[#F97316] opacity-70 animate-sparkle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${3 + Math.random() * 4}s`
+              }}
+            />
+          ))}
+          {Array.from({ length: 20 }).map((_, index) => (
+            <div 
+              key={`lg-${index}`}
+              className="absolute w-2 h-2 rounded-full bg-[#FEC6A1] opacity-60 animate-sparkle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 5}s`,
+                animationDuration: `${4 + Math.random() * 5}s`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
       <div className="container relative z-10 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text */}
         <div className="text-center mb-8 relative">
