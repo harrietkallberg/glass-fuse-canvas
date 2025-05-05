@@ -15,26 +15,28 @@ const Landing = () => {
         {/* This ensures all animation and gradient effects stay in this background layer */}
       </div>
       
-      <div className="container relative max-w-2xl w-full px-4 flex flex-col pt-10 md:pt-14" style={{ zIndex: 30 }}>
-        {/* Title section with highest z-index value */}
-        <div className="text-center mb-6 relative">
-          <div className="relative" style={{ zIndex: 40 }}>
-            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block mb-3">
+      <div className="container relative max-w-2xl w-full px-4 flex flex-col items-center pt-0 md:pt-4" style={{ zIndex: 30 }}>
+        {/* Title section in a glass card similar to the feature tiles */}
+        <div className="text-center w-full mb-6 relative">
+          <div className="glass-vibrant-orange p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
+            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark inline-block mb-3">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-3 gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
+            <p className="text-xl gradient-text-dark inline-block">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
           
-          <p className="text-xl text-foreground/80 mt-3 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block" style={{ position: 'relative', zIndex: 35 }}>
-            Join a community of passionate glass fusion artists
-          </p>
+          <div className="glass-vibrant-cream p-4 rounded-xl inline-block" style={{ position: 'relative', zIndex: 35 }}>
+            <p className="text-xl text-foreground/80 animate-fade-in">
+              Join a community of passionate glass fusion artists
+            </p>
+          </div>
         </div>
         
         {/* Feature grid with slightly lower z-index than title */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 relative" style={{ zIndex: 30 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 w-full relative" style={{ zIndex: 30 }}>
           <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
             <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
@@ -56,15 +58,15 @@ const Landing = () => {
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center relative" style={{ zIndex: 30 }}>
-          <Link to="/login">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center w-full relative" style={{ zIndex: 30 }}>
+          <Link to="/login" className="w-full sm:w-auto">
             <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
               Sign In
               <ArrowRight className="w-4 h-4" />
             </Button>
           </Link>
           
-          <Link to="/register">
+          <Link to="/register" className="w-full sm:w-auto">
             <Button variant="outline" className="w-full sm:w-auto h-12 bg-white/20 border-white/30 hover:bg-white/30 shadow-md hover:shadow-lg transition-all backdrop-blur-md">
               Create Account
             </Button>
