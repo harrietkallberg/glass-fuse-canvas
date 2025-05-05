@@ -7,18 +7,20 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-      {/* Background blob positioned explicitly behind content */}
-      <div className="absolute inset-0 z-0 fluid-bg-diagonal"></div>
+      {/* Background blob positioned explicitly behind all content */}
+      <div className="absolute inset-0 z-0 fluid-bg-diagonal">
+        {/* Empty div to ensure all blob animations and content stay in this layer */}
+      </div>
       
-      <div className="container relative z-10 max-w-2xl w-full px-4 flex flex-col pt-16 md:pt-20">
-        {/* Title with proper z-index to stay above the background */}
-        <div className="text-center mb-8 relative z-20">
+      <div className="container relative z-20 max-w-2xl w-full px-4 flex flex-col pt-20 md:pt-24">
+        {/* Title with higher z-index to stay above ALL background elements */}
+        <div className="text-center mb-8 relative">
           <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold relative gradient-text-dark">
+            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 relative gradient-text-dark">
+            <p className="text-xl mt-4 gradient-text-dark">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
@@ -28,8 +30,8 @@ const Landing = () => {
           </p>
         </div>
         
-        {/* Feature grid directly on the blob background, without the glass-surface wrapper */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Feature grid directly on the blob background, ensuring it stays below title with z-10 */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
           <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
             <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
@@ -51,7 +53,7 @@ const Landing = () => {
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
           <Link to="/login">
             <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
               Sign In
