@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,32 +7,26 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-      {/* Background blob with lower z-index and pushed down */}
+      {/* Background blob with lower z-index to ensure it stays behind all content */}
       <div 
         className="absolute inset-0 fluid-bg-diagonal" 
-        style={{ 
-          zIndex: -20,
-          top: "15%", // Push the blob down
-          bottom: "-15%" // Extend the blob to maintain coverage
-        }}
+        style={{ zIndex: -20 }}
       >
         {/* This ensures all animation and gradient effects stay in this background layer */}
       </div>
       
       <div className="container relative max-w-2xl w-full px-4 flex flex-col items-center pt-0 md:pt-4" style={{ zIndex: 30 }}>
-        {/* Title section with isolation to prevent background bleed */}
+        {/* Title section with complete isolation from background */}
         <div className="text-center w-full mb-6 relative">
-          <div className="bg-transparent p-6 rounded-xl mb-6 relative isolation-auto" style={{ zIndex: 40 }}>
-            {/* Using a pseudo-element to create an invisible backdrop */}
-            <div className="relative isolation-auto">
-              <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark mb-3 relative">
-                GlassFuse Studio
-              </h1>
-              
-              <p className="text-xl gradient-text-dark relative">
-                Create, share, and perfect your glass fusion firing curves
-              </p>
-            </div>
+          {/* Title container with solid white background for complete isolation */}
+          <div className="bg-white p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
+            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark mb-3">
+              GlassFuse Studio
+            </h1>
+            
+            <p className="text-xl gradient-text-dark">
+              Create, share, and perfect your glass fusion firing curves
+            </p>
           </div>
           
           <div className="glass-vibrant-cream p-4 rounded-xl inline-block" style={{ position: 'relative', zIndex: 35 }}>
