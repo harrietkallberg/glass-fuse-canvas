@@ -16,16 +16,19 @@ const Landing = () => {
       </div>
       
       <div className="container relative max-w-2xl w-full px-4 flex flex-col items-center pt-0 md:pt-4" style={{ zIndex: 30 }}>
-        {/* Title section with transparent background but gradient text */}
+        {/* Title section with isolation to prevent background bleed */}
         <div className="text-center w-full mb-6 relative">
-          <div className="bg-transparent p-6 rounded-xl mb-6 relative" style={{ zIndex: 40 }}>
-            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark mb-3">
-              GlassFuse Studio
-            </h1>
-            
-            <p className="text-xl gradient-text-dark">
-              Create, share, and perfect your glass fusion firing curves
-            </p>
+          <div className="bg-transparent p-6 rounded-xl mb-6 relative isolation-auto" style={{ zIndex: 40 }}>
+            {/* Using a pseudo-element to create an invisible backdrop */}
+            <div className="relative isolation-auto">
+              <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark mb-3 relative">
+                GlassFuse Studio
+              </h1>
+              
+              <p className="text-xl gradient-text-dark relative">
+                Create, share, and perfect your glass fusion firing curves
+              </p>
+            </div>
           </div>
           
           <div className="glass-vibrant-cream p-4 rounded-xl inline-block" style={{ position: 'relative', zIndex: 35 }}>
