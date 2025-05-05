@@ -124,90 +124,46 @@
     filter: blur(72px); /* Increased blur for more ethereal effect */
   }
 
-  /* Dynamic title background - inherits the page gradients but darker */
-  .dynamic-title-background {
+  /* New morphing background with multiple blobs */
+  .morphing-bg {
     position: relative;
+    background-color: rgba(255, 255, 255, 0.6);
     overflow: hidden;
-    isolation: isolate;
+    min-height: 100vh;
+  }
+
+  .morphing-bg::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
     z-index: 1;
-  }
-
-  .dynamic-title-background::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.2); /* 20% darker overlay */
-    z-index: 1;
-    border-radius: inherit;
-  }
-  
-  .text-shadow-lg {
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-  }
-
-  .glass-surface {
-    @apply bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .glass-surface::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    background: radial-gradient(
-      circle,
-      rgba(255,255,255,0.15) 0%, /* Increased opacity for more vibrance */
-      transparent 80%
-    );
-    transform: rotate(45deg);
-    pointer-events: none;
-  }
-
-  /* Updated fluid background with diagonal and circular movement */
-  .fluid-bg-diagonal {
-    @apply relative overflow-hidden;
-    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
-    background-size: 400% 400%;
-    animation: gradient-circular-motion 15s ease infinite;
-    position: relative;
-  }
-
-  .fluid-bg-diagonal::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%);
-    background-size: 400% 400%;
-    filter: blur(50px);
-    animation: gradient-circular-motion 20s ease infinite reverse;
-    z-index: 0;
-    opacity: 0.8;
-  }
-
-  .fluid-bg-diagonal::after {
-    content: "";
-    position: absolute;
-    inset: 0;
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
-    z-index: 1;
   }
 
-  /* Updated title styling - removing container and applying gradient text */
-  .gradient-text {
-    background: linear-gradient(135deg, rgba(249,115,22,1) 0%, rgba(51,195,240,1) 100%);
-    background-size: 400% 400%;
-    animation: gradient-circular-motion 15s ease infinite;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  /* Multiple blob gradients - positioned absolutely */
+  .morphing-bg::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
   }
   
+  /* Create the multi-blob effect with pseudo-elements */
+  .morphing-bg {
+    --blob-size-1: 45vw;
+    --blob-size-2: 35vw;
+    --blob-size-3: 40vw;
+    --blob-size-4: 30vw;
+    --blob-size-5: 25vw;
+    --blob-size-6: 35vw;
+  }
+
+  /* Add gradient text styling */
   .gradient-text-dark {
     background: linear-gradient(135deg, rgba(189,75,0,1) 0%, rgba(11,145,190,1) 100%);
     background-size: 400% 400%;
@@ -215,133 +171,117 @@
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.2)); /* Better text edge definition */
+    position: relative;
+    z-index: 15; /* Ensure text stays above all background elements */
   }
 
-  /* Glass art components inspired by modern glass art */
-  .glass-panel {
-    @apply bg-black/30 backdrop-blur-xl;
-    position: relative;
-    overflow: hidden;
+  /* Add text shadow utility */
+  .text-shadow-lg {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   }
-  
-  .glass-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(249,115,22,0.1) 0%, rgba(51,195,240,0.1) 100%);
-    z-index: -1;
-  }
-  
-  .glass-panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 0%, rgba(255,255,255,0.15) 0%, transparent 70%);
-    z-index: -1;
-  }
-  
-  .glass-card-orange {
-    @apply bg-[#F97316]/10 backdrop-blur-xl;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .glass-card-orange::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(249,115,22,0.2) 0%, transparent 100%);
-    z-index: -1;
-  }
-  
-  .glass-card-blue {
-    @apply bg-[#33C3F0]/10 backdrop-blur-xl;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .glass-card-blue::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(51,195,240,0.2) 0%, transparent 100%);
-    z-index: -1;
-  }
-  
-  .shadow-glow {
-    box-shadow: 0 0 20px rgba(249,115,22,0.2), 0 0 40px rgba(0,0,0,0.1);
-  }
-  
-  .shadow-blue-glow {
-    box-shadow: 0 0 20px rgba(51,195,240,0.2), 0 0 40px rgba(0,0,0,0.1);
-  }
-  
-  /* Fluid art glass components */
-  .glass-card {
-    @apply bg-white/40 backdrop-blur-sm border shadow-md transition-all;
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .glass-card::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
-    z-index: -1;
-  }
-  
-  .glass-panel {
-    position: relative;
-    overflow: hidden;
-  }
-  
-  .glass-panel::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
-    z-index: -1;
-  }
-  
-  .glass-panel::after {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    background: linear-gradient(
-      to bottom right,
-      rgba(255, 255, 255, 0.2) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
-      rgba(255, 255, 255, 0) 100%
-    );
-    transform: rotate(25deg);
-    pointer-events: none;
-    z-index: -1;
-  }
-  
-  .shadow-glow {
-    box-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(0,0,0,0.05);
-  }
-  
-  .shadow-blue-glow {
-    box-shadow: 0 0 20px rgba(2,179,201,0.3), 0 0 40px rgba(0,0,0,0.05);
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   }
 }
 
-/* Enhanced animations with more random and circular movements */
+/* New morphing blobs with more random and circular movements */
+.morphing-bg::before {
+  /* Add multiple moving blobs with pseudo-elements */
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 40% 70%, rgba(249,115,22,0.7) 0%, transparent 40%) 0% 0%,
+    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.7) 0%, transparent 35%) 0% 0%,
+    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.7) 0%, transparent 40%) 0% 0%;
+  background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%;
+  animation: 
+    blob-move-1 25s ease infinite alternate,
+    blob-morph 30s ease infinite;
+}
+
+/* Create separate keyframes for each blob's movement */
+@keyframes blob-move-1 {
+  0% {
+    background-position: 
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%,
+      0% 0%;
+  }
+  100% {
+    background-position: 
+      100% 100%,
+      70% 50%,
+      30% 80%,
+      80% 30%,
+      50% 90%,
+      20% 60%;
+  }
+}
+
+@keyframes blob-morph {
+  0%, 100% {
+    border-radius: 
+      60% 40% 30% 70% / 60% 30% 70% 40%,
+      40% 60% 70% 30% / 30% 40% 60% 70%,
+      60% 40% 30% 70% / 60% 30% 70% 40%,
+      40% 60% 70% 30% / 30% 40% 60% 70%,
+      60% 40% 30% 70% / 60% 30% 70% 40%,
+      40% 60% 70% 30% / 30% 40% 60% 70%;
+  }
+  20% {
+    border-radius: 
+      30% 60% 70% 40% / 50% 60% 30% 60%,
+      70% 30% 40% 60% / 60% 50% 70% 40%,
+      30% 60% 70% 40% / 50% 60% 30% 60%,
+      70% 30% 40% 60% / 60% 50% 70% 40%,
+      30% 60% 70% 40% / 50% 60% 30% 60%,
+      70% 30% 40% 60% / 60% 50% 70% 40%;
+  }
+  40% {
+    border-radius: 
+      40% 60% 40% 70% / 70% 30% 50% 40%,
+      60% 40% 70% 30% / 30% 70% 40% 60%,
+      40% 60% 40% 70% / 70% 30% 50% 40%,
+      60% 40% 70% 30% / 30% 70% 40% 60%,
+      40% 60% 40% 70% / 70% 30% 50% 40%,
+      60% 40% 70% 30% / 30% 70% 40% 60%;
+  }
+  60% {
+    border-radius: 
+      60% 40% 70% 30% / 40% 50% 60% 50%,
+      30% 70% 30% 80% / 80% 30% 30% 60%,
+      60% 40% 70% 30% / 40% 50% 60% 50%,
+      30% 70% 30% 80% / 80% 30% 30% 60%,
+      60% 40% 70% 30% / 40% 50% 60% 50%,
+      30% 70% 30% 80% / 80% 30% 30% 60%;
+  }
+  80% {
+    border-radius: 
+      50% 50% 30% 70% / 70% 30% 70% 30%,
+      70% 30% 50% 50% / 40% 60% 40% 60%,
+      50% 50% 30% 70% / 70% 30% 70% 30%,
+      70% 30% 50% 50% / 40% 60% 40% 60%,
+      50% 50% 30% 70% / 70% 30% 70% 30%,
+      70% 30% 50% 50% / 40% 60% 40% 60%;
+  }
+}
+
+/* Keep the remaining animations and utilities from the original file */
 @keyframes float-slow {
   0%, 100% {
     transform: translateY(0) scale(1);
   }
   33% {
-    transform: translateY(-25px) scale(1.05) rotate(-2deg); /* More dramatic movement */
+    transform: translateY(-25px) scale(1.05) rotate(-2deg);
   }
   66% {
-    transform: translateY(-20px) scale(1.07) rotate(3deg); /* More dramatic movement */
+    transform: translateY(-20px) scale(1.07) rotate(3deg);
   }
 }
 
@@ -350,10 +290,10 @@
     transform: translateY(0) rotate(0);
   }
   33% {
-    transform: translateY(-15px) rotate(-3deg); /* More dramatic movement */
+    transform: translateY(-15px) rotate(-3deg);
   }
   66% {
-    transform: translateY(-20px) rotate(2deg); /* More dramatic movement */
+    transform: translateY(-20px) rotate(2deg);
   }
 }
 
@@ -362,10 +302,10 @@
     transform: translateY(0) rotate(0);
   }
   33% {
-    transform: translateY(20px) rotate(4deg); /* More dramatic movement */
+    transform: translateY(20px) rotate(4deg);
   }
   66% {
-    transform: translateY(25px) rotate(-2deg); /* More dramatic movement */
+    transform: translateY(25px) rotate(-2deg);
   }
 }
 
@@ -374,10 +314,10 @@
     transform: translateY(0) rotate(0) scale(1);
   }
   33% {
-    transform: translateY(15px) rotate(-3deg) scale(1.03); /* More dramatic movement */
+    transform: translateY(15px) rotate(-3deg) scale(1.03);
   }
   66% {
-    transform: translateY(20px) rotate(2deg) scale(1.05); /* More dramatic movement */
+    transform: translateY(20px) rotate(2deg) scale(1.05);
   }
 }
 
@@ -387,24 +327,12 @@
     opacity: 0.5;
   }
   33% {
-    transform: scale(1.05); /* More dramatic pulsing */
-    opacity: 0.65; /* More vibrant */
+    transform: scale(1.05);
+    opacity: 0.65;
   }
   66% {
-    transform: scale(1.07); /* More dramatic pulsing */
-    opacity: 0.60; /* More vibrant */
-  }
-}
-
-/* New animation for sparkles */
-@keyframes sparkle {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(0) translateY(0);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1) translateY(-10px);
+    transform: scale(1.07);
+    opacity: 0.60;
   }
 }
 
@@ -413,7 +341,7 @@
     border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
   }
   25% {
-    border-radius: 30% 60% 70% 40% / 50% 60% 40% 60%;
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
   }
   50% {
     border-radius: 40% 60% 40% 70% / 70% 30% 50% 40%;
@@ -494,399 +422,7 @@
   }
 }
 
-@keyframes glass-flow-slow {
-  0% {
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-  25% {
-    border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
-    transform: rotate(5deg) scale(1.05) translateX(2%) translateY(-2%);
-  }
-  50% {
-    border-radius: 50% 50% 30% 70% / 70% 30% 70% 30%;
-    transform: rotate(0deg) scale(1.1) translateX(5%) translateY(0);
-  }
-  75% {
-    border-radius: 30% 70% 60% 40% / 50% 60% 40% 50%;
-    transform: rotate(-5deg) scale(1.05) translateX(2%) translateY(2%);
-  }
-  100% {
-    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-}
-
-@keyframes glass-flow-reverse {
-  0% {
-    border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-  25% {
-    border-radius: 30% 70% 50% 50% / 60% 40% 60% 40%;
-    transform: rotate(-5deg) scale(1.05) translateX(-2%) translateY(2%);
-  }
-  50% {
-    border-radius: 50% 50% 70% 30% / 30% 70% 30% 70%;
-    transform: rotate(0deg) scale(1.1) translateX(-5%) translateY(0);
-  }
-  75% {
-    border-radius: 70% 30% 40% 60% / 50% 40% 60% 50%;
-    transform: rotate(5deg) scale(1.05) translateX(-2%) translateY(-2%);
-  }
-  100% {
-    border-radius: 70% 30% 30% 70% / 70% 70% 30% 30%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-}
-
-@keyframes glass-flow-medium {
-  0% {
-    border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-  33% {
-    border-radius: 60% 40% 30% 70% / 50% 50% 50% 50%;
-    transform: rotate(3deg) scale(1.03) translateX(3%) translateY(-1%);
-  }
-  66% {
-    border-radius: 35% 65% 65% 35% / 65% 35% 35% 65%;
-    transform: rotate(-3deg) scale(1.03) translateX(-1%) translateY(3%);
-  }
-  100% {
-    border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
-    transform: rotate(0deg) scale(1) translateX(0) translateY(0);
-  }
-}
-
-@keyframes glass-swirl {
-  0% {
-    border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%;
-    transform: rotate(0deg) scale(1);
-  }
-  33% {
-    border-radius: 45% 55% 35% 65% / 40% 50% 50% 60%;
-    transform: rotate(120deg) scale(1.05);
-  }
-  66% {
-    border-radius: 35% 65% 65% 35% / 70% 30% 40% 60%;
-    transform: rotate(240deg) scale(1.1);
-  }
-  100% {
-    border-radius: 60% 40% 40% 60% / 60% 60% 40% 40%;
-    transform: rotate(360deg) scale(1);
-  }
-}
-
-@keyframes glass-swirl-reverse {
-  0% {
-    border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
-    transform: rotate(0deg) scale(1);
-  }
-  33% {
-    border-radius: 55% 45% 65% 35% / 50% 40% 60% 50%;
-    transform: rotate(-120deg) scale(1.05);
-  }
-  66% {
-    border-radius: 65% 35% 35% 65% / 30% 70% 60% 40%;
-    transform: rotate(-240deg) scale(1.1);
-  }
-  100% {
-    border-radius: 40% 60% 60% 40% / 40% 40% 60% 60%;
-    transform: rotate(-360deg) scale(1);
-  }
-}
-
-@keyframes orb-float {
-  0% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.5;
-  }
-  33% {
-    transform: translateY(-30px) translateX(10px) scale(1.05);
-    opacity: 0.7;
-  }
-  66% {
-    transform: translateY(-20px) translateX(30px) scale(1.03);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.5;
-  }
-}
-
-@keyframes orb-float-reverse {
-  0% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.5;
-  }
-  33% {
-    transform: translateY(30px) translateX(-10px) scale(1.05);
-    opacity: 0.7;
-  }
-  66% {
-    transform: translateY(20px) translateX(-30px) scale(1.03);
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(0) translateX(0) scale(1);
-    opacity: 0.5;
-  }
-}
-
-@keyframes orb-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.1);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-}
-
-@keyframes ripple {
-  0% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-  50% {
-    transform: scale(1.3);
-    opacity: 0.3;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.6;
-  }
-}
-
-@keyframes ripple-reverse {
-  0% {
-    transform: scale(1.2);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(0.9);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1.2);
-    opacity: 0.3;
-  }
-}
-
-@keyframes ripple-slow {
-  0% {
-    transform: scale(0.9);
-    opacity: 0.5;
-  }
-  33% {
-    transform: scale(1.1);
-    opacity: 0.3;
-  }
-  66% {
-    transform: scale(1.3);
-    opacity: 0.2;
-  }
-  100% {
-    transform: scale(0.9);
-    opacity: 0.5;
-  }
-}
-
-@keyframes particle-float {
-  0% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.2;
-  }
-  50% {
-    transform: translateY(-20px) translateX(10px);
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(0) translateX(0);
-    opacity: 0.2;
-  }
-}
-
-@keyframes particle-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-  50% {
-    transform: scale(1.5);
-    opacity: 0.7;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.3;
-  }
-}
-
-@keyframes sparkle {
-  0% {
-    transform: scale(0) rotate(0deg);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1) rotate(180deg);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@keyframes edge-shine {
-  0% {
-    opacity: 0.2;
-    transform: rotate(0deg) skew(20deg) translateX(0);
-    filter: blur(3px);
-  }
-  50% {
-    opacity: 0.7;
-    transform: rotate(5deg) skew(0deg) translateX(10px); 
-    filter: blur(1px);
-  }
-  100% {
-    opacity: 0.2;
-    transform: rotate(0deg) skew(20deg) translateX(0);
-    filter: blur(3px);
-  }
-}
-
-/* New fluid animations specifically for the watercolor/liquid art effect */
-@keyframes color-blend {
-  0% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg);
-  }
-  50% {
-    background-position: 100% 50%;
-    filter: hue-rotate(15deg);
-  }
-  100% {
-    background-position: 0% 50%;
-    filter: hue-rotate(0deg);
-  }
-}
-
-@keyframes blob-float-large {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 60% 40% 70% 30% / 40% 50% 60% 50%;
-  }
-  33% {
-    transform: translate(2%, -3%) scale(1.05) rotate(5deg);
-    border-radius: 50% 60% 30% 70% / 60% 40% 70% 30%;
-  }
-  66% {
-    transform: translate(-2%, 2%) scale(0.98) rotate(-3deg);
-    border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
-  }
-  100% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 60% 40% 70% 30% / 40% 50% 60% 50%;
-  }
-}
-
-@keyframes blob-float-medium {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
-  }
-  33% {
-    transform: translate(-3%, 2%) scale(1.03) rotate(-5deg);
-    border-radius: 50% 50% 40% 60% / 40% 60% 30% 70%;
-  }
-  66% {
-    transform: translate(1%, -2%) scale(0.97) rotate(4deg);
-    border-radius: 60% 40% 50% 50% / 30% 50% 60% 40%;
-  }
-  100% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%;
-  }
-}
-
-@keyframes blob-float-small {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 50% 50% 60% 40% / 40% 60% 50% 60%;
-  }
-  33% {
-    transform: translate(3%, 2%) scale(1.08) rotate(3deg);
-    border-radius: 60% 40% 40% 60% / 50% 40% 60% 50%;
-  }
-  66% {
-    transform: translate(-2%, -1%) scale(0.95) rotate(-4deg);
-    border-radius: 40% 60% 50% 50% / 60% 50% 40% 50%;
-  }
-  100% {
-    transform: translate(0, 0) scale(1) rotate(0);
-    border-radius: 50% 50% 60% 40% / 40% 60% 50% 60%;
-  }
-}
-
-@keyframes blob-float-subtle {
-  0% {
-    transform: translate(0, 0) scale(1);
-    border-radius: 50%;
-  }
-  50% {
-    transform: translate(1%, -1%) scale(1.1);
-    border-radius: 45% 55% 60% 40% / 55% 45% 50% 45%;
-  }
-  100% {
-    transform: translate(0, 0) scale(1);
-    border-radius: 50%;
-  }
-}
-
-@keyframes blob-pulse {
-  0% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-  50% {
-    transform: scale(1.15);
-    opacity: 0.6;
-  }
-  100% {
-    transform: scale(1);
-    opacity: 0.4;
-  }
-}
-
 @layer utilities {
-  /* Add new watercolor blob animation utilities */
-  .animate-blob-float-large {
-    animation: blob-float-large 25s ease-in-out infinite;
-  }
-  
-  .animate-blob-float-medium {
-    animation: blob-float-medium 20s ease-in-out infinite;
-  }
-  
-  .animate-blob-float-small {
-    animation: blob-float-small 18s ease-in-out infinite;
-  }
-  
-  .animate-blob-float-subtle {
-    animation: blob-float-subtle 15s ease-in-out infinite;
-  }
-  
-  .animate-blob-pulse {
-    animation: blob-pulse 10s ease-in-out infinite;
-  }
-  
   .animate-float-slow {
     animation: float-slow 20s ease-in-out infinite;
   }
@@ -907,10 +443,6 @@
     animation: pulse-float 12s ease-in-out infinite;
   }
   
-  .animate-sparkle {
-    animation: sparkle 5s ease-in-out infinite;
-  }
-  
   .animate-gradient {
     background-size: 300% 300%;
     animation: gradient-shift 10s ease infinite;
@@ -929,133 +461,25 @@
   }
   
   .animate-diagonal-reverse-wave {
-    animation: diagonal-reverse-wave 25s linear infinite;
+    animation: diagonal-reverse-wave 30s linear infinite;
   }
   
   .animate-cross-diagonal-wave {
-    animation: cross-diagonal-wave 25s linear infinite;
+    animation: cross-diagonal-wave 35s linear infinite;
   }
   
-  .animate-glass-morph {
-    animation: glass-flow-slow 30s ease-in-out infinite;
-  }
-  
-  .animate-glass-morph-reverse {
-    animation: glass-flow-reverse 30s ease-in-out infinite;
-  }
-  
-  .animate-glass-morph-alt {
-    animation: glass-flow-medium 25s ease-in-out infinite;
-  }
-  
-  .animate-glass-swirl {
-    animation: glass-swirl 45s ease-in-out infinite;
-  }
-  
-  .animate-glass-swirl-reverse {
-    animation: glass-swirl-reverse 45s ease-in-out infinite;
-  }
-  
-  .animate-fluid-morph {
-    animation: glass-flow-slow 35s ease-in-out infinite;
-  }
-  
-  .animate-fluid-morph-alt {
-    animation: glass-flow-reverse 35s ease-in-out infinite;
-  }
-  
-  .animate-fluid-morph-slow {
-    animation: glass-flow-medium 40s ease-in-out infinite;
-  }
-  
-  .animate-orb-float {
-    animation: orb-float 20s ease-in-out infinite;
-  }
-  
-  .animate-orb-float-reverse {
-    animation: orb-float-reverse 20s ease-in-out infinite;
-  }
-  
-  .animate-orb-pulse {
-    animation: orb-pulse 15s ease-in-out infinite;
-  }
-  
-  .animate-ripple {
-    animation: ripple 15s ease-in-out infinite;
-  }
-  
-  .animate-ripple-reverse {
-    animation: ripple-reverse 15s ease-in-out infinite;
-  }
-  
-  .animate-ripple-slow {
-    animation: ripple-slow 20s ease-in-out infinite;
-  }
-  
-  .animate-bubble-float {
-    animation: float-medium 25s ease-in-out infinite;
-  }
-  
-  .animate-bubble-float-small {
-    animation: float-slow 15s ease-in-out infinite;
-  }
-  
-  .animate-droplet-float {
-    animation: particle-float 10s ease-in-out infinite;
-  }
-  
-  .animate-color-swirl {
-    animation: glass-swirl 50s ease-in-out infinite;
-  }
-  
-  .animate-particle-pulse {
-    animation: particle-pulse 8s ease-in-out infinite;
-  }
-  
-  .animate-sparkle-effect {
-    animation: sparkle 4s ease-in-out infinite;
-  }
-  
-  .animate-edge-shine {
-    animation: edge-shine 8s ease-in-out infinite;
-  }
-  
-  .animate-color-blend {
-    animation: color-blend 15s ease-in-out infinite;
-  }
-  
-  .animate-shine-sweep {
-    background-size: 200% auto;
-    animation: shine 8s linear infinite;
-  }
-  
-  .bg-glass-shine {
-    background: radial-gradient(circle, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0) 70%);
-  }
-  
-  .bg-glass-orange-blue {
-    background: radial-gradient(circle, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 70%);
-  }
-  
-  .bg-vibrant-gradient-1 {
-    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(255,255,255,0.3) 50%, rgba(51,195,240,0.8) 100%);
-  }
-  
-  .bg-vibrant-gradient-2 {
-    background: linear-gradient(135deg, rgba(51,195,240,0.8) 0%, rgba(255,255,255,0.3) 50%, rgba(249,115,22,0.8) 100%);
-  }
-  
-  .bg-vibrant-gradient-3 {
-    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(249,115,22,0.6) 50%, rgba(51,195,240,0.6) 100%);
-  }
-  
-  .bg-radial-subtle {
-    background: radial-gradient(circle at center, transparent 0%, rgba(255,255,255,0.8) 100%);
+  .animate-gradient-circular {
+    animation: gradient-circular-motion 15s ease infinite;
   }
 }
 
-@keyframes shine {
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
   to {
-    background-position: 200% center;
+    opacity: 1;
+    transform: translateY(0);
   }
 }
