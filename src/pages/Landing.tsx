@@ -6,24 +6,26 @@ import { ArrowRight } from "lucide-react";
 
 const Landing = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start fluid-bg-diagonal overflow-hidden">
-      {/* Title section positioned lower from the top */}
-      <div className="w-full pt-24 pb-16 relative z-10 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold text-white shadow-lg">
-          GlassFuse Studio
-        </h1>
-        
-        <p className="text-xl mt-4 text-white/90 max-w-2xl mx-auto px-4">
-          Create, share, and perfect your glass fusion firing curves
-        </p>
-      </div>
-      
+    <div className="min-h-screen flex items-center justify-center fluid-bg-diagonal overflow-hidden">
       <div className="container relative z-10 max-w-2xl w-full px-4">
-        <p className="text-xl text-foreground/80 mb-8 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
-          Join a community of passionate glass fusion artists
-        </p>
+        {/* Title directly on background with gradient text */}
+        <div className="text-center mb-8 relative">
+          <div className="mb-4">
+            <h1 className="text-5xl sm:text-6xl font-bold relative z-10 gradient-text-dark">
+              GlassFuse Studio
+            </h1>
+            
+            <p className="text-xl mt-4 relative z-10 gradient-text-dark">
+              Create, share, and perfect your glass fusion firing curves
+            </p>
+          </div>
+          
+          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
+            Join a community of passionate glass fusion artists
+          </p>
+        </div>
         
-        {/* Feature grid directly on the blob background */}
+        {/* Feature grid directly on the blob background, without the glass-surface wrapper */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
