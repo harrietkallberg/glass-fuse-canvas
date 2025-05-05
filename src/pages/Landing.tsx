@@ -20,11 +20,11 @@ const Landing = () => {
         <div className="text-center w-full mb-6 relative">
           <div className="bg-transparent p-6 rounded-xl mb-6 relative">
             <div className="relative">
-              <h1 className="text-5xl sm:text-6xl font-bold text-[#2A6B6B] mb-3 relative" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
+              <h1 className="text-5xl sm:text-6xl font-bold text-[#1e4e4e] mb-3 relative" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
                 GlassFuse Studio
               </h1>
               
-              <p className="text-xl text-[#3A8080] relative" style={{ textShadow: '1px 2px 3px rgba(0,0,0,0.1)' }}>
+              <p className="text-xl text-[#2d6565] relative" style={{ textShadow: '1px 2px 3px rgba(0,0,0,0.1)' }}>
                 Create, share, and perfect your glass fusion firing curves
               </p>
             </div>
