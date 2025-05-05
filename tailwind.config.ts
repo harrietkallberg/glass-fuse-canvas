@@ -67,11 +67,7 @@ export default {
 					orangeBrown: '#bd8770',
 					taupe: '#aea795',
 					brown: '#745641',
-					cream: '#f7e2c8',
-					// Oven effect colors
-					ember: '#FF6B00',           // Hot orange ember color
-					spark: '#FFA500',           // Bright spark color
-					hotOrange: '#FF4500'        // Deep orange for hot spots
+					cream: '#f7e2c8'
 				}
 			},
 			borderRadius: {
@@ -111,46 +107,13 @@ export default {
 					'50%': {
 						opacity: '0.8'
 					}
-				},
-				'ember-float': {
-					'0%': {
-						transform: 'translateY(0) scale(1)',
-						opacity: '0.6'
-					},
-					'50%': {
-						transform: 'translateY(-15px) scale(1.2)',
-						opacity: '1'
-					},
-					'100%': {
-						transform: 'translateY(-30px) scale(0.8)',
-						opacity: '0'
-					}
-				},
-				'spark-pulse': {
-					'0%': {
-						transform: 'scale(1)',
-						opacity: '0.7',
-						boxShadow: '0 0 4px 1px rgba(255, 165, 0, 0.7)'
-					},
-					'50%': {
-						transform: 'scale(1.5)',
-						opacity: '1',
-						boxShadow: '0 0 8px 3px rgba(255, 165, 0, 0.9)'
-					},
-					'100%': {
-						transform: 'scale(0.8)',
-						opacity: '0.5',
-						boxShadow: '0 0 2px 1px rgba(255, 165, 0, 0.5)'
-					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
-				'ember-float': 'ember-float 3s ease-in-out infinite',
-				'spark-pulse': 'spark-pulse 2s ease-out infinite'
+				'pulse-soft': 'pulse-soft 4s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
@@ -165,10 +128,6 @@ export default {
 				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
 				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
 				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
-				// Oven effect gradients
-				'oven-gradient-1': 'linear-gradient(135deg, #000000 0%, #FF6B00 50%, #000000 100%)',
-				'oven-gradient-2': 'linear-gradient(135deg, #FF4500 0%, #FFA500 50%, #FF4500 100%)',
-				'oven-gradient-3': 'radial-gradient(circle, #FF6B00 0%, transparent 70%)',
 			}
 		}
 	},

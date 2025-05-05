@@ -19,40 +19,8 @@ const Landing = () => {
         <div className="fluid-shape w-[18vw] h-[18vw] animate-wave animate-float-medium bg-[#FEC6A1]/15 left-[30vw] top-[15vh]"></div>
         <div className="fluid-shape w-[22vw] h-[22vw] rounded-full animate-float-reverse bg-[#bd8770]/15 right-[10vw] bottom-[20vh]"></div>
         
-        {/* Orange sparkle particles (hot oven effect) */}
-        <div className="absolute inset-0 z-0">
-          {Array.from({ length: 50 }).map((_, index) => (
-            <div 
-              key={`ember-${index}`}
-              className="absolute w-1 h-1 rounded-full bg-[#FF6B00] animate-ember"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                animationDuration: `${2 + Math.random() * 4}s`,
-                opacity: 0.8 + Math.random() * 0.2,
-                boxShadow: '0 0 6px 2px rgba(255, 107, 0, 0.6)'
-              }}
-            />
-          ))}
-          {Array.from({ length: 30 }).map((_, index) => (
-            <div 
-              key={`spark-${index}`}
-              className="absolute w-[3px] h-[3px] rounded-full bg-[#FFA500] animate-spark"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${1 + Math.random() * 2}s`,
-                opacity: 0.9,
-                boxShadow: '0 0 8px 3px rgba(255, 165, 0, 0.7)'
-              }}
-            />
-          ))}
-        </div>
-
-        {/* Original sparkle particles */}
-        <div className="absolute inset-0 z-10">
+        {/* Sparkle particles */}
+        <div className="absolute inset-0">
           {Array.from({ length: 30 }).map((_, index) => (
             <div 
               key={index}
