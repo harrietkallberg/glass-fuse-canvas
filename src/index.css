@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -173,7 +172,7 @@
     @apply relative overflow-hidden;
     background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
     background-size: 400% 400%;
-    animation: gradient-circular-motion 15s ease infinite;
+    animation: gradient-heat-motion 15s ease infinite;
     position: relative;
   }
 
@@ -181,10 +180,10 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%);
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(249,115,22,0.8) 50%, rgba(0,0,0,0.7) 100%);
     background-size: 400% 400%;
-    filter: blur(50px);
-    animation: gradient-circular-motion 20s ease infinite reverse;
+    filter: blur(30px);
+    animation: gradient-heat-pulse 20s ease infinite;
     z-index: 0;
     opacity: 0.8;
   }
@@ -193,12 +192,12 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-color: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(20px);
+    background-color: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
     z-index: 1;
   }
 
-  /* Updated title styling with darker gradient text */
+  /* Updated title styling - removing container and applying gradient text */
   .gradient-text {
     background: linear-gradient(135deg, rgba(249,115,22,1) 0%, rgba(51,195,240,1) 100%);
     background-size: 400% 400%;
@@ -217,103 +216,6 @@
     background-clip: text;
     color: transparent;
     text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  /* New dark-orange gradient text for the title */
-  .text-gradient-dark-orange {
-    background: linear-gradient(135deg, #FF7A00 0%, #1A0A00 100%);
-    background-size: 200% 200%;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
-  }
-
-  /* Hot oven background with orange to black animated gradient */
-  .hot-oven-bg {
-    position: relative;
-    background: linear-gradient(135deg, rgba(20,20,20,1) 0%, rgba(30,15,0,1) 50%, rgba(20,20,20,1) 100%);
-    background-size: 400% 400%;
-    animation: hot-oven-gradient 15s ease infinite;
-    overflow: hidden;
-  }
-  
-  .hot-oven-bg::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(
-      circle at 50% 50%,
-      rgba(249,115,22,0.4) 0%,
-      rgba(249,115,22,0.1) 30%,
-      rgba(0,0,0,0) 70%
-    );
-    filter: blur(30px);
-    z-index: 1;
-    animation: hot-glow-pulse 8s ease-in-out infinite alternate;
-  }
-  
-  /* Main glass blob containing all content */
-  .glass-blob-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 90%;
-    max-width: 1100px;
-    aspect-ratio: 1.5 / 1;
-  }
-  
-  /* Updated glass blob with inward shadow */
-  .glass-blob {
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(51,195,240,0.8) 0%, rgba(249,115,22,0.8) 100%);
-    border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 3rem;
-    position: relative;
-    z-index: 10;
-    animation: blob-morph 20s ease-in-out infinite;
-    overflow: hidden;
-  }
-  
-  /* New inward shadow style for the glass blob */
-  .glass-blob-inward-shadow {
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 
-                inset 0 0 20px rgba(0,0,0,0.5),
-                0 0 30px rgba(249,115,22,0.4);
-  }
-  
-  /* New inward shadow ONLY style for the glass blob - without the orange glow */
-  .glass-blob-inward-shadow-only {
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 
-                inset 0 0 20px rgba(0,0,0,0.5);
-  }
-  
-  .glass-blob::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
-    border-radius: inherit;
-    z-index: -1;
-  }
-  
-  /* Hot sparkle animations with slowed down speeds */
-  .hot-sparkle {
-    position: absolute;
-    animation: hot-sparkle-float 8s ease-in-out infinite; /* Slower animation */
-    box-shadow: 0 0 10px 2px currentColor;
-    z-index: 2;
-  }
-  
-  .hot-ember {
-    position: absolute;
-    animation: hot-ember-float 12s ease-in-out infinite; /* Slower animation */
-    box-shadow: 0 0 15px 3px currentColor;
-    z-index: 2;
   }
 }
 
@@ -390,6 +292,80 @@
   50% {
     opacity: 1;
     transform: scale(1) translateY(-10px);
+  }
+}
+
+/* New animations for embers and sparks */
+@keyframes ember {
+  0% {
+    opacity: 0.4;
+    transform: translateY(0) scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-15px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.8);
+  }
+}
+
+@keyframes spark {
+  0% {
+    opacity: 0.7;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.5);
+    box-shadow: 0 0 12px 4px rgba(255, 165, 0, 0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-16px) scale(0.8);
+  }
+}
+
+/* Hot oven background animations */
+@keyframes gradient-heat-motion {
+  0% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 100% 25%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  75% {
+    background-position: 0% 75%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes gradient-heat-pulse {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.7;
+  }
+  25% {
+    background-position: 100% 0%;
+    opacity: 0.9;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.8;
+  }
+  75% {
+    background-position: 0% 100%;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.7;
   }
 }
 
@@ -479,75 +455,6 @@
   }
 }
 
-@keyframes hot-oven-gradient {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-}
-
-@keyframes hot-glow-pulse {
-  0%, 100% {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.9;
-    transform: scale(1.1);
-  }
-}
-
-@keyframes hot-sparkle-float {
-  0% {
-    transform: translateY(0) translateX(0);
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    opacity: 0.8;
-  }
-  100% {
-    transform: translateY(-100px) translateX(var(--translate-x, 20px));
-    opacity: 0;
-  }
-}
-
-@keyframes hot-ember-float {
-  0% {
-    transform: translateY(0) translateX(0) rotate(0deg);
-    opacity: 0;
-  }
-  10% {
-    opacity: 1;
-  }
-  90% {
-    opacity: 0.6;
-  }
-  100% {
-    transform: translateY(-150px) translateX(var(--translate-x, 30px)) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-@keyframes blob-morph {
-  0%, 100% {
-    border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
-  }
-  25% {
-    border-radius: 50% 50% 40% 60% / 40% 50% 50% 60%;
-  }
-  50% {
-    border-radius: 40% 60% 50% 50% / 60% 40% 60% 40%;
-  }
-  75% {
-    border-radius: 50% 40% 60% 40% / 50% 50% 40% 60%;
-  }
-}
-
 @layer utilities {
   .animate-float-slow {
     animation: float-slow 20s ease-in-out infinite;
@@ -571,6 +478,14 @@
   
   .animate-sparkle {
     animation: sparkle 5s ease-in-out infinite;
+  }
+  
+  .animate-ember {
+    animation: ember 3s ease-in-out infinite;
+  }
+  
+  .animate-spark {
+    animation: spark 2s ease-out infinite;
   }
   
   .animate-gradient {
