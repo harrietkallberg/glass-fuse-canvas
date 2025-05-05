@@ -1,0 +1,82 @@
+
+@layer components {
+  .glass {
+    @apply bg-white/30 backdrop-blur-md border border-white/50 shadow-md;
+  }
+  
+  .glass-card {
+    @apply rounded-2xl bg-white/40 backdrop-blur-md border border-white/50 shadow-md transition-all hover:shadow-lg;
+  }
+  
+  /* Updated glass components with more vibrant earth tones */
+  .glass-earth-orange {
+    @apply bg-[#bd8770]/20 backdrop-blur-md border border-[#bd8770]/30 shadow-md;
+  }
+  
+  .glass-earth-cream {
+    @apply bg-[#f7e2c8]/30 backdrop-blur-md border border-[#f7e2c8]/40 shadow-md;
+  }
+  
+  .glass-earth-sage {
+    @apply bg-[#658579]/20 backdrop-blur-md border border-[#658579]/30 shadow-md;
+  }
+  
+  .glass-earth-taupe {
+    @apply bg-[#aea795]/30 backdrop-blur-md border border-[#aea795]/40 shadow-md;
+  }
+
+  /* New vibrant glass components */
+  .glass-vibrant-orange {
+    @apply bg-[#F97316]/15 backdrop-blur-md border border-[#F97316]/25 shadow-md;
+  }
+  
+  .glass-vibrant-cream {
+    @apply bg-[#FEC6A1]/25 backdrop-blur-md border border-[#FEC6A1]/35 shadow-md;
+  }
+  
+  .glass-vibrant-sage {
+    @apply bg-[#33C3F0]/15 backdrop-blur-md border border-[#33C3F0]/25 shadow-md;
+  }
+  
+  .glass-vibrant-taupe {
+    @apply bg-[#A5D8E2]/25 backdrop-blur-md border border-[#A5D8E2]/35 shadow-md;
+  }
+  
+  .glass-orange {
+    @apply bg-glass-orange/20 backdrop-blur-md border border-glass-orange/30 shadow-md;
+  }
+  
+  .glass-yellow {
+    @apply bg-glass-yellow/30 backdrop-blur-md border border-glass-yellow/40 shadow-md;
+  }
+  
+  .glass-green {
+    @apply bg-glass-green/20 backdrop-blur-md border border-glass-green/30 shadow-md;
+  }
+  
+  .glass-turquoise {
+    @apply bg-glass-turquoise/30 backdrop-blur-md border border-glass-turquoise/40 shadow-md;
+  }
+  
+  /* Add gradient text styling */
+  .gradient-text-dark {
+    background: linear-gradient(135deg, rgba(189,75,0,1) 0%, rgba(11,145,190,1) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    filter: drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.2)); /* Better text edge definition */
+    position: relative;
+    z-index: 15; /* Ensure text stays above all background elements */
+  }
+
+  /* Add text shadow utility */
+  .text-shadow-lg {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+}

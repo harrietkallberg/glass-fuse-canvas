@@ -1,0 +1,65 @@
+
+/* Old components to keep */
+.fluid-bg {
+  @apply relative overflow-hidden;
+}
+
+.fluid-shape {
+  @apply absolute blur-3xl;
+  filter: blur(72px); /* Increased blur for more ethereal effect */
+}
+
+/* New morphing background with multiple blobs */
+.morphing-bg {
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.6);
+  overflow: hidden;
+  min-height: 100vh;
+}
+
+.morphing-bg::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+}
+
+/* Multiple blob gradients - positioned absolutely */
+.morphing-bg::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+/* Create the multi-blob effect with pseudo-elements */
+.morphing-bg {
+  --blob-size-1: 45vw;
+  --blob-size-2: 35vw;
+  --blob-size-3: 40vw;
+  --blob-size-4: 30vw;
+  --blob-size-5: 25vw;
+  --blob-size-6: 35vw;
+}
+
+/* New morphing blobs with more random and circular movements */
+.morphing-bg::before {
+  /* Add multiple moving blobs with pseudo-elements */
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(249,115,22,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 80% 40%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 40% 70%, rgba(249,115,22,0.7) 0%, transparent 40%) 0% 0%,
+    radial-gradient(circle at 60% 10%, rgba(51,195,240,0.7) 0%, transparent 50%) 0% 0%,
+    radial-gradient(circle at 10% 90%, rgba(249,115,22,0.7) 0%, transparent 35%) 0% 0%,
+    radial-gradient(circle at 90% 80%, rgba(51,195,240,0.7) 0%, transparent 40%) 0% 0%;
+  background-size: 200% 200%, 180% 180%, 170% 170%, 160% 160%, 150% 150%, 140% 140%;
+  animation: 
+    blob-move-1 25s ease infinite alternate,
+    blob-morph 30s ease infinite;
+}
