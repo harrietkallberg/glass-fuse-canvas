@@ -25,104 +25,58 @@ const Landing = () => {
     };
     window.addEventListener('resize', handleResize);
 
-    // Particle class with glass-like effect
+    // Particle class
     class Particle {
       x: number;
       y: number;
       size: number;
-      baseColor: string;
+      color: string;
       speedX: number;
       speedY: number;
       opacity: number;
-      pulseSpeed: number;
-      glowRadius: number;
+      colorShift: number;
 
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 5 + 2; // Much smaller sizes (was 20 + 8)
-        this.baseColor = Math.random() > 0.5 ? '#F97316' : '#33C3F0'; // Orange or Teal
-        this.speedX = (Math.random() - 0.5) * 0.3; // Slower movement
-        this.speedY = (Math.random() - 0.5) * 0.3;
-        this.opacity = Math.random() * 0.5 + 0.2; // More visible
-        this.pulseSpeed = Math.random() * 0.002 + 0.001; // Speed of pulsing effect
-        this.glowRadius = this.size * 0.7; // Size of the inner glow
+        this.size = Math.random() * 15 + 5; // Varying sizes
+        this.color = Math.random() > 0.5 ? '#F97316' : '#33C3F0'; // Orange or Teal
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.opacity = Math.random() * 0.3 + 0.1;
+        this.colorShift = Math.random() * 0.01;
       }
 
       update() {
         this.x += this.speedX;
         this.y += this.speedY;
 
-        // Boundary check with smooth turning
-        if (this.x < 0 || this.x > canvas.width) {
-          this.speedX = -this.speedX * 0.9; // Slow down slightly when bouncing
-          // Ensure particle stays within bounds
-          if (this.x < 0) this.x = 1;
-          if (this.x > canvas.width) this.x = canvas.width - 1;
-        }
-        
-        if (this.y < 0 || this.y > canvas.height) {
-          this.speedY = -this.speedY * 0.9;
-          // Ensure particle stays within bounds
-          if (this.y < 0) this.y = 1;
-          if (this.y > canvas.height) this.y = canvas.height - 1;
-        }
+        // Boundary check
+        if (this.x < 0 || this.x > canvas.width) this.speedX = -this.speedX;
+        if (this.y < 0 || this.y > canvas.height) this.speedY = -this.speedY;
 
-        // Pulsing opacity for morphing effect
-        this.opacity = 0.2 + Math.sin(Date.now() * this.pulseSpeed) * 0.1 + 0.2;
+        // Slowly shift opacity for morphing effect
+        this.opacity += Math.sin(Date.now() * 0.001) * 0.01;
+        this.opacity = Math.max(0.1, Math.min(0.4, this.opacity));
       }
 
       draw() {
         if (!ctx) return;
-        
-        // Create glass-like effect with gradient
-        const gradient = ctx.createRadialGradient(
-          this.x, this.y, 0,
-          this.x, this.y, this.size
-        );
-        
-        // Get the base color components for manipulating
-        const isOrange = this.baseColor === '#F97316';
-        let r = isOrange ? 249 : 51;
-        let g = isOrange ? 115 : 195;
-        let b = isOrange ? 22 : 240;
-        
-        // Create lighter center, darker edge gradient
-        // Inner light center - almost white tint of the base color
-        gradient.addColorStop(0, `rgba(${r + (255-r)*0.7}, ${g + (255-g)*0.7}, ${b + (255-b)*0.7}, ${this.opacity * 1.2})`);
-        
-        // Middle - base color
-        gradient.addColorStop(0.6, `rgba(${r}, ${g}, ${b}, ${this.opacity})`);
-        
-        // Outer - darker edge
-        gradient.addColorStop(1, `rgba(${r*0.6}, ${g*0.6}, ${b*0.6}, ${this.opacity * 0.6})`);
-        
-        // Draw the main particle
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        ctx.fillStyle = gradient;
+        ctx.fillStyle = this.color + Math.floor(this.opacity * 255).toString(16).padStart(2, '0');
         ctx.fill();
-        
-        // Add subtle blur effect
-        ctx.shadowColor = this.baseColor;
-        ctx.shadowBlur = 5; // Reduced shadow blur for smaller particles
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-        ctx.fill();
-        ctx.shadowBlur = 0;
       }
     }
 
     // Create particles
     const particles: Particle[] = [];
-    for (let i = 0; i < 40; i++) { // Increased count since particles are smaller
+    for (let i = 0; i < 30; i++) {
       particles.push(new Particle());
     }
 
     // Animation loop
     const animate = () => {
-      // Use clearRect instead of fillRect with opacity to remove trail effect
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       particles.forEach(particle => {
@@ -223,4 +177,3 @@ const Landing = () => {
 };
 
 export default Landing;
-
