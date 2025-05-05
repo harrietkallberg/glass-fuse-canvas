@@ -51,7 +51,7 @@
   }
 
   body {
-    @apply bg-black text-foreground;
+    @apply bg-background text-foreground;
     font-feature-settings: "ss01";
   }
 }
@@ -275,6 +275,60 @@
   
   .shadow-blue-glow {
     box-shadow: 0 0 20px rgba(51,195,240,0.2), 0 0 40px rgba(0,0,0,0.1);
+  }
+  
+  /* Fluid art glass components */
+  .glass-card {
+    @apply bg-white/40 backdrop-blur-sm border shadow-md transition-all;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .glass-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+    z-index: -1;
+  }
+  
+  .glass-panel {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .glass-panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0.1) 100%);
+    z-index: -1;
+  }
+  
+  .glass-panel::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(25deg);
+    pointer-events: none;
+    z-index: -1;
+  }
+  
+  .shadow-glow {
+    box-shadow: 0 0 20px rgba(255,255,255,0.5), 0 0 40px rgba(0,0,0,0.05);
+  }
+  
+  .shadow-blue-glow {
+    box-shadow: 0 0 20px rgba(2,179,201,0.3), 0 0 40px rgba(0,0,0,0.05);
   }
 }
 
@@ -708,6 +762,22 @@
   }
 }
 
+/* New fluid animations specifically for the watercolor/liquid art effect */
+@keyframes color-blend {
+  0% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+  50% {
+    background-position: 100% 50%;
+    filter: hue-rotate(15deg);
+  }
+  100% {
+    background-position: 0% 50%;
+    filter: hue-rotate(0deg);
+  }
+}
+
 @layer utilities {
   .animate-float-slow {
     animation: float-slow 20s ease-in-out infinite;
@@ -751,69 +821,4 @@
   }
   
   .animate-diagonal-reverse-wave {
-    animation: diagonal-reverse-wave 30s linear infinite;
-  }
-  
-  .animate-cross-diagonal-wave {
-    animation: cross-diagonal-wave 35s linear infinite;
-  }
-  
-  .animate-gradient-circular {
-    animation: gradient-circular-motion 15s ease infinite;
-  }
-  
-  .animate-glass-flow-slow {
-    animation: glass-flow-slow 30s ease-in-out infinite;
-  }
-  
-  .animate-glass-flow-reverse {
-    animation: glass-flow-reverse 35s ease-in-out infinite;
-  }
-  
-  .animate-glass-flow-medium {
-    animation: glass-flow-medium 25s ease-in-out infinite;
-  }
-  
-  .animate-glass-swirl {
-    animation: glass-swirl 45s linear infinite;
-  }
-  
-  .animate-glass-swirl-reverse {
-    animation: glass-swirl-reverse 50s linear infinite;
-  }
-  
-  .animate-orb-float {
-    animation: orb-float 20s ease-in-out infinite;
-  }
-  
-  .animate-orb-float-reverse {
-    animation: orb-float-reverse 22s ease-in-out infinite;
-  }
-  
-  .animate-orb-pulse {
-    animation: orb-pulse 15s ease-in-out infinite;
-  }
-  
-  .animate-ripple {
-    animation: ripple 18s ease-in-out infinite;
-  }
-  
-  .animate-ripple-reverse {
-    animation: ripple-reverse 20s ease-in-out infinite;
-  }
-  
-  .animate-ripple-slow {
-    animation: ripple-slow 25s ease-in-out infinite;
-  }
-}
-
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+    animation: diagonal-reverse
