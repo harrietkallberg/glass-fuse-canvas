@@ -168,7 +168,7 @@
     pointer-events: none;
   }
 
-  /* Updated fluid background with diagonal and circular movement */
+  /* Login/Register pages background with wavy edges */
   .fluid-bg-diagonal {
     @apply relative overflow-hidden;
     background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
@@ -196,6 +196,15 @@
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     z-index: 1;
+  }
+
+  /* Dashboard background - clean full-screen gradient with no edges */
+  .dashboard-gradient-bg {
+    @apply fixed inset-0;
+    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
+    z-index: -20;
   }
 
   /* Updated title styling - removing container and applying gradient text */
