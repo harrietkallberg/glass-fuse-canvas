@@ -69,6 +69,71 @@
   }
 }
 
+/* Define blob animation keyframes */
+@keyframes blob-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    border-radius: 60% 40% 70% 30% / 50% 50% 50% 50%;
+  }
+  25% {
+    transform: translate(5px, -5px) scale(1.02) rotate(2deg);
+    border-radius: 40% 60% 30% 70% / 60% 30% 70% 40%;
+  }
+  50% {
+    transform: translate(-5px, 10px) scale(0.98) rotate(-2deg);
+    border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
+  }
+  75% {
+    transform: translate(10px, 5px) scale(1.01) rotate(1deg);
+    border-radius: 50% 50% 20% 80% / 70% 30% 60% 40%;
+  }
+}
+
+@keyframes blob-float-reverse {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    border-radius: 50% 50% 50% 50%;
+  }
+  25% {
+    transform: translate(-8px, 7px) scale(1.04) rotate(-1deg);
+    border-radius: 70% 30% 40% 60% / 40% 60% 40% 60%;
+  }
+  50% {
+    transform: translate(10px, -10px) scale(0.97) rotate(2deg);
+    border-radius: 30% 70% 60% 40% / 60% 40% 60% 40%;
+  }
+  75% {
+    transform: translate(-7px, -5px) scale(1.03) rotate(-2deg);
+    border-radius: 40% 60% 50% 50% / 50% 40% 60% 50%;
+  }
+}
+
+@keyframes particle-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes streamline-flow {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.7;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.9;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.7;
+  }
+}
+
 /* Add a new animation for morphing bubbles */
 @keyframes morph-bubble {
   0%, 100% {

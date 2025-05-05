@@ -15,6 +15,8 @@
   pointer-events: none;
   filter: blur(5px);
   will-change: transform;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
 }
 
 .fluid-particle {
@@ -23,6 +25,8 @@
   mix-blend-mode: screen;
   pointer-events: none;
   will-change: transform, opacity;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
 }
 
 .fluid-streamline {
@@ -34,6 +38,9 @@
   filter: blur(2px);
   pointer-events: none;
   will-change: transform, opacity, background-position;
+  background-size: 200% 100%;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease;
 }
 
 .fluid-morph-bubble {
@@ -43,4 +50,57 @@
   pointer-events: none;
   animation: morph-bubble 15s ease-in-out infinite alternate;
   will-change: transform, border-radius;
+}
+
+/* Animation classes for blobs */
+.animate-blob-float-slow {
+  animation-name: blob-float;
+  animation-duration: 20s;
+}
+
+.animate-blob-float-medium {
+  animation-name: blob-float;
+  animation-duration: 15s;
+}
+
+.animate-blob-float-fast {
+  animation-name: blob-float;
+  animation-duration: 12s;
+}
+
+.animate-blob-float-reverse-slow {
+  animation-name: blob-float-reverse;
+  animation-duration: 18s;
+}
+
+.animate-blob-float-reverse-medium {
+  animation-name: blob-float-reverse;
+  animation-duration: 14s;
+}
+
+/* Animation classes for particles */
+.animate-particle-pulse-slow {
+  animation-name: particle-pulse;
+  animation-duration: 10s;
+}
+
+.animate-particle-pulse-medium {
+  animation-name: particle-pulse;
+  animation-duration: 7s;
+}
+
+.animate-particle-pulse-fast {
+  animation-name: particle-pulse;
+  animation-duration: 5s;
+}
+
+/* Animation classes for streamlines */
+.animate-streamline-flow-slow {
+  animation-name: streamline-flow;
+  animation-duration: 25s;
+}
+
+.animate-streamline-flow-medium {
+  animation-name: streamline-flow;
+  animation-duration: 18s;
 }

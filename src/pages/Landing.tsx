@@ -1,5 +1,4 @@
-
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -20,7 +19,6 @@ const FluidArtBackground = () => {
     size: `${random(15, 150)}px`,
     ...randomPosition(),
     opacity: random(0.6, 0.95),
-    animationDuration: `${random(15, 30)}s`,
     animationDelay: `${random(0, 10)}s`,
     blur: `${random(3, 8)}px`,
   }));
@@ -36,7 +34,6 @@ const FluidArtBackground = () => {
       ...randomPosition(),
       color: colors[Math.floor(random(0, colors.length))],
       opacity: random(0.5, 1),
-      animationDuration: `${random(5, 15)}s`,
       animationDelay: `${random(0, 5)}s`,
       blur: `${random(0, 2)}px`,
     };
@@ -51,12 +48,11 @@ const FluidArtBackground = () => {
       ...randomPosition(),
       angle: `${random(0, 360)}deg`,
       type: isTeal ? "teal" : "orange",
-      animationDuration: `${random(15, 30)}s`,
       animationDelay: `${random(0, 8)}s`,
     };
   });
 
-  // Create new morphing large bubbles that mimic the fluid art reference
+  // Create new morphing large bubbles
   const morphingBubbles = Array.from({ length: 8 }, (_, i) => {
     const colors = ["rgba(255,255,255,0.8)", "rgba(255,122,0,0.4)", "rgba(0,169,181,0.4)", "rgba(51,195,240,0.4)"];
     const isLarge = i < 3; // First three are larger bubbles
@@ -67,8 +63,8 @@ const FluidArtBackground = () => {
       ...randomPosition(),
       color: colors[Math.floor(random(0, colors.length))],
       opacity: random(0.4, 0.9),
-      animationDuration: `${random(25, 40)}s`,
       animationDelay: `${random(0, 15)}s`,
+      animationDuration: `${random(25, 40)}s`,
       transformScale: random(0.9, 1.1),
       blur: `${random(5, 15)}px`,
     };
