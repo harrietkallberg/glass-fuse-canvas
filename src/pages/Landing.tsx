@@ -10,89 +10,85 @@ const Landing = () => {
       {/* Background fluid shapes */}
       <div className="absolute inset-0 overflow-hidden">
         {/* First layer of fluid shapes - larger elements */}
-        <div className="fluid-shape w-[40vw] h-[40vw] rounded-full animate-float-slow bg-[#F97316]/20 left-[-10vw] top-[20vh]"></div>
-        <div className="fluid-shape w-[35vw] h-[35vw] rounded-full animate-float-medium bg-[#FEC6A1]/25 right-[-5vw] top-[10vh]"></div>
-        <div className="fluid-shape w-[30vw] h-[30vw] animate-float-reverse animate-wave bg-[#bd8770]/20 left-[60vw] bottom-[15vh]"></div>
-        <div className="fluid-shape w-[25vw] h-[25vw] animate-float-slow-reverse animate-wave bg-[#33C3F0]/15 left-[20vw] bottom-[-10vh]"></div>
+        <div className="fluid-shape w-[40vw] h-[40vw] rounded-full animate-float-slow bg-[#F97316]/20 left-[-10vw] top-[20vh] absolute"></div>
+        <div className="fluid-shape w-[35vw] h-[35vw] rounded-full animate-float-medium bg-[#FEC6A1]/25 right-[-5vw] top-[10vh] absolute"></div>
+        <div className="fluid-shape w-[30vw] h-[30vw] animate-float-reverse animate-wave bg-[#bd8770]/20 left-[60vw] bottom-[15vh] absolute"></div>
+        <div className="fluid-shape w-[25vw] h-[25vw] animate-float-slow-reverse animate-wave bg-[#33C3F0]/15 left-[20vw] bottom-[-10vh] absolute"></div>
         
         {/* Additional moving elements - medium elements */}
-        <div className="fluid-shape w-[20vw] h-[20vw] rounded-full animate-pulse-float bg-[#F97316]/10 right-[25vw] top-[40vh]"></div>
-        <div className="fluid-shape w-[18vw] h-[18vw] animate-wave animate-float-medium bg-[#FEC6A1]/15 left-[30vw] top-[15vh]"></div>
-        <div className="fluid-shape w-[22vw] h-[22vw] rounded-full animate-float-reverse bg-[#bd8770]/15 right-[10vw] bottom-[20vh]"></div>
+        <div className="fluid-shape w-[20vw] h-[20vw] rounded-full animate-pulse-float bg-[#F97316]/10 right-[25vw] top-[40vh] absolute"></div>
+        <div className="fluid-shape w-[18vw] h-[18vw] animate-wave animate-float-medium bg-[#FEC6A1]/15 left-[30vw] top-[15vh] absolute"></div>
+        <div className="fluid-shape w-[22vw] h-[22vw] rounded-full animate-float-reverse bg-[#bd8770]/15 right-[10vw] bottom-[20vh] absolute"></div>
         
         {/* New additional fluid shapes - more variety */}
-        <div className="fluid-shape w-[15vw] h-[15vw] animate-float-medium animate-wave bg-[#F97316]/15 left-[15vw] top-[60vh]"></div>
-        <div className="fluid-shape w-[12vw] h-[12vw] rounded-full animate-float-slow bg-[#FEC6A1]/20 right-[20vw] top-[70vh]"></div>
-        <div className="fluid-shape w-[18vw] h-[18vw] animate-float-reverse animate-wave bg-[#bd8770]/15 left-[45vw] top-[-5vh]"></div>
-        <div className="fluid-shape w-[14vw] h-[14vw] rounded-full animate-pulse-float bg-[#33C3F0]/10 right-[40vw] bottom-[10vh]"></div>
-        <div className="fluid-shape w-[16vw] h-[16vw] animate-wave animate-float-slow-reverse bg-[#F97316]/20 left-[10vw] top-[30vh]"></div>
+        <div className="fluid-shape w-[15vw] h-[15vw] animate-float-medium animate-wave bg-[#F97316]/15 left-[15vw] top-[60vh] absolute"></div>
+        <div className="fluid-shape w-[12vw] h-[12vw] rounded-full animate-float-slow bg-[#FEC6A1]/20 right-[20vw] top-[70vh] absolute"></div>
+        <div className="fluid-shape w-[18vw] h-[18vw] animate-float-reverse animate-wave bg-[#bd8770]/15 left-[45vw] top-[-5vh] absolute"></div>
+        <div className="fluid-shape w-[14vw] h-[14vw] rounded-full animate-pulse-float bg-[#33C3F0]/10 right-[40vw] bottom-[10vh] absolute"></div>
+        <div className="fluid-shape w-[16vw] h-[16vw] animate-wave animate-float-slow-reverse bg-[#F97316]/20 left-[10vw] top-[30vh] absolute"></div>
         
         {/* Small background elements - for finer details */}
-        <div className="fluid-shape w-[8vw] h-[8vw] rounded-full animate-float-slow bg-[#FEC6A1]/30 left-[75vw] top-[25vh]"></div>
-        <div className="fluid-shape w-[10vw] h-[10vw] animate-wave animate-float-medium bg-[#F97316]/25 right-[30vw] bottom-[30vh]"></div>
-        <div className="fluid-shape w-[7vw] h-[7vw] rounded-full animate-pulse-float bg-[#bd8770]/20 left-[50vw] top-[45vh]"></div>
+        <div className="fluid-shape w-[8vw] h-[8vw] rounded-full animate-float-slow bg-[#FEC6A1]/30 left-[75vw] top-[25vh] absolute"></div>
+        <div className="fluid-shape w-[10vw] h-[10vw] animate-wave animate-float-medium bg-[#F97316]/25 right-[30vw] bottom-[30vh] absolute"></div>
+        <div className="fluid-shape w-[7vw] h-[7vw] rounded-full animate-pulse-float bg-[#bd8770]/20 left-[50vw] top-[45vh] absolute"></div>
+      </div>
+      
+      {/* Separate container for particles to ensure they're rendered properly */}
+      <div className="absolute inset-0 pointer-events-none z-10">
+        {/* Small sparkles - first layer */}
+        {Array.from({ length: 80 }).map((_, index) => (
+          <div 
+            key={`small-${index}`}
+            className="absolute w-1 h-1 rounded-full bg-[#F97316] opacity-70"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `sparkle ${3 + Math.random() * 4}s ease-in-out ${Math.random() * 5}s infinite`
+            }}
+          />
+        ))}
         
-        {/* Sparkle particles - small orange particles */}
-        <div className="absolute inset-0">
-          {/* Small sparkles - first layer */}
-          {Array.from({ length: 50 }).map((_, index) => (
-            <div 
-              key={index}
-              className="absolute w-1 h-1 rounded-full bg-[#F97316] opacity-70 animate-sparkle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${3 + Math.random() * 4}s`
-              }}
-            />
-          ))}
-          
-          {/* Medium sparkles */}
-          {Array.from({ length: 30 }).map((_, index) => (
-            <div 
-              key={`lg-${index}`}
-              className="absolute w-2 h-2 rounded-full bg-[#FEC6A1] opacity-60 animate-sparkle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${4 + Math.random() * 5}s`
-              }}
-            />
-          ))}
-          
-          {/* Large sparkles - fewer but more impactful */}
-          {Array.from({ length: 15 }).map((_, index) => (
-            <div 
-              key={`xl-${index}`}
-              className="absolute w-3 h-3 rounded-full bg-[#F97316] opacity-50 animate-sparkle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${5 + Math.random() * 6}s`
-              }}
-            />
-          ))}
-          
-          {/* Tiny subtle sparkles - creates depth */}
-          {Array.from({ length: 40 }).map((_, index) => (
-            <div 
-              key={`tiny-${index}`}
-              className="absolute w-0.5 h-0.5 rounded-full bg-[#FEC6A1] opacity-80 animate-sparkle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 5}s`,
-                animationDuration: `${2 + Math.random() * 3}s`
-              }}
-            />
-          ))}
-        </div>
+        {/* Medium sparkles */}
+        {Array.from({ length: 50 }).map((_, index) => (
+          <div 
+            key={`medium-${index}`}
+            className="absolute w-2 h-2 rounded-full bg-[#FEC6A1] opacity-60"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `sparkle ${4 + Math.random() * 5}s ease-in-out ${Math.random() * 5}s infinite`
+            }}
+          />
+        ))}
+        
+        {/* Large sparkles - fewer but more impactful */}
+        {Array.from({ length: 25 }).map((_, index) => (
+          <div 
+            key={`large-${index}`}
+            className="absolute w-3 h-3 rounded-full bg-[#F97316] opacity-50"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `sparkle ${5 + Math.random() * 6}s ease-in-out ${Math.random() * 5}s infinite`
+            }}
+          />
+        ))}
+        
+        {/* Tiny subtle sparkles - creates depth */}
+        {Array.from({ length: 60 }).map((_, index) => (
+          <div 
+            key={`tiny-${index}`}
+            className="absolute w-0.5 h-0.5 rounded-full bg-[#FEC6A1] opacity-80"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animation: `sparkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 5}s infinite`
+            }}
+          />
+        ))}
       </div>
 
-      <div className="container relative z-10 max-w-2xl w-full px-4">
+      <div className="container relative z-20 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text */}
         <div className="text-center mb-8 relative">
           <div className="mb-4">
