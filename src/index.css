@@ -1,51 +1,49 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 45 30% 25%;        /* Earthy brown background */
-    --foreground: 50 45% 90%;        /* Soft cream text */
+    --background: 30 33% 98%;
+    --foreground: 30 10% 15%;
 
-    --card: 45 28% 30%;              /* Slightly lighter earthy brown */
-    --card-foreground: 50 45% 90%;   /* Soft cream text */
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 15%;
 
-    --popover: 35 40% 20%;           /* Deep earthy brown-green */
-    --popover-foreground: 50 45% 90%; /* Soft cream text */
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 15%;
 
-    --primary: 80 38% 45%;           /* Sage green primary */
-    --primary-foreground: 50 45% 90%; /* Soft cream text */
+    --primary: 20 90% 65%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 45 25% 35%;         /* Muted earthy brown */
-    --secondary-foreground: 50 45% 90%; /* Soft cream text */
+    --secondary: 40 90% 90%;
+    --secondary-foreground: 30 10% 15%;
 
-    --muted: 45 20% 40%;             /* Medium earthy brown */
-    --muted-foreground: 45 15% 75%;  /* Lighter earthy brown */
+    --muted: 30 10% 96%;
+    --muted-foreground: 30 10% 40%;
 
-    --accent: 45 70% 65%;            /* Warm sandy gold */
-    --accent-foreground: 35 40% 20%; /* Deep earthy brown */
+    --accent: 180 50% 85%;
+    --accent-foreground: 30 10% 15%;
 
-    --destructive: 10 40% 45%;       /* Earthy rust red */
-    --destructive-foreground: 50 45% 90%; /* Soft cream text */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 45 25% 45%;            /* Medium-dark earthy brown border */
-    --input: 45 25% 45%;             /* Medium-dark earthy brown input */
-    --ring: 80 38% 45%;              /* Same as primary */
+    --border: 30 10% 90%;
+    --input: 30 10% 90%;
+    --ring: 20 90% 65%;
 
-    --radius: 0.125rem;
+    --radius: 1rem;
     
-    /* Chernobyl-inspired theme colors */
-    --alien-skin: 95 55% 80%;        /* #C8E0B8 - Yellowy-green alien skin */
-    --alien-dark: 95 35% 50%;        /* Darker yellowy-green */
-    --alien-eye: 0 0% 20%;           /* #333333 - Black pupil */
-    --planet-terrain: 30 35% 55%;    /* #B38F6D - Lighter planet terrain */
-    --organic-green: 95 38% 55%;     /* #A6CC94 - Organic green */
-    --organic-brown: 30 50% 65%;     /* #D2A976 - Organic brown */
-    --bizarre-green: 120 25% 48%;    /* #6D9B6E - Another organic color */
-    --pale-sand: 40 50% 85%;         /* #F0DDB8 - Pale sand color */
-    --rust-color: 14 38% 35%;        /* #7E4D3A - Rusty metal color */
-    --moss-green: 100 25% 25%;       /* #304D25 - Deep moss */
+    /* Earth tone palette variables */
+    --earth-sage: 152 18% 46%;    /* #658579 */
+    --earth-orange: 19 36% 59%;    /* #bd8770 */
+    --earth-taupe: 38 12% 63%;     /* #aea795 */
+    --earth-brown: 24 27% 36%;     /* #745641 */
+    --earth-cream: 35 64% 92%;     /* #f7e2c8 */
+
+    /* Vibrant accent colors */
+    --vibrant-orange: 24 94% 53%;  /* #F97316 */
+    --vibrant-turquoise: 190 84% 57%; /* #33C3F0 */
   }
 
   * {
@@ -54,414 +52,381 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: "Courier New", monospace;
-    overflow-x: hidden;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/f53mer/M8f/Z9P7dt+76u67tt23ld13lZlnNd13NZlnNd13NZlvPz+Tz3fT/9fB97juO496z7tef253mez+/Enu/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
-    background-repeat: repeat;
-  }
-
-  /* Add vertical writing mode for runes/symbols */
-  .writing-tb {
-    writing-mode: vertical-lr;
+    font-feature-settings: "ss01";
   }
 }
 
 @layer components {
-  /* Organic panel styling - updated colors */
-  .alien-panel {
-    @apply bg-[#362D22] border border-[#A0C1A3]/40 shadow-[0_0_15px_rgba(160,193,163,0.3)] rounded-md;
+  .glass {
+    @apply bg-white/30 backdrop-blur-md border border-white/50 shadow-md;
+  }
+  
+  .glass-card {
+    @apply rounded-2xl bg-white/40 backdrop-blur-md border border-white/50 shadow-md transition-all hover:shadow-lg;
+  }
+  
+  /* Updated glass components with more vibrant earth tones */
+  .glass-earth-orange {
+    @apply bg-[#bd8770]/20 backdrop-blur-md border border-[#bd8770]/30 shadow-md;
+  }
+  
+  .glass-earth-cream {
+    @apply bg-[#f7e2c8]/30 backdrop-blur-md border border-[#f7e2c8]/40 shadow-md;
+  }
+  
+  .glass-earth-sage {
+    @apply bg-[#658579]/20 backdrop-blur-md border border-[#658579]/30 shadow-md;
+  }
+  
+  .glass-earth-taupe {
+    @apply bg-[#aea795]/30 backdrop-blur-md border border-[#aea795]/40 shadow-md;
+  }
+
+  /* New vibrant glass components */
+  .glass-vibrant-orange {
+    @apply bg-[#F97316]/15 backdrop-blur-md border border-[#F97316]/25 shadow-md;
+  }
+  
+  .glass-vibrant-cream {
+    @apply bg-[#FEC6A1]/25 backdrop-blur-md border border-[#FEC6A1]/35 shadow-md;
+  }
+  
+  .glass-vibrant-sage {
+    @apply bg-[#33C3F0]/15 backdrop-blur-md border border-[#33C3F0]/25 shadow-md;
+  }
+  
+  .glass-vibrant-taupe {
+    @apply bg-[#A5D8E2]/25 backdrop-blur-md border border-[#A5D8E2]/35 shadow-md;
+  }
+  
+  .glass-orange {
+    @apply bg-glass-orange/20 backdrop-blur-md border border-glass-orange/30 shadow-md;
+  }
+  
+  .glass-yellow {
+    @apply bg-glass-yellow/30 backdrop-blur-md border border-glass-yellow/40 shadow-md;
+  }
+  
+  .glass-green {
+    @apply bg-glass-green/20 backdrop-blur-md border border-glass-green/30 shadow-md;
+  }
+  
+  .glass-turquoise {
+    @apply bg-glass-turquoise/30 backdrop-blur-md border border-glass-turquoise/40 shadow-md;
+  }
+  
+  .fluid-bg {
+    @apply relative overflow-hidden;
+  }
+  
+  .fluid-shape {
+    @apply absolute blur-3xl;
+    filter: blur(72px); /* Increased blur for more ethereal effect */
+  }
+
+  /* Dynamic title background - inherits the page gradients but darker */
+  .dynamic-title-background {
     position: relative;
     overflow: hidden;
-  }
-  
-  .alien-panel::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, rgba(160,193,163,0.1) 0%, transparent 70%);
-    pointer-events: none;
-  }
-  
-  /* Add moss/rust overlay */
-  .alien-panel::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='moss' patternUnits='userSpaceOnUse' width='100' height='100'%3E%3Cpath fill='%23304D25' fill-opacity='0.2' d='M0,0 L100,0 L50,100 z' /%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23moss)' /%3E%3C/svg%3E");
-    opacity: 0.3;
-    mix-blend-mode: overlay;
-    pointer-events: none;
-  }
-  
-  .alien-display {
-    @apply bg-[#2C2822] border-2 border-[#A67F5D] shadow-inner p-4 font-mono;
-    position: relative;
-  }
-  
-  /* Organic button style */
-  .alien-button {
-    @apply bg-[#A67F5D] hover:bg-[#C2B8A3] text-[#F2FCE2] 
-    rounded-md transition-all font-mono tracking-wider;
-    position: relative;
-    border: none;
-    background-image: linear-gradient(to bottom, #A67F5D, #7E4D3A);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3),
-                0 1px 3px rgba(0, 0, 0, 0.2),
-                inset 0 0 3px rgba(255, 255, 255, 0.3);
-    /* Organic, uneven border */
-    border-radius: 47% 53% 47% 53% / 51% 49% 51% 49%;
-    overflow: hidden;
-  }
-
-  .alien-button:hover {
-    background-image: linear-gradient(to bottom, #C2B8A3, #A67F5D);
-  }
-  
-  .alien-button:before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 200 200'%3E%3Cdefs%3E%3Cpattern id='woodgrain' patternUnits='userSpaceOnUse' width='200' height='200'%3E%3Cpath fill='none' stroke='%23A0C1A3' stroke-width='1' stroke-opacity='0.2' d='M0,0 C50,40 150,40 200,0 M0,100 C50,140 150,140 200,100 M0,200 C50,160 150,160 200,200' /%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23woodgrain)' /%3E%3C/svg%3E");
-    opacity: 0.4;
-    pointer-events: none;
-  }
-  
-  .alien-input {
-    @apply bg-[#2C2822] border border-[#A67F5D] focus:border-[#A0C1A3]/70 
-    text-[#FCF0D9] rounded-md font-mono shadow-inner;
-  }
-
-  .planet-overlay {
-    @apply fixed inset-0 pointer-events-none;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(210, 148, 107, 0.08) 0%, transparent 40%),
-      radial-gradient(circle at 80% 20%, rgba(139, 168, 136, 0.08) 0%, transparent 40%);
-    z-index: 5;
-  }
-  
-  .planet-scanline {
-    @apply fixed inset-0 bg-[linear-gradient(to_bottom,rgba(160,193,163,0)_0%,rgba(160,193,163,0.05)_50%,rgba(0,0,0,0.05)_51%,rgba(0,0,0,0)_100%)] 
-    bg-[length:100%_4px] pointer-events-none opacity-30;
-    background-repeat: repeat;
-    z-index: 20;
-    animation: scan 12s linear infinite;
-  }
-
-  .planet-atmosphere {
-    @apply fixed inset-0 pointer-events-none;
-    background: linear-gradient(135deg, rgba(210, 148, 107, 0.1), rgba(139, 168, 136, 0.1), rgba(194, 184, 163, 0.1));
-    opacity: 0.6;
-    z-index: 5;
-  }
-
-  /* Ruins-style frame with organic elements */
-  .bizarre-frame {
-    @apply relative border-2 border-[#A67F5D] 
-    bg-[#2C2822] shadow-[0_0_20px_rgba(160,193,163,0.2)];
-    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
-    animation: morphFrame 30s ease-in-out infinite alternate;
-    position: relative;
-  }
-  
-  /* Add rust/moss details to frame */
-  .bizarre-frame::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-image: 
-      radial-gradient(circle at 20% 30%, rgba(126, 77, 58, 0.4) 0%, transparent 20%),
-      radial-gradient(circle at 70% 65%, rgba(48, 77, 37, 0.3) 0%, transparent 25%);
-    border-radius: inherit;
-    pointer-events: none;
+    isolation: isolate;
     z-index: 1;
   }
 
-  .bizarre-screen {
-    @apply relative bg-[#2C2822] overflow-hidden;
-    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
-    animation: morphScreen 30s ease-in-out infinite alternate;
-    z-index: 2;
-  }
-  
-  .bizarre-screen::before {
+  .dynamic-title-background::before {
     content: "";
-    @apply absolute inset-0 bg-[linear-gradient(transparent_50%,rgba(0,0,0,0.08)_50%)] 
-    bg-[size:100%_4px] pointer-events-none z-10;
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.2); /* 20% darker overlay */
+    z-index: 1;
+    border-radius: inherit;
   }
   
-  .bizarre-screen::after {
+  .text-shadow-lg {
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .glass-surface {
+    @apply bg-white/10 backdrop-blur-lg border border-white/30 rounded-2xl shadow-lg;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-surface::before {
     content: "";
-    @apply absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_50%,rgba(0,0,0,0.2)_100%)];
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: radial-gradient(
+      circle,
+      rgba(255,255,255,0.15) 0%, /* Increased opacity for more vibrance */
+      transparent 80%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
   }
 
-  .alien-glitch {
-    animation: alienGlitch 8s infinite;
+  /* Updated fluid background with diagonal and circular movement */
+  .fluid-bg-diagonal {
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
+    position: relative;
   }
 
-  .blink-text {
-    animation: blink 1s steps(1) infinite;
+  .fluid-bg-diagonal::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%);
+    background-size: 400% 400%;
+    filter: blur(50px);
+    animation: gradient-circular-motion 20s ease infinite reverse;
+    z-index: 0;
+    opacity: 0.8;
   }
 
-  .alien-heading {
-    @apply font-mono uppercase tracking-widest text-[#A0C1A3] shadow-[0_0_10px_rgba(160,193,163,0.5)];
+  .fluid-bg-diagonal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    z-index: 1;
   }
 
-  .bizarre-text {
-    @apply font-mono text-[#FCF0D9];
-  }
-
-  .control-panel {
-    @apply grid grid-cols-1 md:grid-cols-4 gap-2 bg-[#2C2822] p-4 border-t-2 border-[#A67F5D];
-  }
-
-  .alien-eye {
-    @apply inline-block w-3 h-3 rounded-full bg-[#333] shadow-[0_0_5px_rgba(51,51,51,0.8)] 
-    mr-2 animate-[pulse_4s_ease-in-out_infinite];
-  }
-
-  .alien-eye-dim {
-    @apply inline-block w-3 h-3 rounded-full bg-[#222] mr-2;
+  /* Updated title styling - removing container and applying gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, rgba(249,115,22,1) 0%, rgba(51,195,240,1) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
   }
   
-  .terminal-text {
-    @apply font-mono text-[#A0C1A3];
-  }
-
-  /* Alien organism */
-  .alien-organism {
-    position: absolute;
-    background-color: rgba(160, 193, 163, 0.2);
-    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
-    filter: blur(2px);
-    animation: organism 30s ease-in-out infinite alternate;
-  }
-
-  /* Small vines/roots */
-  .small-vine {
-    position: absolute;
-    height: 40px;
-    width: 2px;
-    background-color: #8BA888;
-    transform-origin: top center;
-  }
-
-  /* Small vine branch */
-  .small-branch {
-    position: absolute;
-    height: 15px;
-    width: 1px;
-    background-color: #8BA888;
-    transform-origin: left center;
-  }
-  
-  /* Smoke effect for industrial elements */
-  .smoke-particle {
-    position: absolute;
-    border-radius: 50%;
-    background-color: rgba(230, 230, 230, 0.2);
-    filter: blur(8px);
+  .gradient-text-dark {
+    background: linear-gradient(135deg, rgba(189,75,0,1) 0%, rgba(11,145,190,1) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
   }
 }
 
-@keyframes scan {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 0 100%;
-  }
-}
-
-@keyframes blink {
+/* Enhanced animations with more random and circular movements */
+@keyframes float-slow {
   0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes alienGlitch {
-  0%, 91%, 94%, 100% {
-    transform: translate(0, 0) skew(0);
-    filter: hue-rotate(0deg);
-  }
-  92% {
-    transform: translate(-3px, 0) skew(0.5deg);
-    filter: hue-rotate(90deg);
-  }
-  93% {
-    transform: translate(3px, 0) skew(-0.5deg);
-    filter: hue-rotate(-90deg);
-  }
-  95%, 96% {
-    transform: translate(0, 0) skew(0);
-    filter: hue-rotate(0deg);
-  }
-  97% {
-    transform: translate(4px, 0) skew(-0.75deg);
-    filter: saturate(200%) hue-rotate(45deg);
-  }
-  98% {
-    transform: translate(-4px, 0) skew(0.75deg);
-    filter: saturate(200%) hue-rotate(-45deg);
-  }
-  99% {
-    transform: translate(0, 0) skew(0);
-    filter: hue-rotate(0deg);
-  }
-}
-
-@keyframes morphFrame {
-  0% {
-    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
-  }
-  25% {
-    border-radius: 51% 49% 58% 42% / 42% 55% 45% 58%;
-  }
-  50% {
-    border-radius: 42% 58% 37% 63% / 57% 44% 56% 43%;
-  }
-  75% {
-    border-radius: 54% 46% 50% 50% / 49% 52% 48% 51%;
-  }
-  100% {
-    border-radius: 47% 53% 43% 57% / 51% 39% 61% 49%;
-  }
-}
-
-@keyframes morphScreen {
-  0% {
-    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
-  }
-  25% {
-    border-radius: 49% 51% 54% 46% / 44% 53% 47% 56%;
-  }
-  50% {
-    border-radius: 40% 60% 35% 65% / 59% 42% 58% 41%;
-  }
-  75% {
-    border-radius: 52% 48% 48% 52% / 47% 50% 50% 53%;
-  }
-  100% {
-    border-radius: 45% 55% 41% 59% / 53% 41% 59% 47%;
-  }
-}
-
-@keyframes organism {
-  0% {
-    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
-    transform: scale(1) translate(0, 0) rotate(0deg);
-    background-color: rgba(160, 193, 163, 0.2);
-  }
-  25% {
-    border-radius: 30% 70% 50% 50% / 60% 30% 70% 40%;
-    transform: scale(1.05) translate(5px, -10px) rotate(2deg);
-    background-color: rgba(210, 148, 107, 0.2);
-  }
-  50% {
-    border-radius: 50% 50% 30% 70% / 40% 60% 30% 70%;
-    transform: scale(0.95) translate(15px, 10px) rotate(-2deg);
-    background-color: rgba(194, 184, 163, 0.2);
-  }
-  75% {
-    border-radius: 70% 30% 50% 50% / 30% 40% 60% 70%;
-    transform: scale(1.1) translate(-10px, 5px) rotate(1deg);
-    background-color: rgba(160, 193, 163, 0.2);
-  }
-  100% {
-    border-radius: 60% 40% 70% 30% / 30% 50% 50% 70%;
-    transform: scale(1) translate(0, 0) rotate(0deg);
-    background-color: rgba(230, 210, 181, 0.2);
-  }
-}
-
-/* Smoke rising animation */
-@keyframes smokeRise {
-  0% {
     transform: translateY(0) scale(1);
-    opacity: 0.4;
   }
-  100% {
-    transform: translateY(-100px) scale(2);
-    opacity: 0;
+  33% {
+    transform: translateY(-25px) scale(1.05) rotate(-2deg); /* More dramatic movement */
+  }
+  66% {
+    transform: translateY(-20px) scale(1.07) rotate(3deg); /* More dramatic movement */
   }
 }
 
-/* Creature movement animation */
-@keyframes creatureCrawl {
-  0% {
-    transform: translateX(0);
+@keyframes float-medium {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  33% {
+    transform: translateY(-15px) rotate(-3deg); /* More dramatic movement */
+  }
+  66% {
+    transform: translateY(-20px) rotate(2deg); /* More dramatic movement */
+  }
+}
+
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0) rotate(0);
+  }
+  33% {
+    transform: translateY(20px) rotate(4deg); /* More dramatic movement */
+  }
+  66% {
+    transform: translateY(25px) rotate(-2deg); /* More dramatic movement */
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%, 100% {
+    transform: translateY(0) rotate(0) scale(1);
+  }
+  33% {
+    transform: translateY(15px) rotate(-3deg) scale(1.03); /* More dramatic movement */
+  }
+  66% {
+    transform: translateY(20px) rotate(2deg) scale(1.05); /* More dramatic movement */
+  }
+}
+
+@keyframes pulse-float {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  33% {
+    transform: scale(1.05); /* More dramatic pulsing */
+    opacity: 0.65; /* More vibrant */
+  }
+  66% {
+    transform: scale(1.07); /* More dramatic pulsing */
+    opacity: 0.60; /* More vibrant */
+  }
+}
+
+@keyframes wave-motion {
+  0%, 100% {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+  }
+  25% {
+    border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
   }
   50% {
-    transform: translateX(10px);
+    border-radius: 40% 60% 40% 70% / 70% 30% 50% 40%;
+  }
+  75% {
+    border-radius: 60% 40% 70% 30% / 40% 50% 60% 50%;
+  }
+}
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes diagonal-wave {
+  0% {
+    background-position: 0% 0%;
+  }
+  33% {
+    background-position: 75% 50%;
+  }
+  66% {
+    background-position: 25% 75%;
   }
   100% {
-    transform: translateX(0);
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes diagonal-reverse-wave {
+  0% {
+    background-position: 100% 100%;
+  }
+  50% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% 100%;
+  }
+}
+
+@keyframes cross-diagonal-wave {
+  0% {
+    background-position: 0% 100%;
+  }
+  50% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes gradient-circular-motion {
+  0% {
+    background-position: 0% 0%;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  25% {
+    background-position: 50% 100%;
+    border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
+  }
+  50% {
+    background-position: 100% 50%;
+    border-radius: 50% 50% 30% 70% / 70% 30% 70% 30%;
+  }
+  75% {
+    background-position: 25% 75%;
+    border-radius: 30% 70% 60% 40% / 50% 60% 40% 50%;
+  }
+  100% {
+    background-position: 0% 0%;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   }
 }
 
 @layer utilities {
-  .alien-shadow {
-    text-shadow: 0 0 5px rgba(160, 193, 163, 0.8);
+  .animate-float-slow {
+    animation: float-slow 20s ease-in-out infinite;
   }
   
-  .alien-glow {
-    box-shadow: 0 0 15px rgba(160, 193, 163, 0.6);
+  .animate-float-medium {
+    animation: float-medium 14s ease-in-out infinite;
   }
   
-  .planet-noise::before {
-    content: "";
-    @apply fixed inset-0 opacity-5 pointer-events-none mix-blend-overlay;
-    background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAEAklEQVRogZ2ZW5LcMAgFwV5ktu39r2mbj55Ht4AkQMrU+JejiztIQjbG+G3b9lprrXEc4+/n5xjH8fo8jvE6juNcluW8rutcluU8z/P3PM/f53mer/M8f/Z9P7dt+76u67tt23ld13lZlnNd13NZlnNd13NZlvPz+Tz3fT/9fB97juO496z7tef253mez+/Enu/Ptm2v4zjevjSO4/XxxsZxfA1sUJ5jwBrYOI6P51O53/OdTSfQY1mW17Isp5tw4DnnDdyBXheIB++DOo7j/W7McYzAp5uxh3NOIJ6AhxAO1AE78ARuQBOAtTV7rBuzZx6HnVcJInCbv7LxFmIPLAFNgBYsCWj1sSv/Le3xxx74IhB2nkDQeXU9JQBk7uUVttYCzXUQu/DO9m0Fi9sb/EgtZrcr7VV3ZbcF5ioAUsmVv3aPH48TcVI/bp+vevy4LO7uAaGAI6+o65EIVPzKnpnOnteC9f7o24928y3FPq9kE1qzcXvaXkzdk1d+GcRbdcMgUGnNXFFQQqiUdraus+toQy7JmHdQaZVIoihCMxsn3cc4R0oAcRtG9eNzvhojLhmKmsY+4DKH49TNSTR5ZmXVQWt/RLxBPsOVXYLJIEiQKpD8BpDGiEurMn5KQleQpIyjRABHkBSAyryMnwA0rd5A7JM0XZXzLFrkyRmh5IU0ntP1bkPPpBbLvCtbk/Isn126a2K4K7OykgZj5aN5Oimvs9f4gFniM3Ezc1dzUHzMwVjnc3kYlU9x96m0i9KHrWlUhnEl1pVe1H0DQZOZQdC1LlKrvEJeSdLL69E06WrOa1sFkieY88zmBasRFFvC9krXivyR7V8QedVBeY3ShwFwebnHs5+hfQK515U95S9UI+rVGYRDaBvk2ZMdeayceGeoO0e60rYDuANzB4LXE72CHJ013gKTebRCaXOyC9T0rUDd+Ky8eFxpMq5Eexwr6uyeiSG5B7KjfR8gM3LDFUM6GC/I2CNxFU2NXF7sQDow1Xx1mjQIP7FoKrgSe8f9HMdCixJGUcxksYNKJ5rM69JGSigu1eQNd2xWkK5JPIGoMNKF4n48yatZxMxAlDiijzMw9Vw8hXAiqXldN6v/OXKP0OQGz4pPk0/HXnsiCs65vCreLaqybgDMj/Yd2E664NRUmmZlN5VVU0E1xyhKXHllEaOUrvxhf8AbtFuVwBVAtY+2PnWwukn34ri1u1ma19V+5k7OOn7UpaKpozuizOq+AUhA3cQfp1MXxlHgOlC0inNRmvlDHTWikkt3yuadrH9p1SmrB2c6jurCXSXu/tPvAHmT2Y/2j8DNERdFBNmV2R2wBBHFEv4tiYGgUBJ41P0SoINK4Gn8BP4HUjOgfF3Qy8sAAAAASUVORK5CYII=");
-    z-index: 5;
+  .animate-float-reverse {
+    animation: float-reverse 18s ease-in-out infinite;
   }
   
-  /* Metal texture */
-  .metal-texture {
-    background-image: linear-gradient(45deg, 
-      rgba(0,0,0,0.2) 25%, 
-      transparent 25%, 
-      transparent 75%, 
-      rgba(0,0,0,0.2) 75%),
-    linear-gradient(45deg, 
-      rgba(0,0,0,0.2) 25%, 
-      transparent 25%, 
-      transparent 75%, 
-      rgba(0,0,0,0.2) 75%);
-    background-size: 4px 4px;
-    background-position: 0 0, 2px 2px;
+  .animate-float-slow-reverse {
+    animation: float-slow-reverse 22s ease-in-out infinite;
   }
   
-  /* Moss overlay */
-  .moss-overlay {
-    position: relative;
+  .animate-pulse-float {
+    animation: pulse-float 12s ease-in-out infinite;
   }
   
-  .moss-overlay::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(
-      circle at 30% 20%,
-      rgba(139, 168, 136, 0.4) 0%,
-      transparent 40%
-    );
-    pointer-events: none;
+  .animate-gradient {
+    background-size: 300% 300%;
+    animation: gradient-shift 10s ease infinite;
+  }
+
+  .animate-wave {
+    animation: wave-motion 25s ease-in-out infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fade-in 1.2s ease-out;
+  }
+  
+  .animate-diagonal-wave {
+    animation: diagonal-wave 25s linear infinite;
+  }
+  
+  .animate-diagonal-reverse-wave {
+    animation: diagonal-reverse-wave 30s linear infinite;
+  }
+  
+  .animate-cross-diagonal-wave {
+    animation: cross-diagonal-wave 35s linear infinite;
+  }
+  
+  .animate-gradient-circular {
+    animation: gradient-circular-motion 15s ease infinite;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
