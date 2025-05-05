@@ -192,9 +192,9 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Full screen gradient background without blob shape, matching the interior colors of landing page blob */}
-      <div className="fixed inset-0" style={{ 
-        background: 'linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%)',
+      {/* Clean full screen gradient background with no blob shape */}
+      <div className="fixed inset-0 dashboard-bg-gradient" style={{ 
+        background: 'linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%)',
         backgroundSize: '400% 400%',
         animation: 'gradient-circular-motion 15s ease infinite',
         zIndex: -20
