@@ -177,8 +177,8 @@ const ParticleBackground = () => {
 const Dashboard = () => {
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Enhanced gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white via-[#A5D8E2]/30 to-[#FEC6A1]/40 z-0" />
+      {/* More muted gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f8f8f8] via-[#A5D8E2]/20 to-[#FEC6A1]/30 z-0" />
       
       {/* Particle background */}
       <ParticleBackground />
