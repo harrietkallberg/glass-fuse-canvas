@@ -26,11 +26,12 @@ const FluidArtBackground = () => {
 
   const particles = Array.from({ length: 40 }, (_, i) => {
     const colors = ["#FFFFFF", "#FF7A00", "#00A9B5", "#33C3F0"];
-    const sizeRange = i % 3 === 0 ? [8, 20] : [3, 12]; // Larger particles occasionally
+    const sizeMin = i % 3 === 0 ? 8 : 3;
+    const sizeMax = i % 3 === 0 ? 20 : 12;
     
     return {
       id: `particle-${i}`,
-      size: `${random(...sizeRange)}px`,
+      size: `${random(sizeMin, sizeMax)}px`,
       ...randomPosition(),
       color: colors[Math.floor(random(0, colors.length))],
       opacity: random(0.5, 1),
