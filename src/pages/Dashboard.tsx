@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +49,7 @@ const mockCurves = [
   },
 ];
 
-// Particle animation component
+// Updated Particle animation component
 const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -80,11 +79,13 @@ const ParticleBackground = () => {
       speedY: number;
       opacity: number;
       opacityChange: number;
+      sparkle: number;
+      sparkleDirection: number;
     }
 
     // Create particles
     const particles: Particle[] = [];
-    const particleCount = 50; // Adjust for more or fewer particles
+    const particleCount = 60; // Increased for more sparkling effect
 
     const colors = ['#33C3F0', '#F97316', '#A5D8E2', '#FEC6A1'];
 
@@ -92,12 +93,14 @@ const ParticleBackground = () => {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 3 + 0.5, // Size between 0.5 and 3.5
+        size: Math.random() * 2.5 + 0.2, // Smaller particles for sparkly effect
         color: colors[Math.floor(Math.random() * colors.length)],
-        speedX: (Math.random() - 0.5) * 0.3, // Slow horizontal movement
-        speedY: (Math.random() - 0.5) * 0.3, // Slow vertical movement
-        opacity: Math.random() * 0.5, // Start with random opacity for variety
-        opacityChange: Math.random() * 0.01 - 0.005 // Random change direction
+        speedX: (Math.random() - 0.5) * 0.2, // Slower movement
+        speedY: (Math.random() - 0.5) * 0.2, // Slower movement
+        opacity: Math.random() * 0.3, // Lower starting opacity
+        opacityChange: Math.random() * 0.008 - 0.004, // Slower opacity change
+        sparkle: Math.random() * 10, // Initial sparkle value
+        sparkleDirection: Math.random() > 0.5 ? 0.2 : -0.2 // Direction of sparkle change
       });
     }
 
@@ -116,8 +119,14 @@ const ParticleBackground = () => {
         particle.opacity += particle.opacityChange;
         
         // Reverse opacity change if reaching bounds
-        if (particle.opacity > 0.6 || particle.opacity < 0.1) {
+        if (particle.opacity > 0.4 || particle.opacity < 0.05) { // Lower max opacity, higher min
           particle.opacityChange = -particle.opacityChange;
+        }
+        
+        // Update sparkle effect
+        particle.sparkle += particle.sparkleDirection;
+        if (particle.sparkle > 15 || particle.sparkle < 5) {
+          particle.sparkleDirection = -particle.sparkleDirection;
         }
         
         // Reset position if off canvas
@@ -128,16 +137,19 @@ const ParticleBackground = () => {
           particle.y = Math.random() * canvas.height;
         }
         
-        // Draw particle
+        // Draw particle with varying sparkle
         ctx.beginPath();
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         
-        // Use the color with changing opacity
+        // Sparkle effect with varying size
+        const sparkleSize = (particle.size * (0.8 + (particle.sparkle / 50)));
+        ctx.arc(particle.x, particle.y, sparkleSize, 0, Math.PI * 2);
+        
+        // Use the color with lower opacity
         const rgba = particle.color.replace('rgb', 'rgba').replace(')', `, ${particle.opacity})`);
         ctx.fillStyle = rgba;
         
         // Add glow effect for sparkle
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = particle.sparkle;
         ctx.shadowColor = particle.color;
         
         ctx.fill();
