@@ -15,16 +15,17 @@ const randomPosition = () => ({
 
 const FluidArtBackground = () => {
   // Create arrays for our fluid art elements
-  const whiteBlobs = Array.from({ length: 15 }, (_, i) => ({
+  const whiteBlobs = Array.from({ length: 20 }, (_, i) => ({
     id: `white-blob-${i}`,
-    size: `${random(25, 120)}px`,
+    size: `${random(15, 150)}px`,
     ...randomPosition(),
-    opacity: random(0.6, 0.9),
-    animationDuration: `${random(15, 25)}s`,
+    opacity: random(0.6, 0.95),
+    animationDuration: `${random(15, 30)}s`,
     animationDelay: `${random(0, 10)}s`,
+    blur: `${random(3, 8)}px`,
   }));
 
-  const particles = Array.from({ length: 40 }, (_, i) => {
+  const particles = Array.from({ length: 60 }, (_, i) => {
     const colors = ["#FFFFFF", "#FF7A00", "#00A9B5", "#33C3F0"];
     const sizeMin = i % 3 === 0 ? 8 : 3;
     const sizeMax = i % 3 === 0 ? 20 : 12;
@@ -37,10 +38,11 @@ const FluidArtBackground = () => {
       opacity: random(0.5, 1),
       animationDuration: `${random(5, 15)}s`,
       animationDelay: `${random(0, 5)}s`,
+      blur: `${random(0, 2)}px`,
     };
   });
 
-  const streamlines = Array.from({ length: 10 }, (_, i) => {
+  const streamlines = Array.from({ length: 15 }, (_, i) => {
     const isTeal = i % 2 === 0;
     
     return {
@@ -54,14 +56,72 @@ const FluidArtBackground = () => {
     };
   });
 
+  // Create new morphing large bubbles that mimic the fluid art reference
+  const morphingBubbles = Array.from({ length: 8 }, (_, i) => {
+    const colors = ["rgba(255,255,255,0.8)", "rgba(255,122,0,0.4)", "rgba(0,169,181,0.4)", "rgba(51,195,240,0.4)"];
+    const isLarge = i < 3; // First three are larger bubbles
+    
+    return {
+      id: `morph-bubble-${i}`,
+      size: isLarge ? `${random(120, 200)}px` : `${random(40, 80)}px`,
+      ...randomPosition(),
+      color: colors[Math.floor(random(0, colors.length))],
+      opacity: random(0.4, 0.9),
+      animationDuration: `${random(25, 40)}s`,
+      animationDelay: `${random(0, 15)}s`,
+      transformScale: random(0.9, 1.1),
+      blur: `${random(5, 15)}px`,
+    };
+  });
+
   return (
     <div className="fluid-art-container">
+      {/* Render morphing bubbles (behind everything else) */}
+      {morphingBubbles.map((bubble) => (
+        <div
+          key={bubble.id}
+          className="fluid-morph-bubble"
+          style={{
+            width: bubble.size,
+            height: bubble.size,
+            left: bubble.left,
+            top: bubble.top,
+            opacity: bubble.opacity,
+            backgroundColor: bubble.color,
+            filter: `blur(${bubble.blur})`,
+            animationDelay: bubble.animationDelay,
+            animationDuration: bubble.animationDuration,
+            transform: `scale(${bubble.transformScale})`,
+          }}
+        />
+      ))}
+
+      {/* Render flowing streamlines */}
+      {streamlines.map((streamline) => (
+        <div
+          key={streamline.id}
+          className={`fluid-streamline animate-streamline-flow-${
+            Math.random() > 0.5 ? "slow" : "medium"
+          }`}
+          style={{
+            width: streamline.width,
+            left: streamline.left,
+            top: streamline.top,
+            transform: `rotate(${streamline.angle})`,
+            animationDelay: streamline.animationDelay,
+            backgroundImage: streamline.type === "teal" 
+              ? "linear-gradient(90deg, rgba(0,117,127,0), rgba(0,117,127,0.7), rgba(0,117,127,0))" 
+              : "linear-gradient(90deg, rgba(255,122,0,0), rgba(255,122,0,0.7), rgba(255,122,0,0))",
+          }}
+        />
+      ))}
+
       {/* Render white blobs */}
       {whiteBlobs.map((blob) => (
         <div
           key={blob.id}
           className={`fluid-blob animate-blob-float-${
-            Math.random() > 0.5 ? "slow" : "medium"
+            Math.random() > 0.7 ? "slow" : Math.random() > 0.4 ? "medium" : "fast"
           }`}
           style={{
             width: blob.size,
@@ -70,6 +130,7 @@ const FluidArtBackground = () => {
             top: blob.top,
             opacity: blob.opacity,
             backgroundColor: "#FFFFFF",
+            filter: `blur(${blob.blur})`,
             animationDelay: blob.animationDelay,
           }}
         />
@@ -89,24 +150,8 @@ const FluidArtBackground = () => {
             top: particle.top,
             backgroundColor: particle.color,
             opacity: particle.opacity,
+            filter: `blur(${particle.blur})`,
             animationDelay: particle.animationDelay,
-          }}
-        />
-      ))}
-
-      {/* Render flowing streamlines */}
-      {streamlines.map((streamline) => (
-        <div
-          key={streamline.id}
-          className={`fluid-streamline animate-streamline-flow-${
-            Math.random() > 0.5 ? "slow" : "medium"
-          } bg-streamline-${streamline.type}`}
-          style={{
-            width: streamline.width,
-            left: streamline.left,
-            top: streamline.top,
-            transform: `rotate(${streamline.angle})`,
-            animationDelay: streamline.animationDelay,
           }}
         />
       ))}
