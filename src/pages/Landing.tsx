@@ -62,7 +62,7 @@ const Landing = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full relative" style={{ zIndex: 30 }}>
           <Link to="/login" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
+            <Button className="w-full sm:w-auto gap-2 h-12 glass-vibrant-orange transition-all hover:bg-white/20 backdrop-blur-md shadow-md hover:shadow-lg">
               Sign In
               <ArrowRight className="w-4 h-4" />
             </Button>
