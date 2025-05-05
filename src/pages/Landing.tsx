@@ -7,7 +7,7 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center hot-oven-bg relative overflow-hidden">
-      {/* Hot oven sparkles */}
+      {/* Hot oven sparkles - slowed down */}
       <div className="absolute inset-0 overflow-hidden z-0">
         {/* Generate orange sparkles/gnisters for the hot oven effect */}
         {Array.from({ length: 80 }).map((_, index) => (
@@ -20,13 +20,13 @@ const Landing = () => {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               opacity: Math.random() * 0.8 + 0.2,
-              animationDelay: `${Math.random() * 8}s`,
-              animationDuration: `${2 + Math.random() * 4}s`
+              animationDelay: `${Math.random() * 12}s`,
+              animationDuration: `${4 + Math.random() * 6}s` // Slowed down animation
             }}
           />
         ))}
         
-        {/* Larger ember particles */}
+        {/* Larger ember particles - slowed down */}
         {Array.from({ length: 30 }).map((_, index) => (
           <div 
             key={`ember-${index}`}
@@ -37,34 +37,35 @@ const Landing = () => {
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
               opacity: Math.random() * 0.7 + 0.3,
-              animationDelay: `${Math.random() * 10}s`,
-              animationDuration: `${3 + Math.random() * 5}s`
+              animationDelay: `${Math.random() * 15}s`,
+              animationDuration: `${6 + Math.random() * 8}s` // Slowed down animation
             }}
           />
         ))}
       </div>
 
-      {/* Main content blob */}
+      {/* Main content blob - with inward shadow */}
       <div className="glass-blob-container relative z-10">
-        <div className="glass-blob">
+        <div className="glass-blob glass-blob-inward-shadow">
           <div className="container relative z-10 max-w-2xl w-full px-4">
-            {/* Title directly on background with gradient text */}
+            {/* Title directly on background with gradient text matching the dark to orange theme */}
             <div className="text-center mb-8 relative">
               <div className="mb-4">
-                <h1 className="text-5xl sm:text-6xl font-bold relative z-10 text-cyan-600">
+                <h1 className="text-5xl sm:text-6xl font-bold relative z-10 text-gradient-dark-orange">
                   GlassFuse Studio
                 </h1>
                 
-                <p className="text-xl mt-4 relative z-10 text-cyan-600">
+                <p className="text-xl mt-4 relative z-10 text-gradient-dark-orange">
                   Create, share, and perfect your glass fusion firing curves
                 </p>
               </div>
               
-              <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
+              <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-black/20 px-4 py-2 rounded-lg inline-block text-amber-100">
                 Join a community of passionate glass fusion artists
               </p>
             </div>
             
+            {/* Inner dynamic content - preserved from before */}
             <div className="p-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">

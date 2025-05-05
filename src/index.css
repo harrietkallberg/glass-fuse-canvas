@@ -197,7 +197,7 @@
     z-index: 1;
   }
 
-  /* Updated title styling - removing container and applying gradient text */
+  /* Updated title styling with darker gradient text */
   .gradient-text {
     background: linear-gradient(135deg, rgba(249,115,22,1) 0%, rgba(51,195,240,1) 100%);
     background-size: 400% 400%;
@@ -212,6 +212,16 @@
     background: linear-gradient(135deg, rgba(189,75,0,1) 0%, rgba(11,145,190,1) 100%);
     background-size: 400% 400%;
     animation: gradient-circular-motion 15s ease infinite;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+  }
+
+  /* New dark-orange gradient text for the title */
+  .text-gradient-dark-orange {
+    background: linear-gradient(135deg, #FF7A00 0%, #1A0A00 100%);
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
@@ -252,16 +262,12 @@
     aspect-ratio: 1.5 / 1;
   }
   
+  /* Updated glass blob with inward shadow */
   .glass-blob {
     width: 100%;
     height: 100%;
     background: linear-gradient(135deg, rgba(51,195,240,0.8) 0%, rgba(249,115,22,0.8) 100%);
     border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
-    box-shadow: 
-      0 0 40px rgba(51,195,240,0.4),
-      0 0 80px rgba(0,0,0,0.2),
-      inset 0 0 30px rgba(255,255,255,0.3);
-    backdrop-filter: blur(10px);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -270,6 +276,13 @@
     z-index: 10;
     animation: blob-morph 20s ease-in-out infinite;
     overflow: hidden;
+  }
+  
+  /* New inward shadow style for the glass blob */
+  .glass-blob-inward-shadow {
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.7), 
+                inset 0 0 20px rgba(0,0,0,0.5),
+                0 0 30px rgba(249,115,22,0.4);
   }
   
   .glass-blob::before {
@@ -281,17 +294,17 @@
     z-index: -1;
   }
   
-  /* Hot sparkle animations */
+  /* Hot sparkle animations with slowed down speeds */
   .hot-sparkle {
     position: absolute;
-    animation: hot-sparkle-float 5s ease-in-out infinite;
+    animation: hot-sparkle-float 8s ease-in-out infinite; /* Slower animation */
     box-shadow: 0 0 10px 2px currentColor;
     z-index: 2;
   }
   
   .hot-ember {
     position: absolute;
-    animation: hot-ember-float 8s ease-in-out infinite;
+    animation: hot-ember-float 12s ease-in-out infinite; /* Slower animation */
     box-shadow: 0 0 15px 3px currentColor;
     z-index: 2;
   }
