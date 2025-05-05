@@ -15,26 +15,26 @@ const Landing = () => {
         {/* This ensures all animation and gradient effects stay in this background layer */}
       </div>
       
-      <div className="container relative max-w-2xl w-full px-4 flex flex-col pt-20 md:pt-24" style={{ zIndex: 50 }}>
+      <div className="container relative max-w-2xl w-full px-4 flex flex-col pt-12 md:pt-16" style={{ zIndex: 50 }}>
         {/* Title section with highest z-index value */}
-        <div className="text-center mb-8 relative">
-          <div className="mb-4 relative" style={{ zIndex: 100 }}>
+        <div className="text-center mb-6 relative">
+          <div className="mb-3 relative" style={{ zIndex: 100 }}>
             <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
+            <p className="text-xl mt-3 gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
           
-          <p className="text-xl text-foreground/80 mt-4 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
+          <p className="text-xl text-foreground/80 mt-3 animate-fade-in backdrop-blur-sm bg-white/10 px-4 py-2 rounded-lg inline-block">
             Join a community of passionate glass fusion artists
           </p>
         </div>
         
         {/* Feature grid with medium z-index */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative" style={{ zIndex: 60 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 relative" style={{ zIndex: 60 }}>
           <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
             <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
