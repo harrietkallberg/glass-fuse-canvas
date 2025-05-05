@@ -179,29 +179,25 @@ const Dashboard = () => {
       sessionStorage.setItem('blobAnimationTime', startTime.toString());
     }
     
-    // Create a class for the background element to target it with CSS
-    const backgroundElement = document.querySelector('.dashboard-bg-gradient');
+    // Calculate elapsed time for animation continuity
+    const elapsedTime = Date.now() - startTime;
+    
+    // Apply background animation timing
+    const backgroundElement = document.querySelector('.dashboard-gradient-bg');
     if (backgroundElement) {
-      // Calculate elapsed time since animation started
-      const elapsedTime = Date.now() - startTime;
-      // Apply the animation with the correct offset to continue from where it left off
       backgroundElement.setAttribute('style', 
-        `animation-delay: -${elapsedTime}ms;`);
+        `background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
+         background-size: 400% 400%;
+         animation: gradient-circular-motion 15s ease infinite;
+         animation-delay: -${elapsedTime}ms;
+         z-index: -20;`);
     }
   }, []);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Full screen gradient background */}
-      <div 
-        className="fixed inset-0" 
-        style={{ 
-          background: 'linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%)',
-          backgroundSize: '400% 400%',
-          animation: 'gradient-circular-motion 15s ease infinite',
-          zIndex: -20
-        }} 
-      />
+      {/* Clean full-screen gradient background without any blob shapes or edges */}
+      <div className="fixed inset-0 dashboard-gradient-bg"></div>
       
       {/* Particle background */}
       <ParticleBackground />
