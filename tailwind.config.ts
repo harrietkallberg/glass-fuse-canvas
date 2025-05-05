@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -107,13 +106,40 @@ export default {
 					'50%': {
 						opacity: '0.8'
 					}
-				}
+				},
+                'glass-morph': {
+                    '0%, 100%': {
+                        borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%',
+                        transform: 'translate(0) rotate(0deg)'
+                    },
+                    '33%': {
+                        borderRadius: '70% 30% 50% 50% / 30% 50% 50% 70%',
+                        transform: 'translate(2%, 5%) rotate(5deg)'
+                    },
+                    '66%': {
+                        borderRadius: '40% 60% 60% 40% / 70% 40% 30% 60%',
+                        transform: 'translate(-2%, -5%) rotate(-5deg)'
+                    }
+                },
+                'shine-sweep': {
+                    '0%': {
+                        backgroundPosition: '0% 50%'
+                    },
+                    '50%': {
+                        backgroundPosition: '100% 50%'
+                    },
+                    '100%': {
+                        backgroundPosition: '0% 50%'
+                    }
+                }
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'float': 'float 6s ease-in-out infinite',
-				'pulse-soft': 'pulse-soft 4s ease-in-out infinite'
+				'pulse-soft': 'pulse-soft 4s ease-in-out infinite',
+                'glass-morph': 'glass-morph 20s ease-in-out infinite',
+                'shine-sweep': 'shine-sweep 10s ease-in-out infinite'
 			},
 			backgroundImage: {
 				'glass-gradient-1': 'linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%)',
@@ -124,10 +150,12 @@ export default {
 				'earth-gradient-1': 'linear-gradient(135deg, #658579 0%, #aea795 100%)',
 				'earth-gradient-2': 'linear-gradient(135deg, #bd8770 0%, #f7e2c8 100%)',
 				'earth-gradient-3': 'linear-gradient(135deg, #745641 0%, #bd8770 100%)',
-				// New vibrant gradients
 				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
 				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
 				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
+                'glass-shine': 'linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%)',
+                'glass-highlight': 'radial-gradient(circle at top right, rgba(255,255,255,0.3) 0%, transparent 70%)',
+                'glass-orange-blue': 'linear-gradient(135deg, rgba(249,115,22,0.4) 0%, rgba(51,195,240,0.4) 100%)',
 			}
 		}
 	},
