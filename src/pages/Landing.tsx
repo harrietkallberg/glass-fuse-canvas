@@ -1,12 +1,124 @@
 
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
+// Helper function to generate a random number within a range
+const random = (min: number, max: number) => Math.random() * (max - min) + min;
+
+// Helper function to generate a random position within the viewport
+const randomPosition = () => ({
+  left: `${random(5, 95)}%`,
+  top: `${random(5, 95)}%`,
+});
+
+const FluidArtBackground = () => {
+  // Create arrays for our fluid art elements
+  const whiteBlobs = Array.from({ length: 15 }, (_, i) => ({
+    id: `white-blob-${i}`,
+    size: `${random(25, 120)}px`,
+    ...randomPosition(),
+    opacity: random(0.6, 0.9),
+    animationDuration: `${random(15, 25)}s`,
+    animationDelay: `${random(0, 10)}s`,
+  }));
+
+  const particles = Array.from({ length: 40 }, (_, i) => {
+    const colors = ["#FFFFFF", "#FF7A00", "#00A9B5", "#33C3F0"];
+    const sizeRange = i % 3 === 0 ? [8, 20] : [3, 12]; // Larger particles occasionally
+    
+    return {
+      id: `particle-${i}`,
+      size: `${random(...sizeRange)}px`,
+      ...randomPosition(),
+      color: colors[Math.floor(random(0, colors.length))],
+      opacity: random(0.5, 1),
+      animationDuration: `${random(5, 15)}s`,
+      animationDelay: `${random(0, 5)}s`,
+    };
+  });
+
+  const streamlines = Array.from({ length: 10 }, (_, i) => {
+    const isTeal = i % 2 === 0;
+    
+    return {
+      id: `streamline-${i}`,
+      width: `${random(100, 300)}px`,
+      ...randomPosition(),
+      angle: `${random(0, 360)}deg`,
+      type: isTeal ? "teal" : "orange",
+      animationDuration: `${random(15, 30)}s`,
+      animationDelay: `${random(0, 8)}s`,
+    };
+  });
+
+  return (
+    <div className="fluid-art-container">
+      {/* Render white blobs */}
+      {whiteBlobs.map((blob) => (
+        <div
+          key={blob.id}
+          className={`fluid-blob animate-blob-float-${
+            Math.random() > 0.5 ? "slow" : "medium"
+          }`}
+          style={{
+            width: blob.size,
+            height: blob.size,
+            left: blob.left,
+            top: blob.top,
+            opacity: blob.opacity,
+            backgroundColor: "#FFFFFF",
+            animationDelay: blob.animationDelay,
+          }}
+        />
+      ))}
+
+      {/* Render colored particles */}
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className={`fluid-particle animate-particle-pulse-${
+            Math.random() > 0.7 ? "slow" : Math.random() > 0.4 ? "medium" : "fast"
+          }`}
+          style={{
+            width: particle.size,
+            height: particle.size,
+            left: particle.left,
+            top: particle.top,
+            backgroundColor: particle.color,
+            opacity: particle.opacity,
+            animationDelay: particle.animationDelay,
+          }}
+        />
+      ))}
+
+      {/* Render flowing streamlines */}
+      {streamlines.map((streamline) => (
+        <div
+          key={streamline.id}
+          className={`fluid-streamline animate-streamline-flow-${
+            Math.random() > 0.5 ? "slow" : "medium"
+          } bg-streamline-${streamline.type}`}
+          style={{
+            width: streamline.width,
+            left: streamline.left,
+            top: streamline.top,
+            transform: `rotate(${streamline.angle})`,
+            animationDelay: streamline.animationDelay,
+          }}
+        />
+      ))}
+    </div>
+  );
+};
+
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center morphing-bg overflow-hidden">
+      {/* Add our fluid art background */}
+      <FluidArtBackground />
+      
       <div className="container relative z-10 max-w-2xl w-full px-4">
         {/* Title directly on background with gradient text */}
         <div className="text-center mb-8 relative">
