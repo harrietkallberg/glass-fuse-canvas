@@ -1,10 +1,40 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
 const Landing = () => {
+  // Add useEffect to initialize and preserve animation state
+  useEffect(() => {
+    // Check if we already have a stored animation state
+    const storedAnimationTime = sessionStorage.getItem('blobAnimationTime');
+    const startTime = storedAnimationTime ? parseInt(storedAnimationTime, 10) : Date.now();
+    
+    // If no stored state, save the current time
+    if (!storedAnimationTime) {
+      sessionStorage.setItem('blobAnimationTime', startTime.toString());
+    }
+    
+    // Create a class for the background element to target it with CSS
+    const backgroundElement = document.querySelector('.fluid-bg-diagonal');
+    if (backgroundElement) {
+      // Calculate elapsed time since animation started
+      const elapsedTime = Date.now() - startTime;
+      // Apply the animation with the correct offset to continue from where it left off
+      backgroundElement.setAttribute('style', 
+        `animation-delay: -${elapsedTime}ms; z-index: -20;`);
+    }
+    
+    // Update the stored time periodically to keep the animation state fresh
+    const intervalId = setInterval(() => {
+      sessionStorage.setItem('blobAnimationTime', startTime.toString());
+    }, 10000); // Update every 10 seconds
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
       {/* Background blob with lower z-index to ensure it stays behind all content */}
