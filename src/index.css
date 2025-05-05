@@ -124,6 +124,13 @@
     filter: blur(72px); /* Increased blur for more ethereal effect */
   }
 
+  /* Dashboard-specific background styles - completely separate from authentication pages */
+  .dashboard-bg {
+    @apply bg-gradient-to-br from-[#e8e8e8] via-[#97c4ce]/50 to-[#e6b799]/60;
+    position: relative;
+    isolation: isolate;
+  }
+
   /* Dynamic title background - inherits the page gradients but darker */
   .dynamic-title-background {
     position: relative;
