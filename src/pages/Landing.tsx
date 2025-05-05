@@ -40,7 +40,7 @@ const Landing = () => {
       constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 20 + 8; // Larger varying sizes
+        this.size = Math.random() * 5 + 2; // Much smaller sizes (was 20 + 8)
         this.baseColor = Math.random() > 0.5 ? '#F97316' : '#33C3F0'; // Orange or Teal
         this.speedX = (Math.random() - 0.5) * 0.3; // Slower movement
         this.speedY = (Math.random() - 0.5) * 0.3;
@@ -105,7 +105,7 @@ const Landing = () => {
         
         // Add subtle blur effect
         ctx.shadowColor = this.baseColor;
-        ctx.shadowBlur = 15;
+        ctx.shadowBlur = 5; // Reduced shadow blur for smaller particles
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
@@ -116,7 +116,7 @@ const Landing = () => {
 
     // Create particles
     const particles: Particle[] = [];
-    for (let i = 0; i < 25; i++) { // Reduced count for better performance
+    for (let i = 0; i < 40; i++) { // Increased count since particles are smaller
       particles.push(new Particle());
     }
 
