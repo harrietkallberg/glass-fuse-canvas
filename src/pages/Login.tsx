@@ -45,11 +45,6 @@ const Login = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // In a real app, we would handle authentication here with Supabase
-    // Example:
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //   email,
-    //   password,
-    // });
     
     if (!email || !password) {
       toast({
@@ -69,12 +64,12 @@ const Login = () => {
   
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-      {/* Background blob with lower z-index to ensure it stays behind all content */}
+      {/* Background blob with fluid animation */}
       <div 
-        className="absolute inset-0 fluid-bg-diagonal" 
+        className="absolute inset-0 fluid-bg-diagonal before:animate-wave after:animate-wave" 
         style={{ zIndex: -20 }}
       >
-        {/* This ensures all animation and gradient effects stay in this background layer */}
+        {/* The blob animation is handled by CSS in fluid-bg-diagonal class */}
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
