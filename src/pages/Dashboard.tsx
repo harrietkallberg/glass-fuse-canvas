@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +49,7 @@ const mockCurves = [
   },
 ];
 
-// Updated Particle animation component with white twinkling particles
+// Updated Particle animation component
 const ParticleBackground = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -75,29 +74,33 @@ const ParticleBackground = () => {
       x: number;
       y: number;
       size: number;
+      color: string;
       speedX: number;
       speedY: number;
       opacity: number;
       opacityChange: number;
-      twinkle: number;
-      twinkleSpeed: number;
+      sparkle: number;
+      sparkleDirection: number;
     }
 
     // Create particles
     const particles: Particle[] = [];
-    const particleCount = 80; // Increased for more sparkling effect
+    const particleCount = 60; // Increased for more sparkling effect
+
+    const colors = ['#33C3F0', '#F97316', '#A5D8E2', '#FEC6A1'];
 
     for (let i = 0; i < particleCount; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        size: Math.random() * 2 + 0.2, // Smaller particles for sparkly effect
-        speedX: (Math.random() - 0.5) * 0.1, // Very slow movement
-        speedY: (Math.random() - 0.5) * 0.1, // Very slow movement
-        opacity: Math.random() * 0.5, // Lower starting opacity
-        opacityChange: Math.random() * 0.01 - 0.005, // Slower opacity change
-        twinkle: Math.random() * 10, // Initial twinkle value
-        twinkleSpeed: (Math.random() > 0.5 ? 0.1 : -0.1) * (Math.random() * 0.2 + 0.05) // Variable twinkle speed
+        size: Math.random() * 2.5 + 0.2, // Smaller particles for sparkly effect
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speedX: (Math.random() - 0.5) * 0.2, // Slower movement
+        speedY: (Math.random() - 0.5) * 0.2, // Slower movement
+        opacity: Math.random() * 0.3, // Lower starting opacity
+        opacityChange: Math.random() * 0.008 - 0.004, // Slower opacity change
+        sparkle: Math.random() * 10, // Initial sparkle value
+        sparkleDirection: Math.random() > 0.5 ? 0.2 : -0.2 // Direction of sparkle change
       });
     }
 
@@ -112,16 +115,19 @@ const ParticleBackground = () => {
         particle.x += particle.speedX;
         particle.y += particle.speedY;
         
-        // Update twinkle effect (controls both size and opacity)
-        particle.twinkle += particle.twinkleSpeed;
+        // Update opacity (glistening effect)
+        particle.opacity += particle.opacityChange;
         
-        // Reverse twinkle direction if reaching bounds
-        if (particle.twinkle > 12 || particle.twinkle < 0) {
-          particle.twinkleSpeed = -particle.twinkleSpeed;
+        // Reverse opacity change if reaching bounds
+        if (particle.opacity > 0.4 || particle.opacity < 0.05) { // Lower max opacity, higher min
+          particle.opacityChange = -particle.opacityChange;
         }
         
-        // Calculate current opacity based on twinkle
-        const currentOpacity = 0.2 + (particle.twinkle / 30);
+        // Update sparkle effect
+        particle.sparkle += particle.sparkleDirection;
+        if (particle.sparkle > 15 || particle.sparkle < 5) {
+          particle.sparkleDirection = -particle.sparkleDirection;
+        }
         
         // Reset position if off canvas
         if (particle.x < 0 || particle.x > canvas.width) {
@@ -131,19 +137,20 @@ const ParticleBackground = () => {
           particle.y = Math.random() * canvas.height;
         }
         
-        // Draw particle with twinkling effect
+        // Draw particle with varying sparkle
         ctx.beginPath();
         
-        // Size varies with twinkle
-        const twinkleSize = particle.size * (0.8 + (particle.twinkle / 15));
-        ctx.arc(particle.x, particle.y, twinkleSize, 0, Math.PI * 2);
+        // Sparkle effect with varying size
+        const sparkleSize = (particle.size * (0.8 + (particle.sparkle / 50)));
+        ctx.arc(particle.x, particle.y, sparkleSize, 0, Math.PI * 2);
         
-        // White color with varying opacity for twinkling
-        ctx.fillStyle = `rgba(255, 255, 255, ${currentOpacity})`;
+        // Use the color with lower opacity
+        const rgba = particle.color.replace('rgb', 'rgba').replace(')', `, ${particle.opacity})`);
+        ctx.fillStyle = rgba;
         
-        // Add glow effect for twinkle
-        ctx.shadowBlur = particle.twinkle;
-        ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+        // Add glow effect for sparkle
+        ctx.shadowBlur = particle.sparkle;
+        ctx.shadowColor = particle.color;
         
         ctx.fill();
         ctx.closePath();
@@ -168,36 +175,10 @@ const ParticleBackground = () => {
 };
 
 const Dashboard = () => {
-  // Add useEffect to initialize and preserve animation state
-  useEffect(() => {
-    // Check if we already have a stored animation state
-    const storedAnimationTime = sessionStorage.getItem('blobAnimationTime');
-    const startTime = storedAnimationTime ? parseInt(storedAnimationTime, 10) : Date.now();
-    
-    // If no stored state, save the current time
-    if (!storedAnimationTime) {
-      sessionStorage.setItem('blobAnimationTime', startTime.toString());
-    }
-    
-    // Calculate elapsed time for animation continuity
-    const elapsedTime = Date.now() - startTime;
-    
-    // Apply background animation timing
-    const backgroundElement = document.querySelector('.dashboard-gradient-bg');
-    if (backgroundElement) {
-      backgroundElement.setAttribute('style', 
-        `background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
-         background-size: 400% 400%;
-         animation: gradient-circular-motion 15s ease infinite;
-         animation-delay: -${elapsedTime}ms;
-         z-index: -20;`);
-    }
-  }, []);
-
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Clean full-screen gradient background without any blob shapes or edges */}
-      <div className="fixed inset-0 dashboard-gradient-bg"></div>
+      {/* Muddier gradient background with higher opacity */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#e8e8e8] via-[#97c4ce]/50 to-[#e6b799]/60 z-0" />
       
       {/* Particle background */}
       <ParticleBackground />

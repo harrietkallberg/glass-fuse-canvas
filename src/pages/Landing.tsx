@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,7 +39,7 @@ const Landing = () => {
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
       {/* Background blob with lower z-index to ensure it stays behind all content */}
       <div 
-        className="absolute inset-0 fluid-bg-diagonal before:animate-wave after:animate-wave" 
+        className="absolute inset-0 fluid-bg-diagonal" 
         style={{ zIndex: -20 }}
       >
         {/* This ensures all animation and gradient effects stay in this background layer */}

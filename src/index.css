@@ -167,7 +167,7 @@
     pointer-events: none;
   }
 
-  /* Login/Register pages background with wavy edges */
+  /* Updated fluid background with diagonal and circular movement */
   .fluid-bg-diagonal {
     @apply relative overflow-hidden;
     background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
@@ -186,9 +186,6 @@
     animation: gradient-circular-motion 20s ease infinite reverse;
     z-index: 0;
     opacity: 0.8;
-    /* Add wavy border effect */
-    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-    animation: gradient-circular-motion 20s ease infinite reverse, wave-motion 25s ease-in-out infinite;
   }
 
   .fluid-bg-diagonal::after {
@@ -198,18 +195,6 @@
     background-color: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(20px);
     z-index: 1;
-    /* Add another wavy border with different timing */
-    border-radius: 40% 60% 70% 30% / 50% 60% 30% 60%;
-    animation: wave-motion 30s ease-in-out infinite reverse;
-  }
-
-  /* Dashboard background - clean full-screen gradient with no edges */
-  .dashboard-gradient-bg {
-    @apply fixed inset-0;
-    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
-    background-size: 400% 400%;
-    animation: gradient-circular-motion 15s ease infinite;
-    z-index: -20;
   }
 
   /* Updated title styling - removing container and applying gradient text */
@@ -364,18 +349,23 @@
 @keyframes gradient-circular-motion {
   0% {
     background-position: 0% 0%;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   }
   25% {
     background-position: 50% 100%;
+    border-radius: 70% 30% 50% 50% / 40% 60% 40% 60%;
   }
   50% {
     background-position: 100% 50%;
+    border-radius: 50% 50% 30% 70% / 70% 30% 70% 30%;
   }
   75% {
     background-position: 25% 75%;
+    border-radius: 30% 70% 60% 40% / 50% 60% 40% 50%;
   }
   100% {
     background-position: 0% 0%;
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
   }
 }
 
