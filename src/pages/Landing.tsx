@@ -7,20 +7,23 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-      {/* Background blob positioned explicitly behind all content */}
-      <div className="absolute inset-0 z-0 fluid-bg-diagonal">
-        {/* Empty div to ensure all blob animations and content stay in this layer */}
+      {/* Background blob positioned as the very bottom layer */}
+      <div 
+        className="absolute inset-0 fluid-bg-diagonal" 
+        style={{ zIndex: -10 }}
+      >
+        {/* This ensures all animation and gradient effects stay in this background layer */}
       </div>
       
-      <div className="container relative z-20 max-w-2xl w-full px-4 flex flex-col pt-20 md:pt-24">
-        {/* Title with higher z-index to stay above ALL background elements */}
+      <div className="container relative max-w-2xl w-full px-4 flex flex-col pt-20 md:pt-24" style={{ zIndex: 50 }}>
+        {/* Title section with highest z-index value */}
         <div className="text-center mb-8 relative">
-          <div className="mb-4">
-            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark">
+          <div className="mb-4 relative" style={{ zIndex: 100 }}>
+            <h1 className="text-5xl sm:text-6xl font-bold gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
               GlassFuse Studio
             </h1>
             
-            <p className="text-xl mt-4 gradient-text-dark">
+            <p className="text-xl mt-4 gradient-text-dark backdrop-blur-sm px-4 py-2 rounded-lg inline-block">
               Create, share, and perfect your glass fusion firing curves
             </p>
           </div>
@@ -30,8 +33,8 @@ const Landing = () => {
           </p>
         </div>
         
-        {/* Feature grid directly on the blob background, ensuring it stays below title with z-10 */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative z-10">
+        {/* Feature grid with medium z-index */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 relative" style={{ zIndex: 60 }}>
           <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
             <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
@@ -53,7 +56,7 @@ const Landing = () => {
           </div>
         </div>
         
-        <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center relative" style={{ zIndex: 60 }}>
           <Link to="/login">
             <Button className="w-full sm:w-auto gap-2 h-12 bg-gradient-to-r from-[#F97316] to-[#bd8770] hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md bg-white/10">
               Sign In
