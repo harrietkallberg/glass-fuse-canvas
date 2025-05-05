@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,10 +6,14 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex items-center justify-center overflow-hidden relative">
-      {/* Background blob with lower z-index to ensure it stays behind all content */}
+      {/* Background blob with lower z-index and pushed down */}
       <div 
         className="absolute inset-0 fluid-bg-diagonal" 
-        style={{ zIndex: -20 }}
+        style={{ 
+          zIndex: -20,
+          top: "15%", // Push the blob down
+          bottom: "-15%" // Extend the blob to maintain coverage
+        }}
       >
         {/* This ensures all animation and gradient effects stay in this background layer */}
       </div>
