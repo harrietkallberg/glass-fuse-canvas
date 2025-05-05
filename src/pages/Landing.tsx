@@ -7,13 +7,13 @@ import { ArrowRight } from "lucide-react";
 const Landing = () => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-start fluid-bg-diagonal overflow-hidden">
-      {/* Title section positioned at the top */}
-      <div className="w-full pt-12 pb-16 relative z-10 text-center">
-        <h1 className="text-5xl sm:text-6xl font-bold text-white shadow-sm">
+      {/* Title section positioned lower from the top */}
+      <div className="w-full pt-24 pb-16 relative z-10 text-center">
+        <h1 className="text-5xl sm:text-6xl font-bold text-white shadow-lg">
           GlassFuse Studio
         </h1>
         
-        <p className="text-xl mt-4 text-white/90 max-w-2xl mx-auto">
+        <p className="text-xl mt-4 text-white/90 max-w-2xl mx-auto px-4">
           Create, share, and perfect your glass fusion firing curves
         </p>
       </div>
