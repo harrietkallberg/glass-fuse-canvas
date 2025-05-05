@@ -122,9 +122,8 @@ const Landing = () => {
 
     // Animation loop
     const animate = () => {
-      // Clear with slight opacity to create trailing effect
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Use clearRect instead of fillRect with opacity to remove trail effect
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
       
       particles.forEach(particle => {
         particle.update();
@@ -224,3 +223,4 @@ const Landing = () => {
 };
 
 export default Landing;
+
