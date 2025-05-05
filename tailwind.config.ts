@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -67,7 +66,13 @@ export default {
 					orangeBrown: '#bd8770',
 					taupe: '#aea795',
 					brown: '#745641',
-					cream: '#f7e2c8'
+					cream: '#f7e2c8',
+					// Hot oven colors
+					ember: '#FF5722',
+					spark: '#FFAB91',
+					glow: '#FF7043',
+					darkAmber: '#E65100',
+					coal: '#1A1A1A'
 				}
 			},
 			borderRadius: {
@@ -128,6 +133,10 @@ export default {
 				'vibrant-gradient-1': 'linear-gradient(135deg, #F97316 0%, #FEC6A1 100%)',
 				'vibrant-gradient-2': 'linear-gradient(135deg, #33C3F0 0%, #A5D8E2 100%)',
 				'vibrant-gradient-3': 'linear-gradient(135deg, #F97316 0%, #33C3F0 100%)',
+				// Hot oven gradients
+				'hot-oven': 'linear-gradient(135deg, #000000 0%, #3D1D00 50%, #000000 100%)',
+				'hot-ember-glow': 'radial-gradient(circle, rgba(255,87,34,0.4) 0%, rgba(0,0,0,0) 70%)',
+				'hot-coal': 'linear-gradient(135deg, #1A1A1A 0%, #0D0D0D 100%)',
 			}
 		}
 	},
