@@ -103,31 +103,15 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Use the same fluid-bg-diagonal from auth pages */}
-      <div className="absolute inset-0 fluid-bg-diagonal z-0"></div>
+      {/* Full-page gradient background without blob edges */}
+      <div className="absolute inset-0 bg-gradient-content z-0"></div>
       
-      {/* Animated background blob shapes */}
+      {/* Animated background content without visible blob shapes */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        <div 
-          className="fluid-shape bg-[#F97316]/15 w-[40rem] h-[40rem] rounded-full 
-                    absolute -top-[10rem] -left-[15rem] animate-float-slow"
-        ></div>
-        <div 
-          className="fluid-shape bg-[#33C3F0]/20 w-[50rem] h-[50rem] rounded-full 
-                    absolute -bottom-[15rem] -right-[10rem] animate-float-medium"
-        ></div>
-        <div 
-          className="fluid-shape bg-[#FEC6A1]/15 w-[25rem] h-[25rem] rounded-full 
-                    absolute top-[20%] right-[15%] animate-float-slow-reverse"
-        ></div>
-        <div 
-          className="fluid-shape bg-[#A5D8E2]/20 w-[30rem] h-[30rem] rounded-full 
-                    absolute bottom-[25%] left-[10%] animate-float-reverse"
-        ></div>
-        <div 
-          className="fluid-shape bg-[#F97316]/10 w-[20rem] h-[20rem] rounded-full 
-                    absolute top-[40%] left-[40%] animate-pulse-float"
-        ></div>
+        {/* Removed the explicit blob shapes and replaced with full gradients */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F97316]/30 to-[#33C3F0]/30 animate-gradient-slow"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#33C3F0]/25 to-[#F97316]/25 animate-gradient-medium"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#FEC6A1]/20 to-[#A5D8E2]/20 animate-gradient-reverse"></div>
         
         {/* Dynamic light source effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent animate-diagonal-wave"></div>
