@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
@@ -50,9 +49,63 @@ const mockCurves = [
   },
 ];
 
+// Generate random sparkling particles
+const generateParticles = (count: number) => {
+  const particles = [];
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      id: i,
+      size: Math.random() * 4 + 1, // 1-5px
+      x: Math.random() * 100, // 0-100%
+      y: Math.random() * 100, // 0-100%
+      opacity: Math.random() * 0.5 + 0.1, // 0.1-0.6
+      delay: Math.random() * 15, // 0-15s delay for animation
+      duration: Math.random() * 20 + 10, // 10-30s animation duration
+    });
+  }
+  return particles;
+};
+
 const Dashboard = () => {
+  // Add useEffect to initialize and preserve animation state
+  useEffect(() => {
+    // Use the same stored animation state from Landing/Auth pages
+    const storedAnimationTime = sessionStorage.getItem('blobAnimationTime');
+    const startTime = storedAnimationTime ? parseInt(storedAnimationTime, 10) : Date.now();
+    
+    // If no stored state, save the current time
+    if (!storedAnimationTime) {
+      sessionStorage.setItem('blobAnimationTime', startTime.toString());
+    }
+    
+    // Target the background element
+    const backgroundElement = document.querySelector('.fluid-bg-diagonal');
+    if (backgroundElement) {
+      // Calculate elapsed time since animation started
+      const elapsedTime = Date.now() - startTime;
+      // Apply the animation with the correct offset to continue from where it left off
+      backgroundElement.setAttribute('style', 
+        `animation-delay: -${elapsedTime}ms; z-index: 0;`);
+    }
+    
+    // Update the stored time periodically to keep the animation state fresh
+    const intervalId = setInterval(() => {
+      sessionStorage.setItem('blobAnimationTime', startTime.toString());
+    }, 10000); // Update every 10 seconds
+    
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, []);
+
+  // Generate 50 sparkling particles
+  const particles = generateParticles(50);
+
   return (
-    <div className="min-h-screen fluid-bg dashboard-bg-animated relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Use the same fluid-bg-diagonal from auth pages */}
+      <div className="absolute inset-0 fluid-bg-diagonal z-0"></div>
+      
       {/* Animated background blob shapes */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div 
@@ -80,6 +133,24 @@ const Dashboard = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent animate-diagonal-wave"></div>
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-diagonal-reverse-wave"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent animate-cross-diagonal-wave"></div>
+        
+        {/* Sparkling particles */}
+        {particles.map(particle => (
+          <div
+            key={particle.id}
+            className="absolute rounded-full bg-white animate-float-particle pointer-events-none"
+            style={{
+              width: `${particle.size}px`,
+              height: `${particle.size}px`,
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              opacity: particle.opacity,
+              boxShadow: `0 0 ${particle.size * 2}px ${particle.size/2}px rgba(255, 255, 255, ${particle.opacity + 0.2})`,
+              animationDuration: `${particle.duration}s`,
+              animationDelay: `${particle.delay}s`,
+            }}
+          />
+        ))}
       </div>
       
       <Navigation />
