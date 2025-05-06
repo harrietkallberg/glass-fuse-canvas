@@ -1,5 +1,5 @@
 
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
@@ -50,139 +50,36 @@ const mockCurves = [
   },
 ];
 
-// Updated Particle animation component
-const ParticleBackground = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    // Set canvas dimensions
-    const updateCanvasDimensions = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    };
-    
-    updateCanvasDimensions();
-    window.addEventListener('resize', updateCanvasDimensions);
-
-    // Particle properties
-    interface Particle {
-      x: number;
-      y: number;
-      size: number;
-      color: string;
-      speedX: number;
-      speedY: number;
-      opacity: number;
-      opacityChange: number;
-      sparkle: number;
-      sparkleDirection: number;
-    }
-
-    // Create particles
-    const particles: Particle[] = [];
-    const particleCount = 60; // Increased for more sparkling effect
-
-    const colors = ['#33C3F0', '#F97316', '#A5D8E2', '#FEC6A1'];
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        size: Math.random() * 2.5 + 0.2, // Smaller particles for sparkly effect
-        color: colors[Math.floor(Math.random() * colors.length)],
-        speedX: (Math.random() - 0.5) * 0.2, // Slower movement
-        speedY: (Math.random() - 0.5) * 0.2, // Slower movement
-        opacity: Math.random() * 0.3, // Lower starting opacity
-        opacityChange: Math.random() * 0.008 - 0.004, // Slower opacity change
-        sparkle: Math.random() * 10, // Initial sparkle value
-        sparkleDirection: Math.random() > 0.5 ? 0.2 : -0.2 // Direction of sparkle change
-      });
-    }
-
-    // Animation loop
-    const animate = () => {
-      // Clear canvas with slight persistence for trailing effect
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Update and draw particles
-      particles.forEach(particle => {
-        // Update position
-        particle.x += particle.speedX;
-        particle.y += particle.speedY;
-        
-        // Update opacity (glistening effect)
-        particle.opacity += particle.opacityChange;
-        
-        // Reverse opacity change if reaching bounds
-        if (particle.opacity > 0.4 || particle.opacity < 0.05) { // Lower max opacity, higher min
-          particle.opacityChange = -particle.opacityChange;
-        }
-        
-        // Update sparkle effect
-        particle.sparkle += particle.sparkleDirection;
-        if (particle.sparkle > 15 || particle.sparkle < 5) {
-          particle.sparkleDirection = -particle.sparkleDirection;
-        }
-        
-        // Reset position if off canvas
-        if (particle.x < 0 || particle.x > canvas.width) {
-          particle.x = Math.random() * canvas.width;
-        }
-        if (particle.y < 0 || particle.y > canvas.height) {
-          particle.y = Math.random() * canvas.height;
-        }
-        
-        // Draw particle with varying sparkle
-        ctx.beginPath();
-        
-        // Sparkle effect with varying size
-        const sparkleSize = (particle.size * (0.8 + (particle.sparkle / 50)));
-        ctx.arc(particle.x, particle.y, sparkleSize, 0, Math.PI * 2);
-        
-        // Use the color with lower opacity
-        const rgba = particle.color.replace('rgb', 'rgba').replace(')', `, ${particle.opacity})`);
-        ctx.fillStyle = rgba;
-        
-        // Add glow effect for sparkle
-        ctx.shadowBlur = particle.sparkle;
-        ctx.shadowColor = particle.color;
-        
-        ctx.fill();
-        ctx.closePath();
-      });
-      
-      requestAnimationFrame(animate);
-    };
-    
-    animate();
-    
-    return () => {
-      window.removeEventListener('resize', updateCanvasDimensions);
-    };
-  }, []);
-
-  return (
-    <canvas 
-      ref={canvasRef} 
-      className="absolute inset-0 z-0 pointer-events-none"
-    />
-  );
-};
-
 const Dashboard = () => {
   return (
-    <div className="min-h-screen relative overflow-hidden dashboard-bg">
-      {/* Dashboard-specific gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#e8e8e8] via-[#97c4ce]/50 to-[#e6b799]/60 z-0" />
-      
-      {/* Particle background */}
-      <ParticleBackground />
+    <div className="min-h-screen fluid-bg dashboard-bg relative overflow-hidden">
+      {/* Background blob shapes */}
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <div 
+          className="fluid-shape bg-[#F97316]/15 w-[40rem] h-[40rem] rounded-full 
+                    absolute -top-[10rem] -left-[15rem] animate-float-slow"
+        ></div>
+        <div 
+          className="fluid-shape bg-[#33C3F0]/20 w-[50rem] h-[50rem] rounded-full 
+                    absolute -bottom-[15rem] -right-[10rem] animate-float-medium"
+        ></div>
+        <div 
+          className="fluid-shape bg-[#FEC6A1]/15 w-[25rem] h-[25rem] rounded-full 
+                    absolute top-[20%] right-[15%] animate-float-slow-reverse"
+        ></div>
+        <div 
+          className="fluid-shape bg-[#A5D8E2]/20 w-[30rem] h-[30rem] rounded-full 
+                    absolute bottom-[25%] left-[10%] animate-float-reverse"
+        ></div>
+        <div 
+          className="fluid-shape bg-[#F97316]/10 w-[20rem] h-[20rem] rounded-full 
+                    absolute top-[40%] left-[40%] animate-pulse-float"
+        ></div>
+        
+        {/* Light source effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent animate-diagonal-wave"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-diagonal-reverse-wave"></div>
+      </div>
       
       <Navigation />
       
