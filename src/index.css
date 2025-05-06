@@ -131,6 +131,20 @@
     position: relative;
     isolation: isolate;
   }
+  
+  /* New animated dashboard background with dynamic gradient */
+  .dashboard-bg-animated {
+    position: relative;
+    isolation: isolate;
+    animation: gradient-position-shift 15s ease infinite;
+    background: linear-gradient(135deg, 
+      rgba(232, 232, 232, 0.8) 0%, 
+      rgba(151, 196, 206, 0.5) 33%, 
+      rgba(230, 183, 153, 0.6) 66%, 
+      rgba(151, 196, 206, 0.5) 100%);
+    background-size: 300% 300%;
+    transition: background-position 0.5s ease-in-out;
+  }
 
   /* Dynamic title background - inherits the page gradients but darker */
   .dynamic-title-background {
@@ -312,6 +326,21 @@
   }
   50% {
     background-position: 100% 50%;
+  }
+}
+
+@keyframes gradient-position-shift {
+  0%, 100% {
+    background-position: 0% 0%;
+  }
+  25% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 100% 100%;
+  }
+  75% {
+    background-position: 0% 100%;
   }
 }
 

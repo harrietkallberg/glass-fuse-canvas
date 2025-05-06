@@ -52,8 +52,8 @@ const mockCurves = [
 
 const Dashboard = () => {
   return (
-    <div className="min-h-screen fluid-bg dashboard-bg relative overflow-hidden">
-      {/* Background blob shapes */}
+    <div className="min-h-screen fluid-bg dashboard-bg-animated relative overflow-hidden">
+      {/* Animated background blob shapes */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div 
           className="fluid-shape bg-[#F97316]/15 w-[40rem] h-[40rem] rounded-full 
@@ -76,9 +76,10 @@ const Dashboard = () => {
                     absolute top-[40%] left-[40%] animate-pulse-float"
         ></div>
         
-        {/* Light source effect */}
+        {/* Dynamic light source effects */}
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent animate-diagonal-wave"></div>
         <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-diagonal-reverse-wave"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent animate-cross-diagonal-wave"></div>
       </div>
       
       <Navigation />
