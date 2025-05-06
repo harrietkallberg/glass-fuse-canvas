@@ -78,14 +78,14 @@ const Dashboard = () => {
       sessionStorage.setItem('blobAnimationTime', startTime.toString());
     }
     
-    // Target the background element - remove specific class targeting
-    const backgroundElements = document.querySelectorAll('.bg-gradient-content');
+    // Target all background gradient elements
+    const backgroundElements = document.querySelectorAll('.gradient-bg-element');
     backgroundElements.forEach(element => {
       // Calculate elapsed time since animation started
       const elapsedTime = Date.now() - startTime;
       // Apply the animation with the correct offset to continue from where it left off
       element.setAttribute('style', 
-        `animation-delay: -${elapsedTime}ms; z-index: 0;`);
+        `animation-delay: -${elapsedTime}ms;`);
     });
     
     // Update the stored time periodically to keep the animation state fresh
@@ -103,38 +103,35 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Full-page gradient background with no blob edges */}
-      <div className="absolute inset-0 bg-gradient-content z-0"></div>
+      {/* Base gradient layer */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#F97316]/40 to-[#33C3F0]/40 animate-gradient-slow"></div>
       
-      {/* Layered gradient backgrounds for depth and movement */}
-      <div className="absolute inset-0 overflow-hidden z-0">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F97316]/30 to-[#33C3F0]/30 animate-gradient-slow"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-[#33C3F0]/25 to-[#F97316]/25 animate-gradient-medium"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#FEC6A1]/20 to-[#A5D8E2]/20 animate-gradient-reverse"></div>
-        
-        {/* Dynamic light source effects */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/5 to-transparent animate-diagonal-wave"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-transparent animate-diagonal-reverse-wave"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-white/5 to-transparent animate-cross-diagonal-wave"></div>
-        
-        {/* Sparkling particles */}
-        {particles.map(particle => (
-          <div
-            key={particle.id}
-            className="absolute rounded-full bg-white animate-float-particle pointer-events-none"
-            style={{
-              width: `${particle.size}px`,
-              height: `${particle.size}px`,
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              opacity: particle.opacity,
-              boxShadow: `0 0 ${particle.size * 2}px ${particle.size/2}px rgba(255, 255, 255, ${particle.opacity + 0.2})`,
-              animationDuration: `${particle.duration}s`,
-              animationDelay: `${particle.delay}s`,
-            }}
-          />
-        ))}
-      </div>
+      {/* Multiple layered gradients for depth and movement */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#33C3F0]/30 to-[#F97316]/30 animate-gradient-medium"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#FEC6A1]/25 to-[#A5D8E2]/25 animate-gradient-reverse"></div>
+      
+      {/* Dynamic light source effects */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-transparent via-white/10 to-transparent animate-diagonal-wave"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-diagonal-reverse-wave"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-transparent via-white/10 to-transparent animate-cross-diagonal-wave"></div>
+      
+      {/* Sparkling particles */}
+      {particles.map(particle => (
+        <div
+          key={particle.id}
+          className="absolute rounded-full bg-white animate-float-particle pointer-events-none"
+          style={{
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            opacity: particle.opacity,
+            boxShadow: `0 0 ${particle.size * 2}px ${particle.size/2}px rgba(255, 255, 255, ${particle.opacity + 0.2})`,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`,
+          }}
+        />
+      ))}
       
       <Navigation />
       
