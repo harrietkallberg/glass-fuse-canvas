@@ -78,15 +78,15 @@ const Dashboard = () => {
       sessionStorage.setItem('blobAnimationTime', startTime.toString());
     }
     
-    // Target the background element
-    const backgroundElement = document.querySelector('.fluid-bg-diagonal');
-    if (backgroundElement) {
+    // Target the background element - remove specific class targeting
+    const backgroundElements = document.querySelectorAll('.bg-gradient-content');
+    backgroundElements.forEach(element => {
       // Calculate elapsed time since animation started
       const elapsedTime = Date.now() - startTime;
       // Apply the animation with the correct offset to continue from where it left off
-      backgroundElement.setAttribute('style', 
+      element.setAttribute('style', 
         `animation-delay: -${elapsedTime}ms; z-index: 0;`);
-    }
+    });
     
     // Update the stored time periodically to keep the animation state fresh
     const intervalId = setInterval(() => {
@@ -103,12 +103,11 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Full-page gradient background without blob edges */}
+      {/* Full-page gradient background with no blob edges */}
       <div className="absolute inset-0 bg-gradient-content z-0"></div>
       
-      {/* Animated background content without visible blob shapes */}
+      {/* Layered gradient backgrounds for depth and movement */}
       <div className="absolute inset-0 overflow-hidden z-0">
-        {/* Removed the explicit blob shapes and replaced with full gradients */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#F97316]/30 to-[#33C3F0]/30 animate-gradient-slow"></div>
         <div className="absolute inset-0 bg-gradient-to-tr from-[#33C3F0]/25 to-[#F97316]/25 animate-gradient-medium"></div>
         <div className="absolute inset-0 bg-gradient-to-b from-[#FEC6A1]/20 to-[#A5D8E2]/20 animate-gradient-reverse"></div>
