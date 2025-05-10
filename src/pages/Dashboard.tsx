@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,23 +49,6 @@ const mockCurves = [
   },
 ];
 
-// Generate random sparkling particles
-const generateParticles = (count: number) => {
-  const particles = [];
-  for (let i = 0; i < count; i++) {
-    particles.push({
-      id: i,
-      size: Math.random() * 4 + 1, // 1-5px
-      x: Math.random() * 100, // 0-100%
-      y: Math.random() * 100, // 0-100%
-      opacity: Math.random() * 0.5 + 0.1, // 0.1-0.6
-      delay: Math.random() * 15, // 0-15s delay for animation
-      duration: Math.random() * 20 + 10, // 10-30s animation duration
-    });
-  }
-  return particles;
-};
-
 const Dashboard = () => {
   // Add useEffect to initialize and preserve animation state
   useEffect(() => {
@@ -99,9 +81,6 @@ const Dashboard = () => {
     };
   }, []);
 
-  // Generate 50 sparkling particles
-  const particles = generateParticles(50);
-
   return (
     <div className="min-h-screen relative overflow-hidden">
       {/* Base gradient layer - Using teal/green/orange from auth pages */}
@@ -115,24 +94,6 @@ const Dashboard = () => {
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-transparent via-white/10 to-transparent animate-diagonal-wave"></div>
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-diagonal-reverse-wave"></div>
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-transparent via-white/5 to-transparent animate-cross-diagonal-wave"></div>
-      
-      {/* Sparkling particles */}
-      {particles.map(particle => (
-        <div
-          key={particle.id}
-          className="absolute rounded-full bg-white animate-float-particle pointer-events-none"
-          style={{
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            left: `${particle.x}%`,
-            top: `${particle.y}%`,
-            opacity: particle.opacity,
-            boxShadow: `0 0 ${particle.size * 2}px ${particle.size/2}px rgba(255, 255, 255, ${particle.opacity + 0.2})`,
-            animationDuration: `${particle.duration}s`,
-            animationDelay: `${particle.delay}s`,
-          }}
-        />
-      ))}
       
       <Navigation />
       
@@ -169,7 +130,7 @@ const Dashboard = () => {
                 description={curve.description}
                 lastUpdated={curve.lastUpdated}
                 isPrivate={curve.isPrivate}
-                colorClass={`enhanced-glass ${curve.colorClass || ''}`}
+                colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
               />
             </div>
           ))}
