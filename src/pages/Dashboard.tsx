@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -103,12 +104,12 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Base gradient layer */}
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#F97316]/40 to-[#33C3F0]/40 animate-gradient-slow"></div>
+      {/* Base gradient layer - Darker and more intense colors */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#D946EF]/40 to-[#8B5CF6]/50 animate-gradient-slow"></div>
       
-      {/* Multiple layered gradients for depth and movement */}
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#33C3F0]/30 to-[#F97316]/30 animate-gradient-medium"></div>
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#FEC6A1]/25 to-[#A5D8E2]/25 animate-gradient-reverse"></div>
+      {/* Multiple layered gradients for depth and movement - Darker and more intense */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#0EA5E9]/40 to-[#F97316]/40 animate-gradient-medium"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#8B5CF6]/25 to-[#F97316]/30 animate-gradient-reverse"></div>
       
       {/* Dynamic light source effects */}
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-transparent via-white/10 to-transparent animate-diagonal-wave"></div>
@@ -138,20 +139,20 @@ const Dashboard = () => {
       <div className="container mx-auto pt-24 px-4 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-[#2A6B6B]" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.1)' }}>
+            <h1 className="text-3xl font-bold text-white" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
               Your Firing Curves
             </h1>
-            <p className="text-muted-foreground">Create and manage your glass fusion schedules</p>
+            <p className="text-white/80">Create and manage your glass fusion schedules</p>
           </div>
           
           <div className="flex gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search your curves..." className="pl-8 glass-surface backdrop-blur-md bg-white/30" />
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-white/70" />
+              <Input placeholder="Search your curves..." className="pl-8 glass-surface backdrop-blur-md bg-white/10 text-white" />
             </div>
             
             <Link to="/create">
-              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-md hover:shadow-lg">
+              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-xl hover:shadow-2xl border-white/20">
                 <Plus className="h-4 w-4" />
                 New Curve
               </Button>
@@ -168,7 +169,7 @@ const Dashboard = () => {
                 description={curve.description}
                 lastUpdated={curve.lastUpdated}
                 isPrivate={curve.isPrivate}
-                colorClass={curve.colorClass}
+                colorClass={`enhanced-glass ${curve.colorClass || ''}`}
               />
             </div>
           ))}
