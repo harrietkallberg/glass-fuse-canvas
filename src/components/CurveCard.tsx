@@ -24,34 +24,34 @@ const CurveCard = ({
 }: CurveCardProps) => {
   return (
     <Card className={`${colorClass} border-none overflow-hidden`}>
-      <CardHeader className="pb-2 relative z-10">
+      <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-lg text-white text-shadow-sm">{title}</h3>
+          <h3 className="font-medium text-lg">{title}</h3>
           {isPrivate && (
-            <span className="text-xs bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full text-white/90">
+            <span className="text-xs bg-muted px-2 py-1 rounded-full">
               Private
             </span>
           )}
         </div>
       </CardHeader>
-      <CardContent className="pb-2 relative z-10">
-        <p className="text-sm text-white/80">{description}</p>
-        <div className="w-full h-[60px] mt-4 flex items-center justify-center overflow-hidden rounded-md bg-white/10 backdrop-blur-md">
-          <div className="w-full h-[2px] bg-white/50 relative">
-            <div className="absolute h-2 w-2 bg-white/80 rounded-full -top-[3px] glow-dot" style={{ left: '20%' }}></div>
-            <div className="absolute h-2 w-2 bg-white/80 rounded-full -top-[3px] glow-dot" style={{ left: '50%' }}></div>
-            <div className="absolute h-2 w-2 bg-white/80 rounded-full -top-[3px] glow-dot" style={{ left: '80%' }}></div>
+      <CardContent className="pb-2">
+        <p className="text-sm text-muted-foreground">{description}</p>
+        <div className="w-full h-[60px] mt-4 flex items-center justify-center overflow-hidden rounded-md bg-muted/50">
+          <div className="w-full h-[2px] bg-primary/30 relative">
+            <div className="absolute h-2 w-2 bg-primary rounded-full -top-[3px]" style={{ left: '20%' }}></div>
+            <div className="absolute h-2 w-2 bg-primary rounded-full -top-[3px]" style={{ left: '50%' }}></div>
+            <div className="absolute h-2 w-2 bg-primary rounded-full -top-[3px]" style={{ left: '80%' }}></div>
           </div>
         </div>
       </CardContent>
-      <CardFooter className="pt-2 flex justify-between relative z-10">
-        <span className="text-xs text-white/70">Updated {lastUpdated}</span>
+      <CardFooter className="pt-2 flex justify-between">
+        <span className="text-xs text-muted-foreground">Updated {lastUpdated}</span>
         <div className="flex gap-2">
-          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 text-white">
+          <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
             <Share2 className="h-4 w-4" />
           </Button>
           <Link to={`/edit/${id}`}>
-            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white/20 border-white/30 hover:bg-white/30 text-white">
+            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full">
               <Edit className="h-4 w-4" />
             </Button>
           </Link>

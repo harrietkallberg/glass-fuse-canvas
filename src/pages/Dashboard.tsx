@@ -83,8 +83,10 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background gradient layers */}
+      {/* Base gradient layer - Using teal/green/orange from auth pages */}
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#0EA5E9]/50 to-[#F97316]/60 animate-gradient-slow"></div>
+      
+      {/* Multiple layered gradients for depth and movement */}
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#33C3F0]/40 to-[#F97316]/50 animate-gradient-medium"></div>
       <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#A5D8E2]/30 to-[#FEC6A1]/40 animate-gradient-reverse"></div>
       
