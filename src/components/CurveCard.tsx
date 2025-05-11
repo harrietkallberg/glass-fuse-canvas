@@ -97,14 +97,14 @@ const CurveCard = ({
               <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FFA07A" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#FFA07A" stopOpacity={0.3}/>
+                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#F97316" stopOpacity={0.3}/>
                   </linearGradient>
                 </defs>
                 <Area 
                   type="monotone" 
                   dataKey="temperature" 
-                  stroke="#FFA07A" 
+                  stroke="#F97316" 
                   strokeWidth={2.5}
                   fillOpacity={1} 
                   fill={`url(#colorTemp-${id})`}
