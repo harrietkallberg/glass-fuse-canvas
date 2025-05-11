@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Plus, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import CurveCard from "@/components/CurveCard";
 import { Link } from "react-router-dom";
