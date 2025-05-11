@@ -65,32 +65,32 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        <div className="glass-card p-6 mb-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
-          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6">
-            <div className="space-y-4">
-              <CurveHeader 
-                title={title}
-                setTitle={setTitle}
-                description={description}
-                setDescription={setDescription}
-                isPrivate={isPrivate}
-                setIsPrivate={setIsPrivate}
-              />
-            </div>
-            
-            <div className="space-y-4">
-              <Tabs defaultValue="curve" className="w-full">
-                <TabsList className="w-full mb-4">
-                  <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
-                  <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
-                </TabsList>
-                
-                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
-              </Tabs>
-            </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Left tile - Curve details */}
+          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+            <CurveHeader 
+              title={title}
+              setTitle={setTitle}
+              description={description}
+              setDescription={setDescription}
+              isPrivate={isPrivate}
+              setIsPrivate={setIsPrivate}
+            />
+          </div>
+          
+          {/* Right tile - Three-way toggle */}
+          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+            <Tabs defaultValue="curve" className="w-full">
+              <TabsList className="w-full mb-4">
+                <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
+                <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
+                <TabsTrigger value="versions" className="flex-1">Version History</TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
         </div>
         
+        {/* Main content area - changes based on selected tab */}
         <Tabs defaultValue="curve">
           <TabsContent value="curve" className="space-y-6">
             <CurveEditor initialPhases={phases} onSave={setPhases} />
@@ -106,6 +106,12 @@ const CurveEditPage = () => {
               setTags={setTags}
               handleSave={handleProjectDetailsSave}
             />
+          </TabsContent>
+          
+          <TabsContent value="versions" className="space-y-6">
+            <div className="glass p-6 rounded-2xl bg-glass-100/20 backdrop-blur-sm">
+              <CurveVersionHistory />
+            </div>
           </TabsContent>
         </Tabs>
       </div>

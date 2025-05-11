@@ -11,11 +11,7 @@ const mockVersions = [
   { id: "v1", name: "Version 1", date: "3 days ago", current: false },
 ];
 
-interface CurveVersionHistoryProps {
-  className?: string;
-}
-
-const CurveVersionHistory = ({ className }: CurveVersionHistoryProps) => {
+const CurveVersionHistory = () => {
   const handleSaveVersion = () => {
     // Here you would save a new version in your Supabase database
     toast({
@@ -25,9 +21,9 @@ const CurveVersionHistory = ({ className }: CurveVersionHistoryProps) => {
   };
 
   return (
-    <div className={className}>
-      <h3 className="font-medium">Version History</h3>
-      <div className="space-y-2 max-h-[250px] overflow-auto pr-2">
+    <div>
+      <h3 className="font-medium mb-3">Version History</h3>
+      <div className="space-y-2 max-h-[250px] overflow-auto pr-2 mb-3">
         {mockVersions.map((version) => (
           <div
             key={version.id}
@@ -52,7 +48,7 @@ const CurveVersionHistory = ({ className }: CurveVersionHistoryProps) => {
       
       <Button 
         variant="outline" 
-        className="w-full mt-2 gap-1"
+        className="w-full gap-1"
         onClick={handleSaveVersion}
       >
         <BookmarkPlus className="h-4 w-4" />
