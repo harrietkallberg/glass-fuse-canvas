@@ -91,27 +91,29 @@ const CurveCard = ({
       <CardContent className="pb-2">
         <p className="text-sm md:text-base text-foreground font-medium">{description}</p>
         <div className="flex gap-4 mt-4">
-          {/* Curve visualization with fixed container size */}
-          <div className="w-1/2 h-[85px] bg-white/15 backdrop-blur-sm rounded-md overflow-hidden border border-white/40">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
-                <defs>
-                  <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#F97316" stopOpacity={0.3}/>
-                  </linearGradient>
-                </defs>
-                <Area 
-                  type="monotone" 
-                  dataKey="temperature" 
-                  stroke="#F97316" 
-                  strokeWidth={2.5}
-                  fillOpacity={1} 
-                  fill={`url(#colorTemp-${id})`}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+          {/* Curve visualization with overflow visible on sides */}
+          <div className="w-1/2 h-[85px] bg-white/15 backdrop-blur-sm rounded-md overflow-hidden border border-white/40 relative">
+            <div className="absolute inset-0 -mx-2">
+              <ResponsiveContainer width="110%" height="100%">
+                <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#F97316" stopOpacity={0.3}/>
+                    </linearGradient>
+                  </defs>
+                  <Area 
+                    type="monotone" 
+                    dataKey="temperature" 
+                    stroke="#F97316" 
+                    strokeWidth={2.5}
+                    fillOpacity={1} 
+                    fill={`url(#colorTemp-${id})`}
+                    isAnimationActive={false}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
           
           {/* Glass and oven settings with improved readability */}
