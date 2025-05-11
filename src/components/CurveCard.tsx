@@ -63,9 +63,9 @@ const CurveCard = ({
     <Card className={`${colorClass} border-white border overflow-hidden backdrop-blur-sm bg-white/40`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-lg">{title}</h3>
+          <h3 className="font-medium text-lg md:text-xl">{title}</h3>
           <div className="flex items-center gap-2">
-            <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs md:text-sm font-medium bg-white/70 px-2 py-1 rounded-full border border-white/80 shadow-sm">
               {isModified ? (
                 <>
                   <Pencil className="w-3 h-3 mr-1" /> Modified
@@ -77,11 +77,11 @@ const CurveCard = ({
               )}
             </span>
             {isPrivate ? (
-              <span className="text-xs bg-muted px-2 py-1 rounded-full">
+              <span className="text-xs md:text-sm font-medium bg-muted/90 px-2 py-1 rounded-full border border-muted shadow-sm">
                 Private
               </span>
             ) : (
-              <span className="text-xs bg-white/50 px-2 py-1 rounded-full flex items-center">
+              <span className="text-xs md:text-sm font-medium bg-white/70 px-2 py-1 rounded-full flex items-center border border-white/80 shadow-sm">
                 <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
@@ -89,23 +89,23 @@ const CurveCard = ({
         </div>
       </CardHeader>
       <CardContent className="pb-2">
-        <p className="text-sm text-muted-foreground">{description}</p>
+        <p className="text-sm md:text-base text-foreground">{description}</p>
         <div className="flex gap-4 mt-4">
-          {/* Miniature curve plot */}
+          {/* Miniature curve plot with darker orange */}
           <div className="w-1/2 h-[80px] bg-white/20 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#FEC6A1" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#FEC6A1" stopOpacity={0.2}/>
+                    <stop offset="5%" stopColor="#F97316" stopOpacity={0.8}/>
+                    <stop offset="95%" stopColor="#F97316" stopOpacity={0.3}/>
                   </linearGradient>
                 </defs>
                 <Area 
                   type="monotone" 
                   dataKey="temperature" 
-                  stroke="#FEC6A1" 
-                  strokeWidth={2}
+                  stroke="#F97316" 
+                  strokeWidth={2.5}
                   fillOpacity={1} 
                   fill={`url(#colorTemp-${id})`} 
                 />
@@ -113,23 +113,23 @@ const CurveCard = ({
             </ResponsiveContainer>
           </div>
           
-          {/* Glass and oven settings */}
+          {/* Glass and oven settings with improved readability */}
           <div className="w-1/2">
-            <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
+            <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs md:text-sm">
               <div>
-                <span className="text-muted-foreground">Glass</span>
+                <span className="text-muted-foreground font-medium">Glass</span>
                 <p className="font-medium text-foreground">{glassType}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Oven</span>
+                <span className="text-muted-foreground font-medium">Oven</span>
                 <p className="font-medium text-foreground">{formatOvenType(ovenType)}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Thickness</span>
+                <span className="text-muted-foreground font-medium">Thickness</span>
                 <p className="font-medium text-foreground">{thickness}</p>
               </div>
               <div>
-                <span className="text-muted-foreground">Project</span>
+                <span className="text-muted-foreground font-medium">Project</span>
                 <p className="font-medium text-foreground">{projectType}</p>
               </div>
             </div>
@@ -137,7 +137,7 @@ const CurveCard = ({
         </div>
       </CardContent>
       <CardFooter className="pt-2 flex justify-between">
-        <span className="text-xs text-muted-foreground">Updated {lastUpdated}</span>
+        <span className="text-xs md:text-sm text-muted-foreground font-medium">Updated {lastUpdated}</span>
         <div className="flex gap-2">
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
             <Share2 className="h-4 w-4" />
