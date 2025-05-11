@@ -49,17 +49,23 @@ const CurveCard = ({
       return "Top Heated";
     } else if (type === "s" || type.toLowerCase().includes("side")) {
       return "Side Heated";
+    } else if (type.toLowerCase().includes("gas")) {
+      return "Gas Kiln";
+    } else if (type.toLowerCase().includes("electric")) {
+      return "Electric Kiln";
+    } else if (type.toLowerCase().includes("ceramic")) {
+      return "Ceramic Kiln";
     }
     return type;
   };
 
   return (
-    <Card className={`${colorClass} border-white border overflow-hidden backdrop-blur-sm bg-white/25`}>
+    <Card className={`${colorClass} border-white border overflow-hidden backdrop-blur-sm bg-white/40`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <h3 className="font-medium text-lg">{title}</h3>
           <div className="flex items-center gap-2">
-            <span className="flex items-center text-xs bg-white/40 px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs bg-white/50 px-2 py-1 rounded-full">
               {isModified ? (
                 <>
                   <Pencil className="w-3 h-3 mr-1" /> Modified
@@ -75,7 +81,7 @@ const CurveCard = ({
                 Private
               </span>
             ) : (
-              <span className="text-xs bg-white/40 px-2 py-1 rounded-full flex items-center">
+              <span className="text-xs bg-white/50 px-2 py-1 rounded-full flex items-center">
                 <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
@@ -86,7 +92,7 @@ const CurveCard = ({
         <p className="text-sm text-muted-foreground">{description}</p>
         <div className="flex gap-4 mt-4">
           {/* Miniature curve plot */}
-          <div className="w-1/2 h-[80px] bg-black/5 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
+          <div className="w-1/2 h-[80px] bg-white/20 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                 <defs>
@@ -111,20 +117,20 @@ const CurveCard = ({
           <div className="w-1/2">
             <div className="grid grid-cols-2 gap-x-3 gap-y-2 text-xs">
               <div>
-                <span className="text-white/70">Glass</span>
-                <p className="font-medium text-white">{glassType}</p>
+                <span className="text-muted-foreground">Glass</span>
+                <p className="font-medium text-foreground">{glassType}</p>
               </div>
               <div>
-                <span className="text-white/70">Oven</span>
-                <p className="font-medium text-white">{formatOvenType(ovenType)}</p>
+                <span className="text-muted-foreground">Oven</span>
+                <p className="font-medium text-foreground">{formatOvenType(ovenType)}</p>
               </div>
               <div>
-                <span className="text-white/70">Thickness</span>
-                <p className="font-medium text-white">{thickness}</p>
+                <span className="text-muted-foreground">Thickness</span>
+                <p className="font-medium text-foreground">{thickness}</p>
               </div>
               <div>
-                <span className="text-white/70">Project</span>
-                <p className="font-medium text-white">{projectType}</p>
+                <span className="text-muted-foreground">Project</span>
+                <p className="font-medium text-foreground">{projectType}</p>
               </div>
             </div>
           </div>
@@ -140,7 +146,7 @@ const CurveCard = ({
             <Button 
               size="icon" 
               variant="outline" 
-              className="h-8 w-8 rounded-full bg-white/50 backdrop-blur-sm border-white hover:bg-white/60 ring-1 ring-white/70 shadow-lg"
+              className="h-8 w-8 rounded-full bg-white/60 backdrop-blur-sm border-white hover:bg-white/70 ring-1 ring-white/70 shadow-lg"
               aria-label="Edit curve"
             >
               <Edit className="h-4 w-4" />
