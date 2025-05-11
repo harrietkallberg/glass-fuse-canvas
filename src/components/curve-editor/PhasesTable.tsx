@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Plus, Save, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Phase {
@@ -99,13 +99,9 @@ const PhasesTable = ({
         </div>
       ))}
       
-      <div className="flex justify-between">
+      <div className="flex justify-start">
         <Button onClick={addPhase} variant="outline" className="gap-1">
           <Plus className="h-4 w-4" /> Add Phase
-        </Button>
-        
-        <Button onClick={handleSave} className="gap-1">
-          <Save className="h-4 w-4" /> Save Changes
         </Button>
       </div>
     </div>
