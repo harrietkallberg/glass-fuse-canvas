@@ -1,139 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
-import Navigation from "@/components/Navigation";
-import CurveCard from "@/components/CurveCard";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
 
-// Mock data for curves with accurate curve data for visualization
-const mockCurves = [
-  {
-    id: "1",
-    title: "Standard Bowl Fuse",
-    description: "Full fuse for 10mm thick glass bowl project",
-    lastUpdated: "2 days ago",
-    isPrivate: false,
-    glassType: "Bullseye",
-    ovenType: "t", // Using "t" to match editor format for Top Heated
-    thickness: "10mm",
-    projectType: "Full Fuse",
-    isModified: false,
-    curveData: [
-      {time: 0, temperature: 20},
-      {time: 60, temperature: 250},
-      {time: 120, temperature: 500},
-      {time: 160, temperature: 750},
-      {time: 190, temperature: 750},  // Hold at top temperature
-      {time: 240, temperature: 520},  // Controlled cooldown to annealing point
-      {time: 320, temperature: 460},  // Annealing
-      {time: 380, temperature: 100},
-      {time: 440, temperature: 20}
-    ]
-  },
-  {
-    id: "2",
-    title: "Tack Fuse Experiment",
-    description: "Light tack fuse preserving texture for wall art",
-    lastUpdated: "1 week ago",
-    isPrivate: true,
-    glassType: "Float Glass",
-    ovenType: "s", // Using "s" to match editor format for Side Heated
-    thickness: "4mm",
-    projectType: "Tack Fuse",
-    isModified: true,
-    curveData: [
-      {time: 0, temperature: 20},
-      {time: 60, temperature: 200},
-      {time: 120, temperature: 400},
-      {time: 180, temperature: 650},  // Lower top temperature for tack fuse
-      {time: 200, temperature: 650},  // Short hold
-      {time: 260, temperature: 510},  // Controlled cooldown
-      {time: 330, temperature: 450},  // Annealing
-      {time: 390, temperature: 100},
-      {time: 450, temperature: 20}
-    ],
-    colorClass: "glass-yellow"
-  },
-  {
-    id: "3",
-    title: "Casting Schedule",
-    description: "Slow schedule for thick cast glass sculptures",
-    lastUpdated: "3 days ago",
-    isPrivate: false,
-    glassType: "System 96",
-    ovenType: "Gas Kiln",
-    thickness: "25mm",
-    projectType: "Casting",
-    isModified: true,
-    curveData: [
-      {time: 0, temperature: 20},
-      {time: 120, temperature: 200},  // Slower ramp for thicker glass
-      {time: 240, temperature: 450},
-      {time: 360, temperature: 850},  // Higher top temperature for casting
-      {time: 420, temperature: 850},  // Longer hold at top
-      {time: 540, temperature: 560},  // Slower cooldown
-      {time: 660, temperature: 480},  // Extended annealing
-      {time: 780, temperature: 300},
-      {time: 900, temperature: 20}
-    ],
-    colorClass: "glass-orange"
-  },
-  {
-    id: "4",
-    title: "Slumping Profile",
-    description: "Gentle slumping for decorative plate",
-    lastUpdated: "yesterday",
-    isPrivate: false,
-    glassType: "Spectrum",
-    ovenType: "Electric Kiln",
-    thickness: "6mm",
-    projectType: "Slumping",
-    isModified: false,
-    curveData: [
-      {time: 0, temperature: 20},
-      {time: 60, temperature: 200},
-      {time: 120, temperature: 400},
-      {time: 180, temperature: 650},  // Lower temperature for slumping
-      {time: 210, temperature: 650},  // Hold
-      {time: 270, temperature: 500},
-      {time: 330, temperature: 450},
-      {time: 390, temperature: 100},
-      {time: 450, temperature: 20}
-    ],
-    colorClass: "glass-green"
-  },
-  {
-    id: "5",
-    title: "Delicate Drape",
-    description: "Careful schedule for thin glass draping",
-    lastUpdated: "3 hours ago",
-    isPrivate: true,
-    glassType: "Bullseye",
-    ovenType: "Ceramic Kiln",
-    thickness: "3mm",
-    projectType: "Draping",
-    isModified: true,
-    curveData: [
-      {time: 0, temperature: 20},
-      {time: 40, temperature: 150},
-      {time: 80, temperature: 300},
-      {time: 120, temperature: 600},  // Lower temperature for delicate draping
-      {time: 140, temperature: 600},  // Short hold
-      {time: 180, temperature: 500},
-      {time: 240, temperature: 460},
-      {time: 300, temperature: 100},
-      {time: 360, temperature: 20}
-    ],
-    colorClass: "glass-turquoise"
-  },
-];
+import React, { useEffect, useState } from "react";
+import Navigation from "@/components/Navigation";
+import DashboardHeader from "@/components/dashboard/DashboardHeader";
+import CurveList from "@/components/dashboard/CurveList";
+import { mockCurves, Curve } from "@/data/mockCurves";
 
 const Dashboard = () => {
   // Add search state and filtered curves
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredCurves, setFilteredCurves] = useState(mockCurves);
+  const [filteredCurves, setFilteredCurves] = useState<Curve[]>(mockCurves);
 
   // Filter curves based on search query
   useEffect(() => {
@@ -146,13 +21,13 @@ const Dashboard = () => {
     const filtered = mockCurves.filter(curve => 
       curve.title.toLowerCase().includes(query) ||
       curve.description.toLowerCase().includes(query) ||
-      curve.glassType.toLowerCase().includes(query) ||
+      curve.glassType?.toLowerCase().includes(query) ||
       (typeof curve.ovenType === 'string' && 
         (curve.ovenType.toLowerCase().includes(query) || 
          (curve.ovenType === 't' && 'top heated'.includes(query)) ||
          (curve.ovenType === 's' && 'side heated'.includes(query)))) ||
-      curve.thickness.toLowerCase().includes(query) ||
-      curve.projectType.toLowerCase().includes(query)
+      curve.thickness?.toLowerCase().includes(query) ||
+      curve.projectType?.toLowerCase().includes(query)
     );
     
     setFilteredCurves(filtered);
@@ -163,60 +38,12 @@ const Dashboard = () => {
       <Navigation />
       
       <div className="container mx-auto pt-24 px-4 relative z-10">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground">
-              Your Firing Curves
-            </h1>
-            <p className="text-muted-foreground">Create and manage your glass fusion schedules</p>
-          </div>
-          
-          <div className="flex gap-4 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64">
-              <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input 
-                placeholder="Search your curves..." 
-                className="pl-8 bg-white/50 backdrop-blur-sm border-white"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-            
-            <Link to="/create">
-              <Button className="gap-1 bg-white/60 backdrop-blur-sm shadow-lg hover:bg-white/70 border border-white">
-                <Plus className="h-4 w-4" />
-                New Curve
-              </Button>
-            </Link>
-          </div>
-        </div>
+        <DashboardHeader 
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredCurves.length > 0 ? (
-            filteredCurves.map(curve => (
-              <div key={curve.id} className="transform transition-all hover:scale-[1.02] hover:-translate-y-1 duration-300">
-                <CurveCard
-                  id={curve.id}
-                  title={curve.title}
-                  description={curve.description}
-                  lastUpdated={curve.lastUpdated}
-                  isPrivate={curve.isPrivate}
-                  glassType={curve.glassType}
-                  ovenType={curve.ovenType}
-                  thickness={curve.thickness}
-                  projectType={curve.projectType}
-                  isModified={curve.isModified}
-                  curveData={curve.curveData}
-                  colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
-                />
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-8">
-              <p className="text-foreground text-lg">No curves match your search. Try using different keywords.</p>
-            </div>
-          )}
-        </div>
+        <CurveList curves={filteredCurves} />
       </div>
     </div>
   );
