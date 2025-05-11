@@ -8,6 +8,7 @@ import Navigation from "@/components/Navigation";
 import CurveEditor from "@/components/CurveEditor";
 import CurveHeader from "@/components/CurveHeader";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
+import CurveVersionHistory from "@/components/CurveVersionHistory";
 import { ArrowLeft } from "lucide-react";
 
 interface Phase {
