@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Plus, Save, Trash2 } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Phase {
   id: string;
@@ -17,6 +18,8 @@ interface PhasesTableProps {
   addPhase: () => void;
   removePhase: (id: string) => void;
   handleSave: () => void;
+  ovenType?: string;
+  setOvenType?: (type: string) => void;
 }
 
 const PhasesTable = ({
@@ -24,10 +27,29 @@ const PhasesTable = ({
   updatePhase,
   addPhase,
   removePhase,
-  handleSave
+  handleSave,
+  ovenType,
+  setOvenType
 }: PhasesTableProps) => {
   return (
     <div className="space-y-4">
+      {setOvenType && (
+        <div className="mb-4">
+          <label htmlFor="ovenType" className="block text-sm font-medium mb-1">
+            Oven Type
+          </label>
+          <Select value={ovenType} onValueChange={setOvenType}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select oven type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="t">Top Heated (Toppvärme)</SelectItem>
+              <SelectItem value="s">Side Heated (Sidovärme)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      )}
+
       <div className="grid grid-cols-4 gap-4 px-2 py-2 bg-muted/30 rounded-lg">
         <div className="font-medium">Phase</div>
         <div className="font-medium">Target Temp (°C)</div>

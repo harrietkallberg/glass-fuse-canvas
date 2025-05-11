@@ -53,6 +53,8 @@ const CurveEditorTabs = ({
           addPhase={addPhase}
           removePhase={removePhase}
           handleSave={handleSave}
+          ovenType={ovenType}
+          setOvenType={setOvenType}
         />
       </TabsContent>
     </Tabs>
