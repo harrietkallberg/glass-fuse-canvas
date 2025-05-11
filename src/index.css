@@ -58,16 +58,16 @@
 
 @layer components {
   .glass {
-    @apply bg-white/30 backdrop-blur-md border border-white/50 shadow-md;
+    @apply bg-white/40 backdrop-blur-md border border-white/60 shadow-md;
   }
   
   .glass-card {
-    @apply rounded-2xl bg-white/40 backdrop-blur-md border border-white/50 shadow-md transition-all hover:shadow-lg;
+    @apply rounded-2xl bg-white/50 backdrop-blur-md border border-white/60 shadow-md transition-all hover:shadow-lg;
   }
   
-  /* Enhanced glass effect for curve cards */
+  /* Enhanced glass effect for curve cards - lightened */
   .enhanced-glass {
-    @apply rounded-2xl backdrop-blur-xl bg-white/10 border border-white/20 shadow-xl;
+    @apply rounded-2xl backdrop-blur-xl bg-white/20 border border-white/30 shadow-xl;
     position: relative;
     overflow: hidden;
   }
@@ -79,19 +79,19 @@
     left: 0;
     right: 0;
     height: 50%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.25), transparent);
     border-radius: inherit;
     z-index: 0;
     pointer-events: none;
   }
 
-  /* New enhanced glass card effect with better glass-like appearance */
+  /* New enhanced glass card effect with better glass-like appearance - lightened */
   .enhanced-glass-card {
-    @apply rounded-2xl backdrop-blur-xl bg-white/15 shadow-xl;
+    @apply rounded-2xl backdrop-blur-xl bg-white/25 shadow-xl;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.25);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
   }
   
   .enhanced-glass-card:before {
@@ -101,7 +101,7 @@
     left: 0;
     right: 0;
     height: 40%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.35), transparent);
     border-radius: inherit;
     z-index: 0;
     pointer-events: none;
@@ -114,60 +114,82 @@
     right: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.05) 40%, rgba(255,255,255,0.1) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.1) 40%, rgba(255,255,255,0.15) 100%);
     border-radius: inherit;
     z-index: 0;
     pointer-events: none;
   }
   
-  /* Updated glass components with more vibrant earth tones */
+  /* Updated glass components with more vibrant earth tones - lightened */
   .glass-earth-orange {
-    @apply bg-[#bd8770]/20 backdrop-blur-md border border-[#bd8770]/30 shadow-md;
+    @apply bg-[#bd8770]/30 backdrop-blur-md border border-white/60 shadow-md;
   }
   
   .glass-earth-cream {
-    @apply bg-[#f7e2c8]/30 backdrop-blur-md border border-[#f7e2c8]/40 shadow-md;
+    @apply bg-[#f7e2c8]/40 backdrop-blur-md border border-white/60 shadow-md;
   }
   
   .glass-earth-sage {
-    @apply bg-[#658579]/20 backdrop-blur-md border border-[#658579]/30 shadow-md;
+    @apply bg-[#658579]/30 backdrop-blur-md border border-white/60 shadow-md;
   }
   
   .glass-earth-taupe {
-    @apply bg-[#aea795]/30 backdrop-blur-md border border-[#aea795]/40 shadow-md;
+    @apply bg-[#aea795]/40 backdrop-blur-md border border-white/60 shadow-md;
   }
 
-  /* New vibrant glass components */
+  /* New vibrant glass components - lightened */
   .glass-vibrant-orange {
-    @apply bg-[#F97316]/15 backdrop-blur-md border border-[#F97316]/25 shadow-md;
+    @apply bg-[#F97316]/20 backdrop-blur-md border border-white shadow-md;
   }
   
   .glass-vibrant-cream {
-    @apply bg-[#FEC6A1]/25 backdrop-blur-md border border-[#FEC6A1]/35 shadow-md;
+    @apply bg-[#FEC6A1]/30 backdrop-blur-md border border-white shadow-md;
   }
   
   .glass-vibrant-sage {
-    @apply bg-[#33C3F0]/15 backdrop-blur-md border border-[#33C3F0]/25 shadow-md;
+    @apply bg-[#33C3F0]/20 backdrop-blur-md border border-white shadow-md;
   }
   
   .glass-vibrant-taupe {
-    @apply bg-[#A5D8E2]/25 backdrop-blur-md border border-[#A5D8E2]/35 shadow-md;
+    @apply bg-[#A5D8E2]/30 backdrop-blur-md border border-white shadow-md;
   }
   
   .glass-orange {
-    @apply backdrop-blur-xl bg-[#FEC6A1]/15 border border-[#FEC6A1]/25 shadow-xl;
+    @apply backdrop-blur-xl bg-[#FEC6A1]/25 border border-white shadow-xl;
   }
   
   .glass-yellow {
-    @apply backdrop-blur-xl bg-[#FEF7CD]/15 border border-[#FEF7CD]/25 shadow-xl;
+    @apply backdrop-blur-xl bg-[#FEF7CD]/25 border border-white shadow-xl;
   }
   
   .glass-green {
-    @apply backdrop-blur-xl bg-[#F2FCE2]/15 border border-[#F2FCE2]/25 shadow-xl;
+    @apply backdrop-blur-xl bg-[#F2FCE2]/25 border border-white shadow-xl;
   }
   
   .glass-turquoise {
-    @apply backdrop-blur-xl bg-[#D3E4FD]/15 border border-[#D3E4FD]/25 shadow-xl;
+    @apply backdrop-blur-xl bg-[#D3E4FD]/25 border border-white shadow-xl;
+  }
+  
+  .glass-surface {
+    @apply bg-white/25 backdrop-blur-lg border border-white rounded-2xl shadow-lg;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .glass-surface::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    background: radial-gradient(
+      circle,
+      rgba(255,255,255,0.25),
+      transparent 80%
+    );
+    transform: rotate(45deg);
+    pointer-events: none;
   }
   
   .fluid-bg {
@@ -221,26 +243,33 @@
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   }
 
-  .glass-surface {
-    @apply bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl shadow-lg;
+  .fluid-bg-diagonal {
+    @apply relative overflow-hidden;
+    background: linear-gradient(135deg, rgba(249,115,22,0.8) 0%, rgba(51,195,240,0.8) 100%);
+    background-size: 400% 400%;
+    animation: gradient-circular-motion 15s ease infinite;
     position: relative;
-    overflow: hidden;
   }
 
-  .glass-surface::before {
+  .fluid-bg-diagonal::before {
     content: "";
     position: absolute;
-    top: -50%;
-    left: -50%;
-    right: -50%;
-    bottom: -50%;
-    background: radial-gradient(
-      circle,
-      rgba(255,255,255,0.2) 0%, /* Increased opacity for more vibrance */
-      transparent 80%
-    );
-    transform: rotate(45deg);
-    pointer-events: none;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(249,115,22,0.9) 0%, rgba(51,195,240,0.9) 100%);
+    background-size: 400% 400%;
+    filter: blur(50px);
+    animation: gradient-circular-motion 20s ease infinite reverse;
+    z-index: 0;
+    opacity: 0.8;
+  }
+
+  .fluid-bg-diagonal::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    z-index: 1;
   }
 
   /* Updated fluid background with diagonal and circular movement */
@@ -580,7 +609,7 @@
 }
 
 @keyframes gradient-slow {
-  0% {
+  0%, 100% {
     background-position: 0% 0%;
   }
   50% {
@@ -592,7 +621,7 @@
 }
 
 @keyframes gradient-medium {
-  0% {
+  0%, 100% {
     background-position: 100% 0%;
   }
   50% {
@@ -604,7 +633,7 @@
 }
 
 @keyframes gradient-reverse {
-  0% {
+  0%, 100% {
     background-position: 50% 50%;
   }
   50% {

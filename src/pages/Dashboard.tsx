@@ -16,7 +16,7 @@ const mockCurves = [
     lastUpdated: "2 days ago",
     isPrivate: false,
     glassType: "Bullseye",
-    ovenType: "Electric Kiln",
+    ovenType: "t", // Using "t" to match editor format for Top Heated
     thickness: "10mm",
     projectType: "Full Fuse",
     isModified: false,
@@ -39,7 +39,7 @@ const mockCurves = [
     lastUpdated: "1 week ago",
     isPrivate: true,
     glassType: "Float Glass",
-    ovenType: "Ceramic Kiln",
+    ovenType: "s", // Using "s" to match editor format for Side Heated
     thickness: "4mm",
     projectType: "Tack Fuse",
     isModified: true,
@@ -147,7 +147,10 @@ const Dashboard = () => {
       curve.title.toLowerCase().includes(query) ||
       curve.description.toLowerCase().includes(query) ||
       curve.glassType.toLowerCase().includes(query) ||
-      curve.ovenType.toLowerCase().includes(query) ||
+      (typeof curve.ovenType === 'string' && 
+        (curve.ovenType.toLowerCase().includes(query) || 
+         (curve.ovenType === 't' && 'top heated'.includes(query)) ||
+         (curve.ovenType === 's' && 'side heated'.includes(query)))) ||
       curve.thickness.toLowerCase().includes(query) ||
       curve.projectType.toLowerCase().includes(query)
     );
@@ -188,27 +191,27 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Base gradient layer - Using teal/green/orange from auth pages */}
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#0EA5E9]/50 to-[#F97316]/60 animate-gradient-slow"></div>
+      {/* Base gradient layer - Using lighter versions of the existing colors */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-[#0EA5E9]/30 to-[#F97316]/40 animate-gradient-slow"></div>
       
-      {/* Multiple layered gradients for depth and movement */}
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#33C3F0]/40 to-[#F97316]/50 animate-gradient-medium"></div>
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#A5D8E2]/30 to-[#FEC6A1]/40 animate-gradient-reverse"></div>
+      {/* Multiple layered gradients for depth and movement - lightened */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-[#33C3F0]/25 to-[#F97316]/30 animate-gradient-medium"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-[#A5D8E2]/20 to-[#FEC6A1]/25 animate-gradient-reverse"></div>
       
-      {/* Dynamic light source effects */}
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-transparent via-white/10 to-transparent animate-diagonal-wave"></div>
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-transparent via-white/10 to-transparent animate-diagonal-reverse-wave"></div>
-      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-transparent via-white/5 to-transparent animate-cross-diagonal-wave"></div>
+      {/* Dynamic light source effects - more subtle */}
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-br from-transparent via-white/15 to-transparent animate-diagonal-wave"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-tr from-transparent via-white/15 to-transparent animate-diagonal-reverse-wave"></div>
+      <div className="absolute inset-0 gradient-bg-element bg-gradient-to-b from-transparent via-white/10 to-transparent animate-cross-diagonal-wave"></div>
       
       <Navigation />
       
       <div className="container mx-auto pt-24 px-4 relative z-10">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-white" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
+            <h1 className="text-3xl font-bold text-white" style={{ textShadow: '1px 2px 4px rgba(0,0,0,0.15)' }}>
               Your Firing Curves
             </h1>
-            <p className="text-white/80">Create and manage your glass fusion schedules</p>
+            <p className="text-white/90">Create and manage your glass fusion schedules</p>
           </div>
           
           <div className="flex gap-4 w-full md:w-auto">
@@ -216,14 +219,14 @@ const Dashboard = () => {
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-white/70" />
               <Input 
                 placeholder="Search your curves..." 
-                className="pl-8 glass-surface border-white/30 backdrop-blur-md bg-white/10 text-white"
+                className="pl-8 glass-surface border-white backdrop-blur-md bg-white/20 text-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
             
             <Link to="/create">
-              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-xl hover:shadow-2xl border-white/30">
+              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-xl hover:shadow-2xl border-white">
                 <Plus className="h-4 w-4" />
                 New Curve
               </Button>

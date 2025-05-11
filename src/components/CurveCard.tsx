@@ -43,13 +43,23 @@ const CurveCard = ({
   ],
   colorClass = "glass-card"
 }: CurveCardProps) => {
+  // Format oven type to match editor options
+  const formatOvenType = (type: string) => {
+    if (type === "t" || type.toLowerCase().includes("top")) {
+      return "Top Heated";
+    } else if (type === "s" || type.toLowerCase().includes("side")) {
+      return "Side Heated";
+    }
+    return type;
+  };
+
   return (
-    <Card className={`${colorClass} border-white/30 border overflow-hidden backdrop-blur-sm bg-white/10`}>
+    <Card className={`${colorClass} border-white border overflow-hidden backdrop-blur-sm bg-white/25`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <h3 className="font-medium text-lg">{title}</h3>
           <div className="flex items-center gap-2">
-            <span className="flex items-center text-xs bg-white/20 px-2 py-1 rounded-full">
+            <span className="flex items-center text-xs bg-white/40 px-2 py-1 rounded-full">
               {isModified ? (
                 <>
                   <Pencil className="w-3 h-3 mr-1" /> Modified
@@ -65,7 +75,7 @@ const CurveCard = ({
                 Private
               </span>
             ) : (
-              <span className="text-xs bg-white/20 px-2 py-1 rounded-full flex items-center">
+              <span className="text-xs bg-white/40 px-2 py-1 rounded-full flex items-center">
                 <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
@@ -76,7 +86,7 @@ const CurveCard = ({
         <p className="text-sm text-muted-foreground">{description}</p>
         <div className="flex gap-4 mt-4">
           {/* Miniature curve plot */}
-          <div className="w-1/2 h-[80px] bg-black/10 backdrop-blur-sm rounded-md overflow-hidden">
+          <div className="w-1/2 h-[80px] bg-black/5 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                 <defs>
@@ -106,7 +116,7 @@ const CurveCard = ({
               </div>
               <div>
                 <span className="text-white/70">Oven</span>
-                <p className="font-medium text-white">{ovenType}</p>
+                <p className="font-medium text-white">{formatOvenType(ovenType)}</p>
               </div>
               <div>
                 <span className="text-white/70">Thickness</span>
@@ -130,7 +140,7 @@ const CurveCard = ({
             <Button 
               size="icon" 
               variant="outline" 
-              className="h-8 w-8 rounded-full bg-white/30 backdrop-blur-sm border-white/30 hover:bg-white/40 ring-1 ring-white/50 shadow-lg"
+              className="h-8 w-8 rounded-full bg-white/50 backdrop-blur-sm border-white hover:bg-white/60 ring-1 ring-white/70 shadow-lg"
               aria-label="Edit curve"
             >
               <Edit className="h-4 w-4" />
