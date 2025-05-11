@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import Navigation from "@/components/Navigation";
 import CurveEditor from "@/components/CurveEditor";
+import CurveVersionHistory from "@/components/CurveVersionHistory";
 import CurveHeader from "@/components/CurveHeader";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
 import { ArrowLeft } from "lucide-react";
@@ -80,19 +81,33 @@ const CurveEditPage = () => {
           </TabsList>
           
           <TabsContent value="curve" className="space-y-6">
-            <CurveEditor initialPhases={phases} onSave={setPhases} />
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <CurveEditor initialPhases={phases} onSave={setPhases} />
+              </div>
+              <div className="w-full md:w-64">
+                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
+              </div>
+            </div>
           </TabsContent>
           
           <TabsContent value="notes" className="space-y-6">
-            <ProjectDetailsTab 
-              notes={notes} 
-              setNotes={setNotes}
-              materials={materials}
-              setMaterials={setMaterials}
-              tags={tags}
-              setTags={setTags}
-              handleSave={handleProjectDetailsSave}
-            />
+            <div className="flex flex-col md:flex-row gap-6">
+              <div className="flex-1">
+                <ProjectDetailsTab 
+                  notes={notes} 
+                  setNotes={setNotes}
+                  materials={materials}
+                  setMaterials={setMaterials}
+                  tags={tags}
+                  setTags={setTags}
+                  handleSave={handleProjectDetailsSave}
+                />
+              </div>
+              <div className="w-full md:w-64">
+                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
+              </div>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
