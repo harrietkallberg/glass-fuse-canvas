@@ -63,7 +63,7 @@ const CurveCard = ({
     <Card className={`${colorClass} border-white/70 border overflow-hidden backdrop-blur-sm bg-white/30`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
-          <h3 className="font-medium text-lg md:text-xl text-white text-shadow-lg">{title}</h3>
+          <h3 className="font-medium text-lg md:text-xl">{title}</h3>
           <div className="flex items-center gap-2">
             <span className={`flex items-center text-xs md:text-sm font-medium ${isModified ? 'bg-white/70' : 'bg-white/50'} px-2 py-1 rounded-full border border-white/60 shadow-sm`}>
               {isModified ? (
