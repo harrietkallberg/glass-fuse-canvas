@@ -36,6 +36,8 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
         topTempMinutes={curveState.topTempMinutes}
         setTopTempMinutes={curveState.setTopTempMinutes}
         applyGlassTemplate={curveState.applyGlassTemplate}
+        ovenType={curveState.ovenType}
+        setOvenType={curveState.setOvenType}
       />
 
       {/* Curve Editor */}
@@ -57,6 +59,8 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
           addPhase={curveState.addPhase}
           removePhase={curveState.removePhase}
           handleSave={handleSave}
+          ovenType={curveState.ovenType}
+          setOvenType={curveState.setOvenType}
         />
       </div>
     </div>

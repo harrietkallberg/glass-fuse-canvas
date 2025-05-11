@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Share2, Check, Pencil } from "lucide-react";
+import { Edit, Share2, Check, Pencil, Globe } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
 
 interface CurveCardProps {
@@ -44,7 +44,7 @@ const CurveCard = ({
   colorClass = "glass-card"
 }: CurveCardProps) => {
   return (
-    <Card className={`${colorClass} border-none overflow-hidden backdrop-blur-sm bg-white/10`}>
+    <Card className={`${colorClass} border-white/30 border overflow-hidden backdrop-blur-sm bg-white/10`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <h3 className="font-medium text-lg">{title}</h3>
@@ -60,9 +60,13 @@ const CurveCard = ({
                 </>
               )}
             </span>
-            {isPrivate && (
+            {isPrivate ? (
               <span className="text-xs bg-muted px-2 py-1 rounded-full">
                 Private
+              </span>
+            ) : (
+              <span className="text-xs bg-white/20 px-2 py-1 rounded-full flex items-center">
+                <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
           </div>
@@ -123,7 +127,12 @@ const CurveCard = ({
             <Share2 className="h-4 w-4" />
           </Button>
           <Link to={`/edit/${id}`}>
-            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm border-white/30 hover:bg-white/30">
+            <Button 
+              size="icon" 
+              variant="outline" 
+              className="h-8 w-8 rounded-full bg-white/30 backdrop-blur-sm border-white/30 hover:bg-white/40 ring-1 ring-white/50 shadow-lg"
+              aria-label="Edit curve"
+            >
               <Edit className="h-4 w-4" />
             </Button>
           </Link>

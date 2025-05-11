@@ -15,6 +15,8 @@ interface CurveEditorTabsProps {
   addPhase: () => void;
   removePhase: (id: string) => void;
   handleSave: () => void;
+  ovenType?: string; // Add oven type prop
+  setOvenType?: (type: string) => void; // Add oven type setter
 }
 
 const CurveEditorTabs = ({
@@ -26,7 +28,9 @@ const CurveEditorTabs = ({
   updatePhase,
   addPhase,
   removePhase,
-  handleSave
+  handleSave,
+  ovenType,
+  setOvenType
 }: CurveEditorTabsProps) => {
   return (
     <Tabs defaultValue="chart" value={activeTab} onValueChange={setActiveTab}>
@@ -36,7 +40,10 @@ const CurveEditorTabs = ({
       </TabsList>
       
       <TabsContent value="chart" className="mt-0">
-        <CurveChart chartData={chartData} selectedGlassInfo={selectedGlassInfo} />
+        <CurveChart 
+          chartData={chartData} 
+          selectedGlassInfo={selectedGlassInfo} 
+        />
       </TabsContent>
       
       <TabsContent value="table" className="mt-0">
@@ -46,6 +53,8 @@ const CurveEditorTabs = ({
           addPhase={addPhase}
           removePhase={removePhase}
           handleSave={handleSave}
+          ovenType={ovenType}
+          setOvenType={setOvenType}
         />
       </TabsContent>
     </Tabs>

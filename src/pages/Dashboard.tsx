@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
@@ -130,6 +131,30 @@ const mockCurves = [
 ];
 
 const Dashboard = () => {
+  // Add search state and filtered curves
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredCurves, setFilteredCurves] = useState(mockCurves);
+
+  // Filter curves based on search query
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredCurves(mockCurves);
+      return;
+    }
+
+    const query = searchQuery.toLowerCase();
+    const filtered = mockCurves.filter(curve => 
+      curve.title.toLowerCase().includes(query) ||
+      curve.description.toLowerCase().includes(query) ||
+      curve.glassType.toLowerCase().includes(query) ||
+      curve.ovenType.toLowerCase().includes(query) ||
+      curve.thickness.toLowerCase().includes(query) ||
+      curve.projectType.toLowerCase().includes(query)
+    );
+    
+    setFilteredCurves(filtered);
+  }, [searchQuery]);
+
   // Add useEffect to initialize and preserve animation state
   useEffect(() => {
     // Use the same stored animation state from Landing/Auth pages
@@ -189,11 +214,16 @@ const Dashboard = () => {
           <div className="flex gap-4 w-full md:w-auto">
             <div className="relative flex-1 md:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-white/70" />
-              <Input placeholder="Search your curves..." className="pl-8 glass-surface backdrop-blur-md bg-white/10 text-white" />
+              <Input 
+                placeholder="Search your curves..." 
+                className="pl-8 glass-surface border-white/30 backdrop-blur-md bg-white/10 text-white"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             
             <Link to="/create">
-              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-xl hover:shadow-2xl border-white/20">
+              <Button className="gap-1 glass-vibrant-orange backdrop-blur-md shadow-xl hover:shadow-2xl border-white/30">
                 <Plus className="h-4 w-4" />
                 New Curve
               </Button>
@@ -202,24 +232,30 @@ const Dashboard = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {mockCurves.map(curve => (
-            <div key={curve.id} className="transform transition-all hover:scale-102 hover:-translate-y-1 duration-300">
-              <CurveCard
-                id={curve.id}
-                title={curve.title}
-                description={curve.description}
-                lastUpdated={curve.lastUpdated}
-                isPrivate={curve.isPrivate}
-                glassType={curve.glassType}
-                ovenType={curve.ovenType}
-                thickness={curve.thickness}
-                projectType={curve.projectType}
-                isModified={curve.isModified}
-                curveData={curve.curveData}
-                colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
-              />
+          {filteredCurves.length > 0 ? (
+            filteredCurves.map(curve => (
+              <div key={curve.id} className="transform transition-all hover:scale-102 hover:-translate-y-1 duration-300">
+                <CurveCard
+                  id={curve.id}
+                  title={curve.title}
+                  description={curve.description}
+                  lastUpdated={curve.lastUpdated}
+                  isPrivate={curve.isPrivate}
+                  glassType={curve.glassType}
+                  ovenType={curve.ovenType}
+                  thickness={curve.thickness}
+                  projectType={curve.projectType}
+                  isModified={curve.isModified}
+                  curveData={curve.curveData}
+                  colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
+                />
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-8">
+              <p className="text-white text-lg">No curves match your search. Try using different keywords.</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
     </div>

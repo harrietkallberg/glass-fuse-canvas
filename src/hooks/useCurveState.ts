@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Phase, generateChartData } from '@/utils/curveUtils';
 import glassData from '../tables.json';
@@ -11,6 +12,7 @@ export interface CurveState {
   glassRadius: string;
   firingType: string;
   topTempMinutes: string;
+  ovenType: string; // Added oven type
   chartData: any[];
 }
 
@@ -32,6 +34,7 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
   const [glassRadius, setGlassRadius] = useState<string>("10");
   const [firingType, setFiringType] = useState<string>("f");
   const [topTempMinutes, setTopTempMinutes] = useState<string>("10");
+  const [ovenType, setOvenType] = useState<string>("t"); // Default to "t" (top heated in Swedish)
   const [chartData, setChartData] = useState<any[]>([]);
 
   // Find selected glass info
@@ -83,7 +86,7 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
 
     // Get matching table for the selected glass category and oven type
     const uppvarmningTable = glassData["Tider for uppvarmning"].find(
-      item => item.kategori === selectedGlassInfo.kategori && item.ugn === "t"
+      item => item.kategori === selectedGlassInfo.kategori && item.ugn === ovenType
     );
     
     const halltiderTable = glassData["Halltider"].find(
@@ -171,6 +174,8 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     setFiringType,
     topTempMinutes,
     setTopTempMinutes,
+    ovenType,
+    setOvenType,
     chartData,
     selectedGlassInfo,
     addPhase,

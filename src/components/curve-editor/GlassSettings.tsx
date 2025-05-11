@@ -1,34 +1,27 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChartBar } from 'lucide-react';
-
-interface GlassType {
-  namn: string;
-  kategori: string;
-  [key: string]: any;
-}
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 
 interface GlassSettingsProps {
-  glassData: {
-    Glassorter: GlassType[];
-  };
+  glassData: any;
   selectedGlass: string;
-  setSelectedGlass: (value: string) => void;
+  setSelectedGlass: (glass: string) => void;
   roomTemp: number;
-  setRoomTemp: (value: number) => void;
+  setRoomTemp: (temp: number) => void;
   glassLayers: string;
-  setGlassLayers: (value: string) => void;
+  setGlassLayers: (layers: string) => void;
   glassRadius: string;
-  setGlassRadius: (value: string) => void;
+  setGlassRadius: (radius: string) => void;
   firingType: string;
-  setFiringType: (value: string) => void;
+  setFiringType: (type: string) => void;
   topTempMinutes: string;
-  setTopTempMinutes: (value: string) => void;
+  setTopTempMinutes: (minutes: string) => void;
   applyGlassTemplate: () => void;
+  ovenType: string;
+  setOvenType: (type: string) => void;
 }
 
 const GlassSettings = ({
@@ -45,117 +38,121 @@ const GlassSettings = ({
   setFiringType,
   topTempMinutes,
   setTopTempMinutes,
-  applyGlassTemplate
+  applyGlassTemplate,
+  ovenType,
+  setOvenType
 }: GlassSettingsProps) => {
+  const glassList = glassData.Glassorter;
+
+  const getTranslatedOvenType = (type: string) => {
+    switch(type) {
+      case "t": return "Top Heated";
+      case "s": return "Side Heated";
+      default: return "Top Heated";
+    }
+  };
+
   return (
-    <div className="glass p-6 rounded-2xl bg-glass-100/20">
-      <h3 className="text-lg font-medium mb-4">Glass Settings</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+    <div className="glass p-6 rounded-2xl space-y-6">
+      <h3 className="text-lg font-medium">Glass Settings</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Label htmlFor="glass-type">Glass Type</Label>
-          <Select 
-            value={selectedGlass} 
-            onValueChange={setSelectedGlass}
-          >
-            <SelectTrigger className="mt-1">
+          <Select value={selectedGlass} onValueChange={setSelectedGlass}>
+            <SelectTrigger id="glass-type">
               <SelectValue placeholder="Select glass type" />
             </SelectTrigger>
             <SelectContent>
-              {glassData.Glassorter.map((glass) => (
+              {glassList.map((glass: any) => (
                 <SelectItem key={glass.namn} value={glass.namn}>
-                  {glass.namn} ({glass.kategori})
+                  {glass.namn}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="oven-type">Oven Type</Label>
+          <Select value={ovenType} onValueChange={setOvenType}>
+            <SelectTrigger id="oven-type">
+              <SelectValue placeholder="Select oven type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="t">{getTranslatedOvenType("t")}</SelectItem>
+              <SelectItem value="s">{getTranslatedOvenType("s")}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div>
           <Label htmlFor="room-temp">Room Temperature (°C)</Label>
-          <Input
+          <Input 
             id="room-temp"
-            type="number"
-            value={roomTemp}
-            onChange={(e) => setRoomTemp(parseInt(e.target.value) || 20)}
-            className="mt-1"
+            type="number" 
+            value={roomTemp} 
+            onChange={e => setRoomTemp(Number(e.target.value))}
           />
         </div>
-
-        <div>
-          <Label htmlFor="firing-type">Firing Type</Label>
-          <Select 
-            value={firingType} 
-            onValueChange={setFiringType}
-          >
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select firing type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="f">Full Fusing</SelectItem>
-              <SelectItem value="s">Slumping</SelectItem>
-              <SelectItem value="t">Tack Fusing</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
+        
         <div>
           <Label htmlFor="glass-layers">Glass Layers</Label>
-          <Select 
-            value={glassLayers} 
-            onValueChange={setGlassLayers}
-          >
-            <SelectTrigger className="mt-1">
+          <Select value={glassLayers} onValueChange={setGlassLayers}>
+            <SelectTrigger id="glass-layers">
               <SelectValue placeholder="Select layers" />
             </SelectTrigger>
             <SelectContent>
-              {[1, 2, 3, 4, 5].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num} {num === 1 ? 'Layer' : 'Layers'}
-                </SelectItem>
-              ))}
+              <SelectItem value="1">1 layer</SelectItem>
+              <SelectItem value="2">2 layers</SelectItem>
+              <SelectItem value="3">3 layers</SelectItem>
+              <SelectItem value="4">4 layers</SelectItem>
             </SelectContent>
           </Select>
         </div>
-
+        
         <div>
-          <Label htmlFor="glass-radius">Max Radius (cm)</Label>
-          <Select 
-            value={glassRadius} 
-            onValueChange={setGlassRadius}
-          >
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder="Select max radius" />
+          <Label htmlFor="glass-radius">Glass Radius (cm)</Label>
+          <Select value={glassRadius} onValueChange={setGlassRadius}>
+            <SelectTrigger id="glass-radius">
+              <SelectValue placeholder="Select radius" />
             </SelectTrigger>
             <SelectContent>
-              {[5, 10, 20, 30, 40, 50, 60].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num} cm
-                </SelectItem>
-              ))}
+              <SelectItem value="10">10 cm</SelectItem>
+              <SelectItem value="20">20 cm</SelectItem>
+              <SelectItem value="30">30 cm</SelectItem>
+              <SelectItem value="40">40 cm</SelectItem>
             </SelectContent>
           </Select>
         </div>
-
+        
         <div>
-          <Label htmlFor="top-temp-minutes">Top Temp Hold (min)</Label>
-          <Input
+          <Label htmlFor="firing-type">Firing Type</Label>
+          <Select value={firingType} onValueChange={setFiringType}>
+            <SelectTrigger id="firing-type">
+              <SelectValue placeholder="Select firing type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="f">Full Fuse</SelectItem>
+              <SelectItem value="s">Slumping</SelectItem>
+              <SelectItem value="t">Tack Fuse</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div>
+          <Label htmlFor="top-temp-minutes">Hold at Top Temp (minutes)</Label>
+          <Input 
             id="top-temp-minutes"
-            type="number"
-            value={topTempMinutes}
-            min="1"
-            max="60"
-            onChange={(e) => setTopTempMinutes(e.target.value)}
-            className="mt-1"
+            type="number" 
+            value={topTempMinutes} 
+            onChange={e => setTopTempMinutes(e.target.value)}
           />
         </div>
-
-        <div className="flex items-end">
-          <Button 
-            onClick={applyGlassTemplate} 
-            className="w-full gap-1"
-          >
-            <ChartBar className="h-4 w-4" />
-            Generate Curve
+        
+        <div className="md:col-span-2 flex justify-end">
+          <Button onClick={applyGlassTemplate}>
+            Apply Glass Template
           </Button>
         </div>
       </div>
