@@ -4,18 +4,27 @@ import { Button } from "@/components/ui/button";
 import { BookmarkPlus, Eye } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-// Mock data for version history
-const mockVersions = [
-  { id: "v3", name: "Version 3", date: "Today", current: true },
-  { id: "v2", name: "Version 2", date: "Yesterday", current: false },
-  { id: "v1", name: "Version 1", date: "3 days ago", current: false },
-];
+interface Version {
+  id: string;
+  name: string;
+  date: string;
+  current: boolean;
+  data?: any;
+}
 
 interface CurveVersionHistoryProps {
   compact?: boolean;
+  versions?: Version[];
 }
 
-const CurveVersionHistory = ({ compact = false }: CurveVersionHistoryProps) => {
+const CurveVersionHistory = ({ compact = false, versions }: CurveVersionHistoryProps) => {
+  // Use provided versions or fallback to default mock data
+  const versionsList = versions || [
+    { id: "v3", name: "Version 3", date: "Today", current: true },
+    { id: "v2", name: "Version 2", date: "Yesterday", current: false },
+    { id: "v1", name: "Version 1", date: "3 days ago", current: false },
+  ];
+
   const handleSaveVersion = () => {
     // Here you would save a new version in your Supabase database
     toast({
@@ -37,7 +46,7 @@ const CurveVersionHistory = ({ compact = false }: CurveVersionHistoryProps) => {
       {!compact && <h3 className="font-medium mb-3">Version History</h3>}
       
       <div className="space-y-2">
-        {mockVersions.map((version) => (
+        {versionsList.map((version) => (
           <div
             key={version.id}
             className={`p-3 flex justify-between items-center rounded-lg ${

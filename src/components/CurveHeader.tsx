@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
@@ -17,6 +17,7 @@ interface CurveHeaderProps {
   setDescription: (description: string) => void;
   isPrivate: boolean;
   setIsPrivate: (isPrivate: boolean) => void;
+  phases?: any[]; // Added to pass to version history
 }
 
 const CurveHeader = ({
@@ -25,9 +26,44 @@ const CurveHeader = ({
   description,
   setDescription,
   isPrivate,
-  setIsPrivate
+  setIsPrivate,
+  phases = []
 }: CurveHeaderProps) => {
+  // Version history state
+  const [versions, setVersions] = useState([
+    { id: "v3", name: "Version 3", date: "Today", current: true },
+    { id: "v2", name: "Version 2", date: "Yesterday", current: false },
+    { id: "v1", name: "Version 1", date: "3 days ago", current: false },
+  ]);
+  
   const handleSave = () => {
+    // Generate a new version ID
+    const newVersionId = `v${versions.length + 1}`;
+    
+    // Create a new version entry
+    const newVersion = {
+      id: newVersionId,
+      name: `Version ${versions.length + 1}`,
+      date: "Just now",
+      current: true,
+      // Store relevant data for this version
+      data: {
+        title,
+        description,
+        isPrivate,
+        phases: [...phases]
+      }
+    };
+    
+    // Update version list - set current version as active, previous ones as inactive
+    const updatedVersions = versions.map(version => ({
+      ...version,
+      current: false
+    }));
+    
+    // Add the new version to the beginning of the list
+    setVersions([newVersion, ...updatedVersions]);
+    
     // Here you would save the curve data to your Supabase database
     toast({
       title: "Curve saved!",
@@ -76,7 +112,7 @@ const CurveHeader = ({
       <div className="pt-4 border-t border-white/10">
         <h3 className="font-medium mb-2 text-sm">Version History</h3>
         <ScrollArea className="h-[180px] pr-2">
-          <CurveVersionHistory compact={true} />
+          <CurveVersionHistory versions={versions} compact={true} />
         </ScrollArea>
       </div>
     </div>
