@@ -84,7 +84,7 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
             activeDot={{ r: 6, fill: '#FDE1D3' }}
           />
           
-          {/* Reference lines for annealing temperatures - now with different colors and no labels */}
+          {/* Reference lines for annealing temperatures - with matching style to the chart */}
           {referenceTemps.map((temp, index) => (
             temp.temp && (
               <ReferenceLine 
@@ -92,19 +92,20 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
                 y={temp.temp} 
                 stroke={temp.color}
                 strokeWidth={2}
+                strokeOpacity={0.7}
                 strokeDasharray="5 5"
               />
             )
           ))}
           
-          {/* Custom legend for reference lines */}
+          {/* Custom legend for reference lines - now stacked vertically */}
           <Legend 
-            content={({ payload }) => (
-              <div className="flex justify-end gap-4 mt-1 mr-4 text-xs font-medium">
+            content={() => (
+              <div className="flex flex-col items-end gap-2 mt-2 mr-6 text-sm font-medium text-gray-700">
                 {legendPayload.map((entry, index) => (
                   <div key={index} className="flex items-center">
                     <span 
-                      className="inline-block w-4 h-[2px] mr-1"
+                      className="inline-block w-6 h-[2px] mr-2"
                       style={{ 
                         backgroundColor: entry.color,
                         borderTop: `2px dashed ${entry.color}`
