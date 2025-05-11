@@ -92,9 +92,9 @@ const Landing = () => {
         
         <div className="flex flex-col sm:flex-row gap-4 justify-center w-full relative" style={{ zIndex: 30 }}>
           <Link to="/login" className="w-full sm:w-auto">
-            <Button className="w-full sm:w-auto gap-2 h-12 glass-vibrant-orange transition-all hover:bg-white/20 backdrop-blur-md shadow-md hover:shadow-lg">
-              Sign In
-              <ArrowRight className="w-4 h-4" />
+            <Button className="w-full sm:w-auto gap-2 h-12 enhanced-glass-card hover:bg-white/20 transition-all backdrop-blur-md shadow-md hover:shadow-lg border-white/30 relative overflow-hidden">
+              <span className="relative z-10">Sign In</span>
+              <ArrowRight className="w-4 h-4 relative z-10" />
             </Button>
           </Link>
           
