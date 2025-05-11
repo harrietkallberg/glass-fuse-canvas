@@ -66,8 +66,9 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {/* Left tile - Curve details */}
+        {/* Adjusted grid layout - making right tile wider */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          {/* Left tile - Curve details (narrower) */}
           <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
             <CurveHeader 
               title={title}
@@ -79,42 +80,40 @@ const CurveEditPage = () => {
             />
           </div>
           
-          {/* Right tile - Three-way toggle */}
-          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+          {/* Right tile - Three-way toggle (wider - takes 2/3 of the width) */}
+          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10 md:col-span-2">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="w-full mb-4">
                 <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
                 <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
                 <TabsTrigger value="versions" className="flex-1">Version History</TabsTrigger>
               </TabsList>
+              
+              {/* Integrated content area directly under the toggle */}
+              <TabsContent value="curve" className="mt-4 space-y-6">
+                <CurveEditor initialPhases={phases} onSave={setPhases} />
+              </TabsContent>
+              
+              <TabsContent value="notes" className="mt-4 space-y-6">
+                <ProjectDetailsTab 
+                  notes={notes} 
+                  setNotes={setNotes}
+                  materials={materials}
+                  setMaterials={setMaterials}
+                  tags={tags}
+                  setTags={setTags}
+                  handleSave={handleProjectDetailsSave}
+                />
+              </TabsContent>
+              
+              <TabsContent value="versions" className="mt-4 space-y-6">
+                <div className="glass p-6 rounded-2xl bg-glass-100/20 backdrop-blur-sm">
+                  <CurveVersionHistory />
+                </div>
+              </TabsContent>
             </Tabs>
           </div>
         </div>
-        
-        {/* Main content area - changes based on selected tab */}
-        <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsContent value="curve" className="space-y-6">
-            <CurveEditor initialPhases={phases} onSave={setPhases} />
-          </TabsContent>
-          
-          <TabsContent value="notes" className="space-y-6">
-            <ProjectDetailsTab 
-              notes={notes} 
-              setNotes={setNotes}
-              materials={materials}
-              setMaterials={setMaterials}
-              tags={tags}
-              setTags={setTags}
-              handleSave={handleProjectDetailsSave}
-            />
-          </TabsContent>
-          
-          <TabsContent value="versions" className="space-y-6">
-            <div className="glass p-6 rounded-2xl bg-glass-100/20 backdrop-blur-sm">
-              <CurveVersionHistory />
-            </div>
-          </TabsContent>
-        </Tabs>
       </div>
     </div>
   );
