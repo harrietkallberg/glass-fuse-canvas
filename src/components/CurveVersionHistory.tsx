@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { BookmarkPlus } from "lucide-react";
+import { BookmarkPlus, Eye } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
 // Mock data for version history
@@ -11,7 +11,11 @@ const mockVersions = [
   { id: "v1", name: "Version 1", date: "3 days ago", current: false },
 ];
 
-const CurveVersionHistory = () => {
+interface CurveVersionHistoryProps {
+  compact?: boolean;
+}
+
+const CurveVersionHistory = ({ compact = false }: CurveVersionHistoryProps) => {
   const handleSaveVersion = () => {
     // Here you would save a new version in your Supabase database
     toast({
@@ -20,40 +24,66 @@ const CurveVersionHistory = () => {
     });
   };
 
+  const handleViewVersion = (versionId: string) => {
+    // Here you would load the selected version
+    toast({
+      title: "Version loaded",
+      description: `Loading version ${versionId}...`,
+    });
+  };
+
   return (
     <div>
-      <h3 className="font-medium mb-3">Version History</h3>
-      <div className="space-y-2 max-h-[250px] overflow-auto pr-2 mb-3">
+      {!compact && <h3 className="font-medium mb-3">Version History</h3>}
+      
+      <div className="space-y-2">
         {mockVersions.map((version) => (
           <div
             key={version.id}
             className={`p-3 flex justify-between items-center rounded-lg ${
               version.current 
                 ? "bg-secondary/70 border border-secondary" 
-                : "bg-muted/30 hover:bg-muted/50 cursor-pointer"
+                : "bg-muted/30 hover:bg-muted/50"
             }`}
           >
             <div>
-              <p className="font-medium">{version.name}</p>
+              <p className={`font-medium ${compact ? "text-sm" : ""}`}>{version.name}</p>
               <p className="text-xs text-muted-foreground">{version.date}</p>
             </div>
-            {version.current && (
-              <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
-                Current
-              </span>
-            )}
+            
+            <div className="flex gap-2 items-center">
+              {version.current && (
+                <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
+                  Current
+                </span>
+              )}
+              
+              {!version.current && (
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-8"
+                  onClick={() => handleViewVersion(version.id)}
+                >
+                  <Eye className="h-3 w-3 mr-1" />
+                  {compact ? "" : "View"}
+                </Button>
+              )}
+            </div>
           </div>
         ))}
       </div>
       
-      <Button 
-        variant="outline" 
-        className="w-full gap-1"
-        onClick={handleSaveVersion}
-      >
-        <BookmarkPlus className="h-4 w-4" />
-        Save as New Version
-      </Button>
+      {!compact && (
+        <Button 
+          variant="outline" 
+          className="w-full gap-1 mt-3"
+          onClick={handleSaveVersion}
+        >
+          <BookmarkPlus className="h-4 w-4" />
+          Save as New Version
+        </Button>
+      )}
     </div>
   );
 };

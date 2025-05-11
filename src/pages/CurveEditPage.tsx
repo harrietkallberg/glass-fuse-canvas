@@ -6,7 +6,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import Navigation from "@/components/Navigation";
 import CurveEditor from "@/components/CurveEditor";
-import CurveVersionHistory from "@/components/CurveVersionHistory";
 import CurveHeader from "@/components/CurveHeader";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
 import { ArrowLeft } from "lucide-react";
