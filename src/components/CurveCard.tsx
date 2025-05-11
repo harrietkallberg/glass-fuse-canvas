@@ -60,12 +60,12 @@ const CurveCard = ({
   };
 
   return (
-    <Card className={`${colorClass} border-white border overflow-hidden backdrop-blur-sm bg-white/40`}>
+    <Card className={`${colorClass} border-white/70 border overflow-hidden backdrop-blur-sm bg-white/30`}>
       <CardHeader className="pb-2">
         <div className="flex justify-between items-center">
           <h3 className="font-medium text-lg md:text-xl">{title}</h3>
           <div className="flex items-center gap-2">
-            <span className={`flex items-center text-xs md:text-sm font-medium ${isModified ? 'bg-white/80' : 'bg-white/60'} px-2 py-1 rounded-full border border-white/80 shadow-sm`}>
+            <span className={`flex items-center text-xs md:text-sm font-medium ${isModified ? 'bg-white/70' : 'bg-white/50'} px-2 py-1 rounded-full border border-white/60 shadow-sm`}>
               {isModified ? (
                 <>
                   <Pencil className="w-3 h-3 mr-1" /> Modified
@@ -77,11 +77,11 @@ const CurveCard = ({
               )}
             </span>
             {isPrivate ? (
-              <span className="text-xs md:text-sm font-medium bg-white/80 px-2 py-1 rounded-full border border-white/80 shadow-sm">
+              <span className="text-xs md:text-sm font-medium bg-white/70 px-2 py-1 rounded-full border border-white/60 shadow-sm">
                 Private
               </span>
             ) : (
-              <span className="text-xs md:text-sm font-medium bg-white/60 px-2 py-1 rounded-full flex items-center border border-white/80 shadow-sm">
+              <span className="text-xs md:text-sm font-medium bg-white/50 px-2 py-1 rounded-full flex items-center border border-white/60 shadow-sm">
                 <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
@@ -89,12 +89,12 @@ const CurveCard = ({
         </div>
       </CardHeader>
       <CardContent className="pb-2">
-        <p className="text-sm md:text-base text-foreground">{description}</p>
+        <p className="text-sm md:text-base text-foreground font-medium">{description}</p>
         <div className="flex gap-4 mt-4">
           {/* Curve visualization with fixed display */}
-          <div className="w-1/2 h-[80px] bg-white/20 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
+          <div className="w-1/2 h-[80px] bg-white/15 backdrop-blur-sm rounded-md overflow-hidden border border-white/40 mb-1">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+              <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
                 <defs>
                   <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#FFA07A" stopOpacity={0.8}/>
@@ -147,7 +147,7 @@ const CurveCard = ({
             <Button 
               size="icon" 
               variant="outline" 
-              className="h-8 w-8 rounded-full bg-white/60 backdrop-blur-sm border-white hover:bg-white/70 ring-1 ring-white/70 shadow-lg"
+              className="h-8 w-8 rounded-full bg-white/50 backdrop-blur-sm border-white/70 hover:bg-white/60 ring-1 ring-white/50 shadow-lg"
               aria-label="Edit curve"
             >
               <Edit className="h-4 w-4" />

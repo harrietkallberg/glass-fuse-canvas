@@ -34,7 +34,7 @@ const Dashboard = () => {
   }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-glass-gradient-1 overflow-hidden">
+    <div className="min-h-screen bg-[#e2d1c3] overflow-hidden">
       <Navigation />
       
       <div className="container mx-auto pt-24 px-4 relative z-10">
