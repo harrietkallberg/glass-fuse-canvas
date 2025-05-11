@@ -65,49 +65,47 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        <CurveHeader 
-          title={title}
-          setTitle={setTitle}
-          description={description}
-          setDescription={setDescription}
-          isPrivate={isPrivate}
-          setIsPrivate={setIsPrivate}
-        />
+        <div className="glass-card p-6 mb-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+          <div className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-6">
+            <div className="space-y-4">
+              <CurveHeader 
+                title={title}
+                setTitle={setTitle}
+                description={description}
+                setDescription={setDescription}
+                isPrivate={isPrivate}
+                setIsPrivate={setIsPrivate}
+              />
+            </div>
+            
+            <div className="space-y-4">
+              <Tabs defaultValue="curve" className="w-full">
+                <TabsList className="w-full mb-4">
+                  <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
+                  <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
+                </TabsList>
+                
+                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
+              </Tabs>
+            </div>
+          </div>
+        </div>
         
         <Tabs defaultValue="curve">
-          <TabsList className="mb-6">
-            <TabsTrigger value="curve">Curve Editor</TabsTrigger>
-            <TabsTrigger value="notes">Notes & Results</TabsTrigger>
-          </TabsList>
-          
           <TabsContent value="curve" className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <CurveEditor initialPhases={phases} onSave={setPhases} />
-              </div>
-              <div className="w-full md:w-64">
-                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
-              </div>
-            </div>
+            <CurveEditor initialPhases={phases} onSave={setPhases} />
           </TabsContent>
           
           <TabsContent value="notes" className="space-y-6">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <ProjectDetailsTab 
-                  notes={notes} 
-                  setNotes={setNotes}
-                  materials={materials}
-                  setMaterials={setMaterials}
-                  tags={tags}
-                  setTags={setTags}
-                  handleSave={handleProjectDetailsSave}
-                />
-              </div>
-              <div className="w-full md:w-64">
-                <CurveVersionHistory className="p-4 glass rounded-lg bg-glass-100/20 backdrop-blur-sm" />
-              </div>
-            </div>
+            <ProjectDetailsTab 
+              notes={notes} 
+              setNotes={setNotes}
+              materials={materials}
+              setMaterials={setMaterials}
+              tags={tags}
+              setTags={setTags}
+              handleSave={handleProjectDetailsSave}
+            />
           </TabsContent>
         </Tabs>
       </div>
