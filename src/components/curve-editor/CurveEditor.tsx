@@ -4,6 +4,7 @@ import { calculateTotalTime } from '@/utils/curveUtils';
 import { useCurveState } from '@/hooks/useCurveState';
 import GlassSettings from './GlassSettings';
 import CurveEditorTabs from './CurveEditorTabs';
+import { toast } from '@/components/ui/use-toast';
 import { Phase } from '@/utils/curveUtils';
 
 interface CurveEditorProps {
@@ -16,6 +17,12 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
   
   const handleSave = () => {
     if (onSave) onSave(curveState.phases);
+    
+    // Show success toast
+    toast({
+      title: "Curve saved!",
+      description: "Your firing curve has been saved successfully.",
+    });
   };
 
   return (
