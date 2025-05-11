@@ -65,7 +65,7 @@ const CurveCard = ({
         <div className="flex justify-between items-center">
           <h3 className="font-medium text-lg md:text-xl">{title}</h3>
           <div className="flex items-center gap-2">
-            <span className={`flex items-center text-xs md:text-sm font-medium ${isModified ? 'bg-glass-turquoise/80 text-teal-800' : 'bg-glass-turquoiseLight/80 text-teal-700'} px-2 py-1 rounded-full border border-white/80 shadow-sm`}>
+            <span className={`flex items-center text-xs md:text-sm font-medium ${isModified ? 'bg-white/80' : 'bg-white/60'} px-2 py-1 rounded-full border border-white/80 shadow-sm`}>
               {isModified ? (
                 <>
                   <Pencil className="w-3 h-3 mr-1" /> Modified
@@ -77,11 +77,11 @@ const CurveCard = ({
               )}
             </span>
             {isPrivate ? (
-              <span className="text-xs md:text-sm font-medium bg-glass-orange/90 text-orange-800 px-2 py-1 rounded-full border border-white/80 shadow-sm">
+              <span className="text-xs md:text-sm font-medium bg-white/80 px-2 py-1 rounded-full border border-white/80 shadow-sm">
                 Private
               </span>
             ) : (
-              <span className="text-xs md:text-sm font-medium bg-glass-brightOrange/60 text-orange-700 px-2 py-1 rounded-full flex items-center border border-white/80 shadow-sm">
+              <span className="text-xs md:text-sm font-medium bg-white/60 px-2 py-1 rounded-full flex items-center border border-white/80 shadow-sm">
                 <Globe className="w-3 h-3 mr-1" /> Public
               </span>
             )}
@@ -91,10 +91,10 @@ const CurveCard = ({
       <CardContent className="pb-2">
         <p className="text-sm md:text-base text-foreground">{description}</p>
         <div className="flex gap-4 mt-4">
-          {/* Miniature curve plot with lighter orange */}
+          {/* Curve visualization with fixed display */}
           <div className="w-1/2 h-[80px] bg-white/20 backdrop-blur-sm rounded-md overflow-hidden border border-white/50">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 5 }}>
+              <AreaChart data={curveData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id={`colorTemp-${id}`} x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#FFA07A" stopOpacity={0.8}/>
@@ -107,7 +107,8 @@ const CurveCard = ({
                   stroke="#FFA07A" 
                   strokeWidth={2.5}
                   fillOpacity={1} 
-                  fill={`url(#colorTemp-${id})`} 
+                  fill={`url(#colorTemp-${id})`}
+                  isAnimationActive={false}
                 />
               </AreaChart>
             </ResponsiveContainer>
