@@ -75,17 +75,21 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
           
           {/* Reference lines for annealing temperatures */}
           {referenceTemps.map((temp, index) => (
-            temp.temp && <ReferenceLine 
-              key={index}
-              y={temp.temp} 
-              stroke="#E5DEFF" 
-              strokeDasharray="3 3" 
-              label={{ 
-                value: `${temp.label}: ${temp.temp}°C`, 
-                fill: '#683bfa',
-                position: 'right'
-              }}
-            />
+            temp.temp && (
+              <ReferenceLine 
+                key={index}
+                y={temp.temp} 
+                stroke="#E5DEFF" 
+                strokeDasharray="3 3" 
+                label={{ 
+                  position: 'right',
+                  value: `${temp.label}: ${temp.temp}°C`,
+                  fill: '#683bfa',
+                  fontSize: 12,
+                  offset: 10,
+                }}
+              />
+            )
           ))}
         </LineChart>
       </ResponsiveContainer>
