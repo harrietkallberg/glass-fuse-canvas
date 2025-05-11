@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import CurveCard from "@/components/CurveCard";
 import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 // Mock data for curves with accurate curve data for visualization
 const mockCurves = [
