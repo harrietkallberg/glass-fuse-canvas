@@ -14,6 +14,20 @@ const mockCurves = [
     description: "Full fuse for 10mm thick glass bowl project",
     lastUpdated: "2 days ago",
     isPrivate: false,
+    glassType: "Bullseye",
+    ovenType: "Electric Kiln",
+    thickness: "10mm",
+    projectType: "Full Fuse",
+    isModified: false,
+    curveData: [
+      {time: 0, temperature: 20},
+      {time: 60, temperature: 250},
+      {time: 120, temperature: 500},
+      {time: 180, temperature: 750},
+      {time: 240, temperature: 500},
+      {time: 300, temperature: 100},
+      {time: 360, temperature: 20}
+    ]
   },
   {
     id: "2",
@@ -21,6 +35,20 @@ const mockCurves = [
     description: "Light tack fuse preserving texture for wall art",
     lastUpdated: "1 week ago",
     isPrivate: true,
+    glassType: "Float Glass",
+    ovenType: "Ceramic Kiln",
+    thickness: "4mm",
+    projectType: "Tack Fuse",
+    isModified: true,
+    curveData: [
+      {time: 0, temperature: 20},
+      {time: 60, temperature: 200},
+      {time: 120, temperature: 400},
+      {time: 180, temperature: 650},
+      {time: 240, temperature: 400},
+      {time: 300, temperature: 100},
+      {time: 360, temperature: 20}
+    ],
     colorClass: "glass-yellow"
   },
   {
@@ -29,6 +57,20 @@ const mockCurves = [
     description: "Slow schedule for thick cast glass sculptures",
     lastUpdated: "3 days ago",
     isPrivate: false,
+    glassType: "System 96",
+    ovenType: "Gas Kiln",
+    thickness: "25mm",
+    projectType: "Casting",
+    isModified: true,
+    curveData: [
+      {time: 0, temperature: 20},
+      {time: 100, temperature: 200},
+      {time: 200, temperature: 450},
+      {time: 300, temperature: 850},
+      {time: 400, temperature: 850},
+      {time: 500, temperature: 450},
+      {time: 600, temperature: 20}
+    ],
     colorClass: "glass-orange"
   },
   {
@@ -37,6 +79,20 @@ const mockCurves = [
     description: "Gentle slumping for decorative plate",
     lastUpdated: "yesterday",
     isPrivate: false,
+    glassType: "Spectrum",
+    ovenType: "Electric Kiln",
+    thickness: "6mm",
+    projectType: "Slumping",
+    isModified: false,
+    curveData: [
+      {time: 0, temperature: 20},
+      {time: 60, temperature: 200},
+      {time: 120, temperature: 400},
+      {time: 180, temperature: 650},
+      {time: 240, temperature: 400},
+      {time: 300, temperature: 100},
+      {time: 360, temperature: 20}
+    ],
     colorClass: "glass-green"
   },
   {
@@ -45,6 +101,20 @@ const mockCurves = [
     description: "Careful schedule for thin glass draping",
     lastUpdated: "3 hours ago",
     isPrivate: true,
+    glassType: "Bullseye",
+    ovenType: "Ceramic Kiln",
+    thickness: "3mm",
+    projectType: "Draping",
+    isModified: true,
+    curveData: [
+      {time: 0, temperature: 20},
+      {time: 40, temperature: 150},
+      {time: 80, temperature: 300},
+      {time: 120, temperature: 600},
+      {time: 160, temperature: 300},
+      {time: 200, temperature: 100},
+      {time: 240, temperature: 20}
+    ],
     colorClass: "glass-turquoise"
   },
 ];
@@ -130,6 +200,12 @@ const Dashboard = () => {
                 description={curve.description}
                 lastUpdated={curve.lastUpdated}
                 isPrivate={curve.isPrivate}
+                glassType={curve.glassType}
+                ovenType={curve.ovenType}
+                thickness={curve.thickness}
+                projectType={curve.projectType}
+                isModified={curve.isModified}
+                curveData={curve.curveData}
                 colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
               />
             </div>
