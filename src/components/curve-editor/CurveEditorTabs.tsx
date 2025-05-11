@@ -58,6 +58,7 @@ const CurveEditorTabs = ({
             handleSave={handleSave}
             ovenType={ovenType}
             setOvenType={setOvenType}
+            selectedGlassInfo={selectedGlassInfo}
           />
         </TabsContent>
       </Tabs>
