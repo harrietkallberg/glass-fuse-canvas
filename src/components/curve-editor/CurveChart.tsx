@@ -8,7 +8,8 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
+  Legend
 } from 'recharts';
 
 interface CurveChartProps {
@@ -23,8 +24,8 @@ interface CurveChartProps {
 const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
   // Find key temperatures from the selected glass for reference lines
   const referenceTemps = selectedGlassInfo ? [
-    { temp: selectedGlassInfo.o_astemp, label: 'Upper Annealing' },
-    { temp: selectedGlassInfo.n_astemp, label: 'Lower Annealing' }
+    { temp: selectedGlassInfo.o_astemp, label: 'Upper Annealing', color: '#8B5CF6' },
+    { temp: selectedGlassInfo.n_astemp, label: 'Lower Annealing', color: '#F97316' }
   ] : [];
   
   // Custom colors for the chart - these match the colors used in the CurveCard component
@@ -33,6 +34,16 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
     grid: '#F2FCE2',
     text: '#333333'
   };
+  
+  // Custom legend payload for reference lines
+  const legendPayload = referenceTemps
+    .filter(temp => temp.temp !== undefined)
+    .map(temp => ({
+      value: `${temp.label} (${temp.temp}°C)`,
+      type: 'line',
+      color: temp.color,
+      id: temp.label
+    }));
   
   return (
     <div className="h-[400px] w-full bg-glass-100/20 rounded-lg p-4">
@@ -73,24 +84,39 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
             activeDot={{ r: 6, fill: '#FDE1D3' }}
           />
           
-          {/* Reference lines for annealing temperatures */}
+          {/* Reference lines for annealing temperatures - now with different colors and no labels */}
           {referenceTemps.map((temp, index) => (
             temp.temp && (
               <ReferenceLine 
                 key={index}
                 y={temp.temp} 
-                stroke="#E5DEFF" 
-                strokeDasharray="3 3" 
-                label={{ 
-                  position: 'right',
-                  value: `${temp.label}: ${temp.temp}°C`,
-                  fill: '#683bfa',
-                  fontSize: 12,
-                  offset: 10,
-                }}
+                stroke={temp.color}
+                strokeWidth={2}
+                strokeDasharray="5 5"
               />
             )
           ))}
+          
+          {/* Custom legend for reference lines */}
+          <Legend 
+            content={({ payload }) => (
+              <div className="flex justify-end gap-4 mt-1 mr-4 text-xs font-medium">
+                {legendPayload.map((entry, index) => (
+                  <div key={index} className="flex items-center">
+                    <span 
+                      className="inline-block w-4 h-[2px] mr-1"
+                      style={{ 
+                        backgroundColor: entry.color,
+                        borderTop: `2px dashed ${entry.color}`
+                      }} 
+                    />
+                    <span>{entry.value}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            wrapperStyle={{ top: 0, right: 0 }}
+          />
         </LineChart>
       </ResponsiveContainer>
     </div>
