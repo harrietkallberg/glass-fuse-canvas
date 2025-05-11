@@ -27,7 +27,7 @@ const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
     { temp: selectedGlassInfo.n_astemp, label: 'Lower Annealing' }
   ] : [];
   
-  // Custom colors for the chart
+  // Custom colors for the chart - these match the colors used in the CurveCard component
   const chartColors = {
     line: '#FEC6A1',
     grid: '#F2FCE2',

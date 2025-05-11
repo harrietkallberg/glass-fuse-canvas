@@ -6,7 +6,7 @@ import Navigation from "@/components/Navigation";
 import CurveCard from "@/components/CurveCard";
 import { Link } from "react-router-dom";
 
-// Mock data for curves
+// Mock data for curves with accurate curve data for visualization
 const mockCurves = [
   {
     id: "1",
@@ -23,10 +23,12 @@ const mockCurves = [
       {time: 0, temperature: 20},
       {time: 60, temperature: 250},
       {time: 120, temperature: 500},
-      {time: 180, temperature: 750},
-      {time: 240, temperature: 500},
-      {time: 300, temperature: 100},
-      {time: 360, temperature: 20}
+      {time: 160, temperature: 750},
+      {time: 190, temperature: 750},  // Hold at top temperature
+      {time: 240, temperature: 520},  // Controlled cooldown to annealing point
+      {time: 320, temperature: 460},  // Annealing
+      {time: 380, temperature: 100},
+      {time: 440, temperature: 20}
     ]
   },
   {
@@ -44,10 +46,12 @@ const mockCurves = [
       {time: 0, temperature: 20},
       {time: 60, temperature: 200},
       {time: 120, temperature: 400},
-      {time: 180, temperature: 650},
-      {time: 240, temperature: 400},
-      {time: 300, temperature: 100},
-      {time: 360, temperature: 20}
+      {time: 180, temperature: 650},  // Lower top temperature for tack fuse
+      {time: 200, temperature: 650},  // Short hold
+      {time: 260, temperature: 510},  // Controlled cooldown
+      {time: 330, temperature: 450},  // Annealing
+      {time: 390, temperature: 100},
+      {time: 450, temperature: 20}
     ],
     colorClass: "glass-yellow"
   },
@@ -64,12 +68,14 @@ const mockCurves = [
     isModified: true,
     curveData: [
       {time: 0, temperature: 20},
-      {time: 100, temperature: 200},
-      {time: 200, temperature: 450},
-      {time: 300, temperature: 850},
-      {time: 400, temperature: 850},
-      {time: 500, temperature: 450},
-      {time: 600, temperature: 20}
+      {time: 120, temperature: 200},  // Slower ramp for thicker glass
+      {time: 240, temperature: 450},
+      {time: 360, temperature: 850},  // Higher top temperature for casting
+      {time: 420, temperature: 850},  // Longer hold at top
+      {time: 540, temperature: 560},  // Slower cooldown
+      {time: 660, temperature: 480},  // Extended annealing
+      {time: 780, temperature: 300},
+      {time: 900, temperature: 20}
     ],
     colorClass: "glass-orange"
   },
@@ -88,10 +94,12 @@ const mockCurves = [
       {time: 0, temperature: 20},
       {time: 60, temperature: 200},
       {time: 120, temperature: 400},
-      {time: 180, temperature: 650},
-      {time: 240, temperature: 400},
-      {time: 300, temperature: 100},
-      {time: 360, temperature: 20}
+      {time: 180, temperature: 650},  // Lower temperature for slumping
+      {time: 210, temperature: 650},  // Hold
+      {time: 270, temperature: 500},
+      {time: 330, temperature: 450},
+      {time: 390, temperature: 100},
+      {time: 450, temperature: 20}
     ],
     colorClass: "glass-green"
   },
@@ -110,10 +118,12 @@ const mockCurves = [
       {time: 0, temperature: 20},
       {time: 40, temperature: 150},
       {time: 80, temperature: 300},
-      {time: 120, temperature: 600},
-      {time: 160, temperature: 300},
-      {time: 200, temperature: 100},
-      {time: 240, temperature: 20}
+      {time: 120, temperature: 600},  // Lower temperature for delicate draping
+      {time: 140, temperature: 600},  // Short hold
+      {time: 180, temperature: 500},
+      {time: 240, temperature: 460},
+      {time: 300, temperature: 100},
+      {time: 360, temperature: 20}
     ],
     colorClass: "glass-turquoise"
   },
