@@ -51,7 +51,7 @@ const CurveCard = ({
             <Share2 className="h-4 w-4" />
           </Button>
           <Link to={`/edit/${id}`}>
-            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full">
+            <Button size="icon" variant="outline" className="h-8 w-8 rounded-full bg-white/20 backdrop-blur-sm border-white/30 hover:bg-white/30">
               <Edit className="h-4 w-4" />
             </Button>
           </Link>

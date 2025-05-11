@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -130,9 +131,9 @@ const Login = () => {
             
             <Button 
               type="submit" 
-              className="w-full h-11 glass-vibrant-orange hover:opacity-90 transition-all shadow-md hover:shadow-lg backdrop-blur-md"
+              className="w-full h-11 enhanced-glass-card hover:bg-white/20 transition-all shadow-md hover:shadow-lg backdrop-blur-md border-white/30 relative overflow-hidden"
             >
-              Sign In
+              <span className="relative z-10">Sign In</span>
             </Button>
           </form>
           
