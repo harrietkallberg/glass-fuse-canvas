@@ -15,8 +15,8 @@ interface CurveEditorTabsProps {
   addPhase: () => void;
   removePhase: (id: string) => void;
   handleSave: () => void;
-  ovenType?: string; // Add oven type prop
-  setOvenType?: (type: string) => void; // Add oven type setter
+  ovenType?: string;
+  setOvenType?: (type: string) => void;
 }
 
 const CurveEditorTabs = ({
@@ -53,8 +53,6 @@ const CurveEditorTabs = ({
           addPhase={addPhase}
           removePhase={removePhase}
           handleSave={handleSave}
-          ovenType={ovenType}
-          setOvenType={setOvenType}
         />
       </TabsContent>
     </Tabs>

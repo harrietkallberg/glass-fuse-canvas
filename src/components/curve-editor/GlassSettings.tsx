@@ -107,6 +107,7 @@ const GlassSettings = ({
               <SelectItem value="2">2 layers</SelectItem>
               <SelectItem value="3">3 layers</SelectItem>
               <SelectItem value="4">4 layers</SelectItem>
+              <SelectItem value="5">5 layers</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -118,10 +119,13 @@ const GlassSettings = ({
               <SelectValue placeholder="Select radius" />
             </SelectTrigger>
             <SelectContent>
+              <SelectItem value="5">5 cm</SelectItem>
               <SelectItem value="10">10 cm</SelectItem>
               <SelectItem value="20">20 cm</SelectItem>
               <SelectItem value="30">30 cm</SelectItem>
               <SelectItem value="40">40 cm</SelectItem>
+              <SelectItem value="50">50 cm</SelectItem>
+              <SelectItem value="60">60 cm</SelectItem>
             </SelectContent>
           </Select>
         </div>
