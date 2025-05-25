@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -69,22 +70,22 @@ const Landing = () => {
         
         {/* Feature grid with slightly lower z-index than title */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6 w-full relative" style={{ zIndex: 30 }}>
-          <div className="glass-vibrant-orange p-6 rounded-xl hover:scale-[1.02] transition-transform">
+          <div className="bg-orange-500/20 backdrop-blur-md p-6 rounded-xl hover:scale-[1.02] transition-transform shadow-md">
             <h3 className="font-medium text-lg mb-2">Create Precise Curves</h3>
             <p className="text-foreground/80">Design customized firing schedules for your unique glass projects</p>
           </div>
           
-          <div className="glass-vibrant-cream p-6 rounded-xl hover:scale-[1.02] transition-transform">
+          <div className="bg-amber-100/30 backdrop-blur-md p-6 rounded-xl hover:scale-[1.02] transition-transform shadow-md">
             <h3 className="font-medium text-lg mb-2">Document Your Process</h3>
             <p className="text-foreground/80">Track your results with images and maintain version history</p>
           </div>
           
-          <div className="glass-vibrant-sage p-6 rounded-xl hover:scale-[1.02] transition-transform">
+          <div className="bg-cyan-400/20 backdrop-blur-md p-6 rounded-xl hover:scale-[1.02] transition-transform shadow-md">
             <h3 className="font-medium text-lg mb-2">Connect with Artists</h3>
             <p className="text-foreground/80">Share your work and learn from other glass fusion enthusiasts</p>
           </div>
           
-          <div className="glass-vibrant-taupe p-6 rounded-xl hover:scale-[1.02] transition-transform">
+          <div className="bg-stone-300/30 backdrop-blur-md p-6 rounded-xl hover:scale-[1.02] transition-transform shadow-md">
             <h3 className="font-medium text-lg mb-2">Perfect Your Craft</h3>
             <p className="text-foreground/80">Refine your techniques through iteration and community feedback</p>
           </div>
