@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -59,12 +58,6 @@ const Landing = () => {
                 Create, share, and perfect your glass fusion firing curves
               </p>
             </div>
-          </div>
-          
-          <div className="glass-vibrant-cream p-4 rounded-xl inline-block" style={{ position: 'relative', zIndex: 35 }}>
-            <p className="text-xl text-foreground/80 animate-fade-in">
-              Join a community of passionate glass fusion artists
-            </p>
           </div>
         </div>
         
