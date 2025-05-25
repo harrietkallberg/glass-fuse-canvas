@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,13 +76,6 @@ const Register = () => {
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
-        <Link to="/" className="inline-block mb-6">
-          <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Button>
-        </Link>
-        
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold relative z-10 text-[#2A6B6B]" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
             Create an Account
@@ -92,7 +86,7 @@ const Register = () => {
           </p>
         </div>
         
-        <div className="glass-surface p-8">
+        <div className="bg-white/25 backdrop-blur-lg rounded-2xl shadow-lg p-8">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name" className="text-foreground/80">Full Name</Label>
@@ -153,12 +147,19 @@ const Register = () => {
           </form>
           
           <div className="mt-8 text-center">
-            <p className="text-sm text-foreground/70">
+            <p className="text-sm text-foreground/70 mb-4">
               Already have an account?{" "}
               <Link to="/login" className="text-[#bd8770] font-medium hover:underline">
                 Sign in
               </Link>
             </p>
+            
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
