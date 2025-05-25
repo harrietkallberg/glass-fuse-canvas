@@ -9,7 +9,183 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      curve_phases: {
+        Row: {
+          duration: number
+          hold_time: number
+          id: string
+          phase_order: number
+          target_temp: number
+          version_id: string
+        }
+        Insert: {
+          duration?: number
+          hold_time?: number
+          id?: string
+          phase_order: number
+          target_temp?: number
+          version_id: string
+        }
+        Update: {
+          duration?: number
+          hold_time?: number
+          id?: string
+          phase_order?: number
+          target_temp?: number
+          version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curve_phases_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "curve_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      curve_versions: {
+        Row: {
+          created_at: string
+          curve_id: string
+          firing_type: string | null
+          glass_layers: string | null
+          glass_radius: string | null
+          id: string
+          is_current: boolean
+          materials: string | null
+          name: string
+          notes: string | null
+          oven_type: string | null
+          room_temp: number | null
+          selected_glass: string | null
+          tags: string | null
+          top_temp_minutes: string | null
+          total_time: number | null
+          version_number: number
+        }
+        Insert: {
+          created_at?: string
+          curve_id: string
+          firing_type?: string | null
+          glass_layers?: string | null
+          glass_radius?: string | null
+          id?: string
+          is_current?: boolean
+          materials?: string | null
+          name?: string
+          notes?: string | null
+          oven_type?: string | null
+          room_temp?: number | null
+          selected_glass?: string | null
+          tags?: string | null
+          top_temp_minutes?: string | null
+          total_time?: number | null
+          version_number?: number
+        }
+        Update: {
+          created_at?: string
+          curve_id?: string
+          firing_type?: string | null
+          glass_layers?: string | null
+          glass_radius?: string | null
+          id?: string
+          is_current?: boolean
+          materials?: string | null
+          name?: string
+          notes?: string | null
+          oven_type?: string | null
+          room_temp?: number | null
+          selected_glass?: string | null
+          tags?: string | null
+          top_temp_minutes?: string | null
+          total_time?: number | null
+          version_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curve_versions_curve_id_fkey"
+            columns: ["curve_id"]
+            isOneToOne: false
+            referencedRelation: "curves"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      curves: {
+        Row: {
+          created_at: string
+          description: string | null
+          glass_type: string | null
+          id: string
+          is_private: boolean
+          oven_type: string | null
+          project_type: string | null
+          thickness: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          glass_type?: string | null
+          id?: string
+          is_private?: boolean
+          oven_type?: string | null
+          project_type?: string | null
+          thickness?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          glass_type?: string | null
+          id?: string
+          is_private?: boolean
+          oven_type?: string | null
+          project_type?: string | null
+          thickness?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "curves_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          id: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          id: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          id?: string
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

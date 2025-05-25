@@ -1,49 +1,77 @@
 
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { User, Plus, Home, Users, MessageSquare } from "lucide-react";
+import { LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/components/ui/use-toast";
 
 const Navigation = () => {
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Sign out failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Signed out",
+        description: "You have been signed out successfully.",
+      });
+      navigate("/");
+    }
+  };
+
   return (
-    <div className="glass fixed top-4 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-full flex items-center gap-6">
-      <Link to="/" className="text-foreground font-medium">GlassFuse</Link>
-      
-      <div className="flex-1 flex justify-center gap-2">
-        <Link to="/dashboard">
-          <Button variant="ghost" size="sm" className="rounded-full">
-            <Home className="w-4 h-4 mr-2" />
-            Dashboard
-          </Button>
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/20">
+      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+        <Link to="/dashboard" className="text-xl font-bold text-[#2A6B6B]">
+          GlassFuse Studio
         </Link>
-        <Link to="/community">
-          <Button variant="ghost" size="sm" className="rounded-full">
-            <Users className="w-4 h-4 mr-2" />
-            Community
-          </Button>
-        </Link>
-        <Link to="/messages">
-          <Button variant="ghost" size="sm" className="rounded-full">
-            <MessageSquare className="w-4 h-4 mr-2" />
-            Messages
-          </Button>
-        </Link>
+        
+        <div className="flex items-center gap-4">
+          {user ? (
+            <>
+              <Link to="/dashboard">
+                <Button variant="ghost" size="sm">
+                  Dashboard
+                </Button>
+              </Link>
+              <Link to="/community">
+                <Button variant="ghost" size="sm">
+                  Community
+                </Button>
+              </Link>
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                <span className="text-sm">{user.email}</span>
+                <Button variant="ghost" size="sm" onClick={handleSignOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <Link to="/login">
+                <Button variant="ghost" size="sm">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/register">
+                <Button size="sm">
+                  Get Started
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
       </div>
-      
-      <div className="flex items-center gap-2">
-        <Link to="/create">
-          <Button size="sm" className="rounded-full bg-primary text-primary-foreground">
-            <Plus className="w-4 h-4 mr-1" />
-            New Curve
-          </Button>
-        </Link>
-        <Link to="/profile">
-          <Button variant="ghost" size="icon" className="rounded-full">
-            <User className="w-5 h-5" />
-          </Button>
-        </Link>
-      </div>
-    </div>
+    </nav>
   );
 };
 

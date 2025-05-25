@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,11 +5,21 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { signIn, user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
   
   // Add useEffect to initialize and preserve animation state
   useEffect(() => {
@@ -43,14 +52,8 @@ const Login = () => {
     };
   }, []);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, we would handle authentication here with Supabase
-    // Example:
-    // const { data, error } = await supabase.auth.signInWithPassword({
-    //   email,
-    //   password,
-    // });
     
     if (!email || !password) {
       toast({
@@ -61,11 +64,23 @@ const Login = () => {
       return;
     }
     
-    toast({
-      title: "Welcome back!",
-      description: "Successfully logged in to GlassFuse",
-    });
-    navigate("/dashboard");
+    setLoading(true);
+    const { error } = await signIn(email, password);
+    
+    if (error) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Welcome back!",
+        description: "You have been logged in successfully.",
+      });
+      navigate("/dashboard");
+    }
+    setLoading(false);
   };
   
   return (
@@ -79,71 +94,69 @@ const Login = () => {
       </div>
       
       <div className="container relative z-10 max-w-md w-full px-4">
-        <Link to="/" className="inline-block mb-6">
-          <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Home
-          </Button>
-        </Link>
-        
         <div className="mb-6 text-center">
           <h1 className="text-3xl font-bold relative z-10 text-[#2A6B6B]" style={{ textShadow: '2px 4px 6px rgba(0,0,0,0.2)' }}>
-            Sign In
+            Welcome Back
           </h1>
           
           <p className="mt-2 relative z-10 text-[#1D4848]" style={{ textShadow: '1px 2px 3px rgba(0,0,0,0.1)' }}>
-            Welcome back to the GlassFuse Studio
+            Sign in to your GlassFuse account
           </p>
         </div>
         
-        <div className="glass-surface p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="bg-white/25 backdrop-blur-lg rounded-2xl shadow-lg p-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground/90">Email</Label>
+              <Label htmlFor="email" className="text-foreground/80">Email</Label>
               <Input 
                 id="email" 
                 type="email" 
                 placeholder="you@example.com" 
-                required 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
+                required 
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <Label htmlFor="password" className="text-foreground/90">Password</Label>
-                <Link to="/forgot-password" className="text-sm text-[#bd8770] hover:text-[#745641]/80 transition-colors">
-                  Forgot password?
-                </Link>
-              </div>
+              <Label htmlFor="password" className="text-foreground/80">Password</Label>
               <Input 
                 id="password" 
                 type="password" 
                 placeholder="••••••••" 
-                required 
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-[#745641]/50 h-11"
+                required 
+                className="bg-white/30 backdrop-blur-md border-white/30 focus:border-primary/50 h-11"
               />
             </div>
             
             <Button 
               type="submit" 
+              disabled={loading}
               className="w-full h-11 enhanced-glass-card hover:bg-white/20 transition-all shadow-md hover:shadow-lg backdrop-blur-md border-white/30 relative overflow-hidden"
             >
-              <span className="relative z-10">Sign In</span>
+              <span className="relative z-10">
+                {loading ? "Signing in..." : "Sign In"}
+              </span>
             </Button>
           </form>
           
           <div className="mt-8 text-center">
-            <p className="text-sm text-foreground/80">
+            <p className="text-sm text-foreground/70 mb-4">
               Don't have an account?{" "}
               <Link to="/register" className="text-[#bd8770] font-medium hover:underline">
-                Create an account
+                Create one
               </Link>
             </p>
+            
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="gap-1 backdrop-blur-sm bg-white/20 hover:bg-white/40">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Home
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

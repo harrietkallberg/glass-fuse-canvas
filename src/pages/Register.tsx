@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,13 +5,23 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 const Register = () => {
   const navigate = useNavigate();
+  const { signUp, user } = useAuth();
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
   
   // Add useEffect to initialize and preserve animation state
   useEffect(() => {
@@ -46,7 +54,7 @@ const Register = () => {
     };
   }, []);
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!name || !username || !email || !password) {
@@ -58,12 +66,23 @@ const Register = () => {
       return;
     }
     
-    // In a real app, we would handle registration here
-    toast({
-      title: "Welcome to GlassFuse!",
-      description: "Your account has been created successfully.",
-    });
-    navigate("/dashboard");
+    setLoading(true);
+    const { error } = await signUp(email, password, username);
+    
+    if (error) {
+      toast({
+        title: "Registration failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } else {
+      toast({
+        title: "Welcome to GlassFuse!",
+        description: "Please check your email to verify your account.",
+      });
+      navigate("/dashboard");
+    }
+    setLoading(false);
   };
   
   return (
@@ -141,9 +160,12 @@ const Register = () => {
             
             <Button 
               type="submit" 
+              disabled={loading}
               className="w-full h-11 enhanced-glass-card hover:bg-white/20 transition-all shadow-md hover:shadow-lg backdrop-blur-md border-white/30 relative overflow-hidden"
             >
-              <span className="relative z-10">Create Account</span>
+              <span className="relative z-10">
+                {loading ? "Creating Account..." : "Create Account"}
+              </span>
             </Button>
           </form>
           
@@ -169,4 +191,3 @@ const Register = () => {
 };
 
 export default Register;
-
