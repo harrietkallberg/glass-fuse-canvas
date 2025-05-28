@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -171,7 +170,14 @@ const CurveEditPage = () => {
         setCurrentVersionName(versionNumber);
         
         // Refresh versions list to show the new version immediately
-        await refreshVersions(curveId);
+        const updatedVersions = await refreshVersions(curveId);
+        
+        // Find the newly created version and make sure it's marked as current
+        const newVersion = updatedVersions.find(v => v.id === savedVersion.id);
+        if (newVersion) {
+          setCurrentVersionId(newVersion.id);
+          setCurrentVersionName(numberToSemantic(newVersion.version_number));
+        }
         
         toast({
           title: "Changes saved!",
@@ -203,6 +209,10 @@ const CurveEditPage = () => {
       // Major.Minor.Patch -> Major.Minor.(Patch+1)
       const patch = parseInt(parts[2]) || 0;
       return `${parts[0]}.${parts[1]}.${patch + 1}`;
+    } else if (parts.length === 4) {
+      // Major.Minor.Patch.SubPatch -> Major.Minor.Patch.(SubPatch+1)
+      const subPatch = parseInt(parts[3]) || 0;
+      return `${parts[0]}.${parts[1]}.${parts[2]}.${subPatch + 1}`;
     }
     return `${currentVersion}.1`;
   };

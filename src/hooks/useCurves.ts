@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -106,21 +105,26 @@ export const useCurves = () => {
     const major = parseInt(parts[0]) || 0;
     const minor = parseInt(parts[1]) || 0;
     const patch = parseInt(parts[2]) || 0;
-    return major * 10000 + minor * 100 + patch;
+    const subPatch = parseInt(parts[3]) || 0;
+    return major * 1000000 + minor * 10000 + patch * 100 + subPatch;
   };
 
   // Convert number back to semantic version
   const numberToSemantic = (versionNumber: number): string => {
-    const major = Math.floor(versionNumber / 10000);
-    const minor = Math.floor((versionNumber % 10000) / 100);
-    const patch = versionNumber % 100;
-    if (patch > 0) {
+    const major = Math.floor(versionNumber / 1000000);
+    const minor = Math.floor((versionNumber % 1000000) / 10000);
+    const patch = Math.floor((versionNumber % 10000) / 100);
+    const subPatch = versionNumber % 100;
+    
+    if (subPatch > 0) {
+      return `${major}.${minor}.${patch}.${subPatch}`;
+    } else if (patch > 0) {
       return `${major}.${minor}.${patch}`;
     }
     return `${major}.${minor}`;
   };
 
-  // Enhanced save function with better transaction handling
+  // Fixed save function with proper constraint handling
   const saveCurveVersion = async (
     curveId: string,
     versionName: string,
@@ -135,51 +139,22 @@ export const useCurves = () => {
     const numericVersion = semanticToNumber(semanticVersion);
 
     try {
-      // First, get all existing versions for this curve
-      const { data: existingVersions, error: fetchError } = await supabase
-        .from('curve_versions')
-        .select('id, is_current')
-        .eq('curve_id', curveId);
-
-      if (fetchError) {
-        console.error('Error fetching existing versions:', fetchError);
-        return null;
-      }
-
-      console.log('Existing versions:', existingVersions);
-
-      // Update all existing versions to not be current using individual updates
-      if (existingVersions && existingVersions.length > 0) {
-        for (const version of existingVersions) {
-          if (version.is_current) {
-            const { error: updateError } = await supabase
-              .from('curve_versions')
-              .update({ is_current: false })
-              .eq('id', version.id);
-
-            if (updateError) {
-              console.error('Error updating existing version:', updateError);
-              return null;
-            }
-          }
-        }
-      }
-
+      // Use a transaction-like approach by creating the new version first without is_current
       console.log('Creating new version with data:', {
         curve_id: curveId,
         version_number: numericVersion,
         name: versionName,
-        is_current: true,
+        is_current: false, // Start with false to avoid constraint violation
       });
 
-      // Create new version
+      // Create new version (not current initially)
       const { data: versionData, error: versionError } = await supabase
         .from('curve_versions')
         .insert({
           curve_id: curveId,
           version_number: numericVersion,
           name: versionName,
-          is_current: true,
+          is_current: false, // Initially false
           selected_glass: curveState.selectedGlass,
           room_temp: curveState.roomTemp,
           glass_layers: curveState.glassLayers,
@@ -202,6 +177,29 @@ export const useCurves = () => {
 
       console.log('Successfully created version:', versionData);
 
+      // Now update all existing versions to not be current
+      const { error: updateError } = await supabase
+        .from('curve_versions')
+        .update({ is_current: false })
+        .eq('curve_id', curveId)
+        .neq('id', versionData.id);
+
+      if (updateError) {
+        console.error('Error updating existing versions:', updateError);
+        return null;
+      }
+
+      // Finally, set the new version as current
+      const { error: setCurrentError } = await supabase
+        .from('curve_versions')
+        .update({ is_current: true })
+        .eq('id', versionData.id);
+
+      if (setCurrentError) {
+        console.error('Error setting version as current:', setCurrentError);
+        return null;
+      }
+
       // Save phases
       const phasesToInsert = phases.map((phase, index) => ({
         version_id: versionData.id,
@@ -221,7 +219,7 @@ export const useCurves = () => {
       }
 
       console.log('Successfully saved phases');
-      return versionData;
+      return { ...versionData, is_current: true };
     } catch (error) {
       console.error('Error in saveCurveVersion:', error);
       return null;
@@ -311,7 +309,7 @@ export const useCurves = () => {
     
     if (isNewVersion) {
       // Create new major version
-      const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 10000));
+      const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 1000000));
       const maxMajor = Math.max(...majorVersions);
       const nextVersion = `${maxMajor + 1}.0`;
       console.log('Next major version:', nextVersion);
