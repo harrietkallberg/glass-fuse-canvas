@@ -5,10 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
-import CurveChart from "@/components/curve-editor/CurveChart";
-import CurveTableView from "@/components/curve-editor/CurveTableView";
 import { Phase } from "@/utils/curveUtils";
 
 interface ProjectInformationSectionProps {
@@ -46,7 +43,6 @@ const ProjectInformationSection = ({
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState<"celsius" | "fahrenheit">("celsius");
-  const [activeTab, setActiveTab] = useState("curve");
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
@@ -145,42 +141,18 @@ const ProjectInformationSection = ({
           )}
         </div>
         
-        <div className="text-sm text-gray-600 mb-4">
+        <div className="text-sm text-gray-600 mb-6">
           {isNewCurve 
             ? "Configure your base firing curve template. This will serve as the starting point for all versions."
             : "This is your project's base template curve. Changes here affect the project identity."
           }
         </div>
         
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full mb-6 p-2 bg-white/50">
-            <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve View</TabsTrigger>
-            <TabsTrigger value="table" className="flex-1 text-lg py-3">Table View</TabsTrigger>
-            <TabsTrigger value="editor" className="flex-1 text-lg py-3">Editor</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="curve" className="mt-6">
-            <CurveChart 
-              phases={templateCurveData?.phases || defaultPhases}
-              roomTemp={20}
-            />
-          </TabsContent>
-          
-          <TabsContent value="table" className="mt-6">
-            <CurveTableView 
-              phases={templateCurveData?.phases || defaultPhases}
-              isTemplateMode={true}
-            />
-          </TabsContent>
-          
-          <TabsContent value="editor" className="mt-6">
-            <CurveEditor
-              initialPhases={templateCurveData?.phases || defaultPhases}
-              onSave={isNewCurve ? handleSaveTemplate : undefined}
-              isTemplateMode={true}
-            />
-          </TabsContent>
-        </Tabs>
+        <CurveEditor
+          initialPhases={templateCurveData?.phases || defaultPhases}
+          onSave={isNewCurve ? handleSaveTemplate : undefined}
+          isTemplateMode={true}
+        />
       </div>
 
       {/* Action Buttons */}
