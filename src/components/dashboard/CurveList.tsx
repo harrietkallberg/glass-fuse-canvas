@@ -1,4 +1,3 @@
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,9 +26,10 @@ interface Curve {
 
 interface CurveListProps {
   curves: Curve[];
+  onDeleteCurve?: (id: string) => void;
 }
 
-const CurveList = ({ curves }: CurveListProps) => {
+const CurveList = ({ curves, onDeleteCurve }: CurveListProps) => {
   const navigate = useNavigate();
 
   const handleCreateCurve = () => {
@@ -77,15 +77,16 @@ const CurveList = ({ curves }: CurveListProps) => {
             id={curve.id}
             title={curve.title}
             description={curve.description}
-            lastUpdated={curve.lastUpdated}
-            isPrivate={curve.isPrivate}
-            glassType={curve.glassType}
-            ovenType={curve.ovenType}
-            thickness={curve.thickness}
-            projectType={curve.projectType}
+            lastUpdated={curve.lastUpdated || new Date(curve.updated_at || curve.created_at).toLocaleDateString()}
+            isPrivate={curve.isPrivate || curve.is_private}
+            glassType={curve.glassType || curve.glass_type || "Standard"}
+            ovenType={curve.ovenType || curve.oven_type || "Electric"}
+            thickness={curve.thickness || "6mm"}
+            projectType={curve.projectType || curve.project_type || "Full Fuse"}
             isModified={curve.isModified}
             curveData={curve.curveData}
             colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
+            onDelete={onDeleteCurve}
           />
         </div>
       ))}

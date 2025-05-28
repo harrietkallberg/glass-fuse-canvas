@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -223,6 +222,64 @@ export const useCurves = () => {
     return data || [];
   };
 
+  // Delete a curve and all its versions
+  const deleteCurve = async (curveId: string) => {
+    if (!user) return false;
+
+    try {
+      // First delete all curve phases for this curve's versions
+      const { data: versions } = await supabase
+        .from('curve_versions')
+        .select('id')
+        .eq('curve_id', curveId);
+
+      if (versions && versions.length > 0) {
+        const versionIds = versions.map(v => v.id);
+        
+        // Delete all phases for these versions
+        const { error: phasesError } = await supabase
+          .from('curve_phases')
+          .delete()
+          .in('version_id', versionIds);
+
+        if (phasesError) {
+          console.error('Error deleting curve phases:', phasesError);
+          return false;
+        }
+      }
+
+      // Delete all versions for this curve
+      const { error: versionsError } = await supabase
+        .from('curve_versions')
+        .delete()
+        .eq('curve_id', curveId);
+
+      if (versionsError) {
+        console.error('Error deleting curve versions:', versionsError);
+        return false;
+      }
+
+      // Finally delete the curve itself
+      const { error: curveError } = await supabase
+        .from('curves')
+        .delete()
+        .eq('id', curveId)
+        .eq('user_id', user.id); // Ensure user can only delete their own curves
+
+      if (curveError) {
+        console.error('Error deleting curve:', curveError);
+        return false;
+      }
+
+      // Refresh the curves list
+      await fetchCurves();
+      return true;
+    } catch (error) {
+      console.error('Error in deleteCurve:', error);
+      return false;
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchCurves();
@@ -236,6 +293,7 @@ export const useCurves = () => {
     curves,
     loading,
     createCurve,
+    deleteCurve,
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,

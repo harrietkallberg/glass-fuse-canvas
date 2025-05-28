@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -124,11 +123,10 @@ const CurveEditPage = () => {
 
       if (!curveId) return;
 
-      // Save new version
-      const versionName = `Version ${versions.length + 1}`;
+      // Save the curve (this will create a new version automatically)
       const savedVersion = await saveCurveVersion(
         curveId,
-        versionName,
+        "Current Version", // Simplified version naming
         {
           selectedGlass: curveState.selectedGlass,
           roomTemp: curveState.roomTemp,
@@ -199,43 +197,73 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
-            <CurveHeader 
-              title={title}
-              setTitle={setTitle}
-              description={description}
-              setDescription={setDescription}
-              isPrivate={isPrivate}
-              setIsPrivate={setIsPrivate}
-              phases={curveState.phases}
-            />
+        {/* Simplified Header Section */}
+        <div className="mb-6 glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Curve Name
+              </label>
+              <input
+                type="text"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
+                placeholder="Enter curve name..."
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-gray-700 mb-2 block">
+                Description
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
+                rows={2}
+                placeholder="Describe your firing curve..."
+              />
+            </div>
+            
+            <div className="flex items-center justify-between pt-2">
+              <div className="text-sm text-gray-600">
+                {isNewCurve ? "Creating new curve" : `Editing: ${title}`}
+              </div>
+              <Button 
+                onClick={handleSave}
+                className="bg-[#2A6B6B] hover:bg-[#1F5555]"
+              >
+                {isNewCurve ? "Create Curve" : "Save Changes"}
+              </Button>
+            </div>
           </div>
-          
-          <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10 md:col-span-2">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="w-full mb-4">
-                <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
-                <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="curve" className="mt-4 space-y-6">
-                <CurveEditor initialPhases={curveState.phases} onSave={handleSave} />
-              </TabsContent>
-              
-              <TabsContent value="notes" className="mt-4 space-y-6">
-                <ProjectDetailsTab 
-                  notes={notes} 
-                  setNotes={setNotes}
-                  materials={materials}
-                  setMaterials={setMaterials}
-                  tags={tags}
-                  setTags={setTags}
-                  handleSave={handleProjectDetailsSave}
-                />
-              </TabsContent>
-            </Tabs>
-          </div>
+        </div>
+        
+        {/* Main Editor */}
+        <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="w-full mb-4">
+              <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
+              <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="curve" className="mt-4 space-y-6">
+              <CurveEditor initialPhases={curveState.phases} onSave={handleSave} />
+            </TabsContent>
+            
+            <TabsContent value="notes" className="mt-4 space-y-6">
+              <ProjectDetailsTab 
+                notes={notes} 
+                setNotes={setNotes}
+                materials={materials}
+                setMaterials={setMaterials}
+                tags={tags}
+                setTags={setTags}
+                handleSave={handleProjectDetailsSave}
+              />
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
     </div>

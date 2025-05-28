@@ -1,10 +1,20 @@
-
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Edit, Share2, Check, Pencil, Globe } from "lucide-react";
+import { Edit, Share2, Check, Pencil, Globe, Trash2 } from "lucide-react";
 import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface CurveCardProps {
   id: string;
@@ -19,6 +29,7 @@ interface CurveCardProps {
   isModified?: boolean;
   curveData?: Array<{time: number, temperature: number}>;
   colorClass?: string;
+  onDelete?: (id: string) => void;
 }
 
 const CurveCard = ({
@@ -41,8 +52,11 @@ const CurveCard = ({
     {time: 300, temperature: 100},
     {time: 360, temperature: 20}
   ],
-  colorClass = "glass-card"
+  colorClass = "glass-card",
+  onDelete
 }: CurveCardProps) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
   // Format oven type to match editor options
   const formatOvenType = (type: string) => {
     if (type === "t" || type.toLowerCase().includes("top")) {
@@ -57,6 +71,19 @@ const CurveCard = ({
       return "Ceramic Kiln";
     }
     return type;
+  };
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await onDelete(id);
+    } catch (error) {
+      console.error('Failed to delete curve:', error);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   return (
@@ -145,6 +172,39 @@ const CurveCard = ({
           <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
             <Share2 className="h-4 w-4" />
           </Button>
+          
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                size="icon" 
+                variant="outline" 
+                className="h-8 w-8 rounded-full bg-red-50/50 backdrop-blur-sm border-red-200/70 hover:bg-red-100/60 ring-1 ring-red-200/50 shadow-lg text-red-600 hover:text-red-700"
+                aria-label="Delete curve"
+                disabled={isDeleting}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Firing Curve</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete "{title}"? This action cannot be undone and will permanently remove the curve and all its versions.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction 
+                  onClick={handleDelete}
+                  className="bg-red-600 hover:bg-red-700"
+                  disabled={isDeleting}
+                >
+                  {isDeleting ? 'Deleting...' : 'Delete Curve'}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+          
           <Link to={`/edit/${id}`}>
             <Button 
               size="icon" 
