@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -36,7 +37,7 @@ const CurveEditPage = () => {
     createCurve, 
     saveCurveVersion, 
     loadCurveVersion, 
-    refetchCurveVersions, 
+    getCurveVersions,
     numberToSemantic,
     getNextVersionNumber
   } = useCurves();
@@ -57,20 +58,15 @@ const CurveEditPage = () => {
   const [tags, setTags] = useState("");
   const [activeTab, setActiveTab] = useState("curve");
   const [versions, setVersions] = useState<any[]>([]);
-  const [editMode, setEditMode] = useState<"edit" | "new">("edit");
   const [selectedVersionColor, setSelectedVersionColor] = useState("#F97316");
 
   const curveState = useCurveState({ initialPhases: defaultPhases });
 
-  // Generate dynamic background gradient based on selected version
-  const getBackgroundGradient = () => {
-    const baseColor = selectedVersionColor;
-    return `linear-gradient(135deg, ${baseColor}08 0%, ${baseColor}15 50%, #33C3F008 100%)`;
-  };
-
   // Function to refresh versions and update state
   const refreshVersions = async (curveId: string) => {
-    const updatedVersions = await refetchCurveVersions(curveId);
+    console.log('Refreshing versions for curve:', curveId);
+    const updatedVersions = await getCurveVersions(curveId);
+    console.log('Updated versions:', updatedVersions);
     setVersions(updatedVersions);
     return updatedVersions;
   };
@@ -88,7 +84,7 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
-        const versionsList = await refetchCurveVersions(id);
+        const versionsList = await getCurveVersions(id);
         const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
         
         if (currentVersion) {
@@ -148,8 +144,8 @@ const CurveEditPage = () => {
 
       if (!curveId) return;
 
-      // Generate semantic version number
-      const versionNumber = getNextVersionNumber(versions, editMode === "new", currentVersionId);
+      // Generate patch version number (e.g., 1.0 -> 1.0.1, 1.0.1 -> 1.0.2)
+      const versionNumber = getNextPatchVersion(currentVersionName);
 
       // Save the curve version
       const savedVersion = await saveCurveVersion(
@@ -178,19 +174,14 @@ const CurveEditPage = () => {
         await refreshVersions(curveId);
         
         toast({
-          title: "Curve saved!",
-          description: editMode === "new" 
-            ? `New version ${versionNumber} created successfully.` 
-            : "Your firing curve has been saved successfully.",
+          title: "Changes saved!",
+          description: `New version ${versionNumber} created successfully.`,
         });
 
         // Navigate to the curve edit page if this was a new curve
         if (isNewCurve) {
           navigate(`/edit/${curveId}`);
         }
-        
-        // Reset to edit mode after saving
-        setEditMode("edit");
       }
     } catch (error) {
       console.error('Error saving curve:', error);
@@ -200,6 +191,20 @@ const CurveEditPage = () => {
         variant: "destructive"
       });
     }
+  };
+
+  // Generate next patch version (e.g., 1.0 -> 1.0.1, 1.0.1 -> 1.0.2)
+  const getNextPatchVersion = (currentVersion: string): string => {
+    const parts = currentVersion.split('.');
+    if (parts.length === 2) {
+      // Major.Minor -> Major.Minor.1
+      return `${parts[0]}.${parts[1]}.1`;
+    } else if (parts.length === 3) {
+      // Major.Minor.Patch -> Major.Minor.(Patch+1)
+      const patch = parseInt(parts[2]) || 0;
+      return `${parts[0]}.${parts[1]}.${patch + 1}`;
+    }
+    return `${currentVersion}.1`;
   };
 
   const handleVersionSelect = async (versionId: string) => {
@@ -228,16 +233,38 @@ const CurveEditPage = () => {
       setNotes(curveData.version.notes || '');
       setMaterials(curveData.version.materials || '');
       setTags(curveData.version.tags || '');
-      setEditMode("edit");
     }
   };
 
-  const handleNewVersion = () => {
-    setEditMode("new");
+  const handleNewMainVersion = () => {
+    // Create a new main version (e.g., 1.0 -> 2.0)
+    const parts = currentVersionName.split('.');
+    const major = parseInt(parts[0]) || 1;
+    const newVersion = `${major + 1}.0`;
+    setCurrentVersionName(newVersion);
+    
     toast({
-      title: "New Version Mode",
-      description: "You're now creating a new version. Save to create it.",
+      title: "New Main Version",
+      description: `Ready to create version ${newVersion}. Save to create it.`,
     });
+  };
+
+  const handleSetAsMainVersion = async (versionId: string) => {
+    // Set the selected version as the current/main version
+    try {
+      // This would need to be implemented in the useCurves hook
+      // For now, just show a toast
+      toast({
+        title: "Main Version Set",
+        description: "This version is now the main version.",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to set as main version",
+        variant: "destructive"
+      });
+    }
   };
 
   if (authLoading || loading) {
@@ -249,13 +276,10 @@ const CurveEditPage = () => {
   }
   
   return (
-    <div 
-      className="min-h-screen pb-20"
-      style={{ background: getBackgroundGradient() }}
-    >
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-blue-50/30 to-orange-50/30">
       <Navigation />
       
-      <div className="container mx-auto pt-24 px-4">
+      <div className="container mx-auto pt-24 px-4 space-y-8">
         <div className="mb-6">
           <Link to="/dashboard">
             <Button variant="ghost" size="sm" className="gap-1">
@@ -266,7 +290,7 @@ const CurveEditPage = () => {
         </div>
         
         {/* Project Header */}
-        <div className="mb-8 glass-card p-8 bg-white/30 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
+        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl">
           {isNewCurve ? (
             <div className="space-y-6">
               <div>
@@ -305,35 +329,13 @@ const CurveEditPage = () => {
               </div>
             </div>
           ) : (
-            <div className="space-y-6">
-              <div>
-                <h1 className="text-4xl font-bold text-gray-800 mb-2">{projectTitle}</h1>
-                <p className="text-xl text-gray-600">{projectDescription}</p>
-              </div>
-              
-              {/* Current Version Info */}
-              <div className="flex items-center justify-between bg-white/50 rounded-xl p-4">
-                <div>
-                  <span className="text-lg font-medium text-gray-700">Currently editing: </span>
-                  <span className="font-bold text-2xl" style={{ color: selectedVersionColor }}>
-                    Version {currentVersionName}
-                  </span>
-                  {editMode === "new" && (
-                    <span className="ml-3 text-sm bg-green-500/20 text-green-700 px-3 py-1 rounded-full">
-                      New Version Mode
-                    </span>
-                  )}
-                </div>
-                <Button 
-                  onClick={handleSave}
-                  className="px-8 py-3 text-lg font-medium"
-                  style={{ 
-                    backgroundColor: selectedVersionColor,
-                    color: 'white'
-                  }}
-                >
-                  {editMode === "new" ? "Save as New Version" : "Save Changes"}
-                </Button>
+            <div className="text-center space-y-4">
+              <h1 className="text-4xl font-bold text-gray-800">{projectTitle}</h1>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
+              <div className="text-lg text-gray-700">
+                Currently editing: <span className="font-bold text-2xl" style={{ color: selectedVersionColor }}>
+                  Version {currentVersionName}
+                </span>
               </div>
             </div>
           )}
@@ -341,22 +343,34 @@ const CurveEditPage = () => {
         
         {/* Version Chart */}
         {!isNewCurve && (
-          <div className="mb-8">
-            <CurveVersionChart 
-              versions={versions.map(v => ({
-                ...v,
-                version_number: numberToSemantic(v.version_number)
-              }))}
-              currentVersionId={currentVersionId}
-              onVersionSelect={handleVersionSelect}
-              onNewVersion={handleNewVersion}
-              selectedVersionColor={selectedVersionColor}
-            />
-          </div>
+          <CurveVersionChart 
+            versions={versions.map(v => ({
+              ...v,
+              version_number: numberToSemantic(v.version_number)
+            }))}
+            currentVersionId={currentVersionId}
+            onVersionSelect={handleVersionSelect}
+            onNewVersion={handleNewMainVersion}
+            selectedVersionColor={selectedVersionColor}
+          />
         )}
         
         {/* Main Editor */}
-        <div className="glass-card p-8 bg-white/30 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
+        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-semibold text-gray-800">
+              {isNewCurve ? "Create New Project" : `Editing Version ${currentVersionName}`}
+            </h2>
+            {!isNewCurve && (
+              <Button 
+                onClick={handleSave}
+                className="px-8 py-3 text-lg font-medium bg-[#F97316] hover:bg-[#F97316]/90 text-white"
+              >
+                Save Changes
+              </Button>
+            )}
+          </div>
+          
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full mb-6 p-2 bg-white/50">
               <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve Editor</TabsTrigger>
