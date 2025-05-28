@@ -89,8 +89,9 @@ export const createGlassTemplatePhases = (
   );
 
   const inledandeSmaltpunkt = glassData["Inledande_smaltpunkt"];
-  const oAstemp = selectedGlassInfo.o_astemp;
-  const nAstemp = selectedGlassInfo.n_astemp;
+  // Exact Python logic: int() conversions
+  const oAstemp = Math.floor(selectedGlassInfo.o_astemp);
+  const nAstemp = Math.floor(selectedGlassInfo.n_astemp);
   const topTempHoldTime = parseInt(topTempMinutes) || 10;
 
   // Calculate velocities exactly like Python
@@ -105,13 +106,12 @@ export const createGlassTemplatePhases = (
     avspanningTime
   );
 
-  // Calculate durations using the Python _calculateTime logic
-  // Note: Python uses velocities directly, then calculates time based on them
+  // Calculate durations using the Python _calculateTime logic exactly
   const phase1Duration = calculatePhaseDuration(roomTemp, inledandeSmaltpunkt, velocities.firstHeatingVelocity, 0);
   const phase2Duration = calculatePhaseDuration(inledandeSmaltpunkt, toppTemp, velocities.secondHeatingVelocity, topTempHoldTime);
-  const phase3Duration = calculatePhaseDuration(toppTemp, oAstemp, Math.abs(velocities.firstCoolingVelocity), 0);
-  const phase4Duration = calculatePhaseDuration(oAstemp, nAstemp, Math.abs(velocities.secondCoolingVelocity), 0);
-  const phase5Duration = calculatePhaseDuration(nAstemp, roomTemp, Math.abs(velocities.lastCoolingVelocity), 0);
+  const phase3Duration = calculatePhaseDuration(toppTemp, oAstemp, velocities.firstCoolingVelocity, 0);
+  const phase4Duration = calculatePhaseDuration(oAstemp, nAstemp, velocities.secondCoolingVelocity, 0);
+  const phase5Duration = calculatePhaseDuration(nAstemp, roomTemp, velocities.lastCoolingVelocity, 0);
 
   console.log('Calculated velocities (matching Python):', velocities);
   console.log('Calculated durations (matching Python):', {
@@ -122,7 +122,7 @@ export const createGlassTemplatePhases = (
     phase5Duration
   });
 
-  // Create phases exactly like Python script order and store the original velocities:
+  // Create phases exactly like Python script order and store the ORIGINAL velocities (including negative signs):
   // curve.newPhase(first_heating_velocity, inledande_smaltpunkt)
   // curve.newPhase(second_heating_velocity, topptemp, minutes)
   // curve.newPhase(first_cooling_velocity, o_astemp)
@@ -148,21 +148,21 @@ export const createGlassTemplatePhases = (
       targetTemp: oAstemp, 
       duration: phase3Duration, 
       holdTime: 0,
-      velocity: Math.abs(velocities.firstCoolingVelocity) // Store original velocity
+      velocity: velocities.firstCoolingVelocity // Store original velocity (negative)
     },
     { 
       id: '4', 
       targetTemp: nAstemp, 
       duration: phase4Duration, 
       holdTime: 0,
-      velocity: Math.abs(velocities.secondCoolingVelocity) // Store original velocity
+      velocity: velocities.secondCoolingVelocity // Store original velocity (negative)
     },
     { 
       id: '5', 
       targetTemp: roomTemp, 
       duration: phase5Duration,
       holdTime: 0,
-      velocity: Math.abs(velocities.lastCoolingVelocity) // Store original velocity
+      velocity: velocities.lastCoolingVelocity // Store original velocity (-20)
     }
   ];
 };

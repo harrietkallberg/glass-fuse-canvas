@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -30,12 +29,12 @@ const CurveTableView = ({
   
   // Get the velocity for display - use stored velocity if available, otherwise calculate
   const getDisplayVelocity = (phase: Phase, index: number): number => {
-    // If velocity is stored in the phase (from glass template), use it
+    // If velocity is stored in the phase (from glass template), use it as-is (including negative values)
     if (phase.velocity !== undefined) {
-      return phase.velocity;
+      return Math.abs(phase.velocity); // Display absolute value for readability
     }
     
-    // Fallback: calculate from temperature difference and duration
+    // Fallback: calculate from temperature difference and duration (for manually created phases)
     const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
     const tempDifference = phase.targetTemp - startTemp;
     return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
