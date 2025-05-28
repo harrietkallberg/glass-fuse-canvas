@@ -120,6 +120,17 @@ export const useCurves = () => {
       ? existingVersions[0].version_number + 1 
       : 1;
 
+    // First, set all existing versions to not current
+    const { error: updateError } = await supabase
+      .from('curve_versions')
+      .update({ is_current: false })
+      .eq('curve_id', curveId);
+
+    if (updateError) {
+      console.error('Error updating existing versions:', updateError);
+      return null;
+    }
+
     // Create new version
     const { data: versionData, error: versionError } = await supabase
       .from('curve_versions')

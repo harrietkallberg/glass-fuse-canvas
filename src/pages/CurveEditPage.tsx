@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -5,9 +6,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import Navigation from "@/components/Navigation";
 import CurveEditor from "@/components/CurveEditor";
-import CurveHeader from "@/components/CurveHeader";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
-import { ArrowLeft } from "lucide-react";
+import CurveVersionChart from "@/components/CurveVersionChart";
+import { ArrowLeft, Edit, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
 import { useCurveState } from "@/hooks/useCurveState";
@@ -39,14 +40,18 @@ const CurveEditPage = () => {
   const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(!isNewCurve);
   
-  const [title, setTitle] = useState(isNewCurve ? "New Firing Curve" : "");
-  const [description, setDescription] = useState(isNewCurve ? "Describe your curve..." : "");
-  const [isPrivate, setIsPrivate] = useState(false);
+  // Project-level info (read-only after creation)
+  const [projectTitle, setProjectTitle] = useState("");
+  const [projectDescription, setProjectDescription] = useState("");
+  
+  // Version-specific data
+  const [currentVersionName, setCurrentVersionName] = useState("Version 1");
   const [notes, setNotes] = useState("");
   const [materials, setMaterials] = useState("");
   const [tags, setTags] = useState("");
   const [activeTab, setActiveTab] = useState("curve");
   const [versions, setVersions] = useState<any[]>([]);
+  const [editMode, setEditMode] = useState<"edit" | "new">("edit");
 
   const curveState = useCurveState({ initialPhases: defaultPhases });
 
@@ -63,19 +68,20 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
-        // For now, we'll assume the id is a curve ID and load the current version
-        // In a real implementation, you might want to load a specific version
-        const versions = await getCurveVersions(id);
-        const currentVersion = versions.find(v => v.is_current) || versions[0];
+        const versionsList = await getCurveVersions(id);
+        const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
         
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            setTitle(curveData.version.name || 'Untitled Curve');
-            setDescription(curveData.version.notes || '');
+            // Set project-level info (read-only)
+            setProjectTitle(curveData.version.name || 'Untitled Project');
+            setProjectDescription(curveData.version.notes || '');
+            
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
-            setVersions(versions);
+            setCurrentVersionName(`Version ${currentVersion.version_number}`);
+            setVersions(versionsList);
             
             // Update curve state with loaded data
             curveState.setPhases(curveData.phases);
@@ -108,7 +114,7 @@ const CurveEditPage = () => {
 
       // Create new curve if this is a new curve
       if (isNewCurve) {
-        const newCurve = await createCurve(title, description);
+        const newCurve = await createCurve(projectTitle, projectDescription);
         if (!newCurve) {
           toast({
             title: "Error",
@@ -123,10 +129,15 @@ const CurveEditPage = () => {
 
       if (!curveId) return;
 
-      // Save the curve (this will create a new version automatically)
+      // Determine version name based on edit mode
+      const versionName = editMode === "new" 
+        ? `Version ${versions.length + 1}` 
+        : currentVersionName;
+
+      // Save the curve version
       const savedVersion = await saveCurveVersion(
         curveId,
-        "Current Version", // Simplified version naming
+        versionName,
         {
           selectedGlass: curveState.selectedGlass,
           roomTemp: curveState.roomTemp,
@@ -144,6 +155,7 @@ const CurveEditPage = () => {
 
       if (savedVersion) {
         setCurrentVersionId(savedVersion.id);
+        setCurrentVersionName(versionName);
         
         // Refresh versions list
         const updatedVersions = await getCurveVersions(curveId);
@@ -151,13 +163,18 @@ const CurveEditPage = () => {
         
         toast({
           title: "Curve saved!",
-          description: "Your firing curve has been saved successfully.",
+          description: editMode === "new" 
+            ? "New version created successfully." 
+            : "Your firing curve has been saved successfully.",
         });
 
         // Navigate to the curve edit page if this was a new curve
         if (isNewCurve) {
           navigate(`/edit/${curveId}`);
         }
+        
+        // Reset to edit mode after saving
+        setEditMode("edit");
       }
     } catch (error) {
       toast({
@@ -168,11 +185,29 @@ const CurveEditPage = () => {
     }
   };
 
-  const handleProjectDetailsSave = () => {
-    toast({
-      title: "Project details saved!",
-      description: "Your project details have been saved successfully.",
-    });
+  const handleVersionSelect = async (versionId: string) => {
+    if (!versionId || versionId === currentVersionId) return;
+    
+    const curveData = await loadCurveVersion(versionId);
+    if (curveData) {
+      setCurrentVersionId(versionId);
+      setCurrentVersionName(curveData.version.name);
+      
+      // Update curve state with loaded data
+      curveState.setPhases(curveData.phases);
+      if (curveData.version.selected_glass) curveState.setSelectedGlass(curveData.version.selected_glass);
+      if (curveData.version.room_temp) curveState.setRoomTemp(curveData.version.room_temp);
+      if (curveData.version.glass_layers) curveState.setGlassLayers(curveData.version.glass_layers);
+      if (curveData.version.glass_radius) curveState.setGlassRadius(curveData.version.glass_radius);
+      if (curveData.version.firing_type) curveState.setFiringType(curveData.version.firing_type);
+      if (curveData.version.top_temp_minutes) curveState.setTopTempMinutes(curveData.version.top_temp_minutes);
+      if (curveData.version.oven_type) curveState.setOvenType(curveData.version.oven_type);
+      
+      setNotes(curveData.version.notes || '');
+      setMaterials(curveData.version.materials || '');
+      setTags(curveData.version.tags || '');
+      setEditMode("edit");
+    }
   };
 
   if (authLoading || loading) {
@@ -197,46 +232,97 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        {/* Simplified Header Section */}
+        {/* Project Header - Read-only after creation */}
         <div className="mb-6 glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Curve Name
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
-                placeholder="Enter curve name..."
-              />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Project Info */}
+            <div className="lg:col-span-2 space-y-4">
+              {isNewCurve ? (
+                <>
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Project Name
+                    </label>
+                    <input
+                      type="text"
+                      value={projectTitle}
+                      onChange={(e) => setProjectTitle(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
+                      placeholder="Enter project name..."
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="text-sm font-medium text-gray-700 mb-2 block">
+                      Project Description
+                    </label>
+                    <textarea
+                      value={projectDescription}
+                      onChange={(e) => setProjectDescription(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
+                      rows={2}
+                      placeholder="Describe your project..."
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <h1 className="text-2xl font-bold text-gray-800">{projectTitle}</h1>
+                    <p className="text-gray-600 mt-1">{projectDescription}</p>
+                  </div>
+                  
+                  {/* Current Version Info */}
+                  <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
+                    <div>
+                      <span className="text-sm font-medium text-gray-700">Currently editing: </span>
+                      <span className="font-semibold text-[#2A6B6B]">{currentVersionName}</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant={editMode === "edit" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setEditMode("edit")}
+                        className="gap-1"
+                      >
+                        <Edit className="h-3 w-3" />
+                        Edit Current
+                      </Button>
+                      <Button 
+                        variant={editMode === "new" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setEditMode("new")}
+                        className="gap-1"
+                      >
+                        <Plus className="h-3 w-3" />
+                        New Version
+                      </Button>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
             
-            <div>
-              <label className="text-sm font-medium text-gray-700 mb-2 block">
-                Description
-              </label>
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
-                rows={2}
-                placeholder="Describe your firing curve..."
-              />
-            </div>
-            
-            <div className="flex items-center justify-between pt-2">
-              <div className="text-sm text-gray-600">
-                {isNewCurve ? "Creating new curve" : `Editing: ${title}`}
+            {/* Version Chart */}
+            {!isNewCurve && (
+              <div className="lg:col-span-1">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Version History</h3>
+                <CurveVersionChart 
+                  versions={versions}
+                  currentVersionId={currentVersionId}
+                  onVersionSelect={handleVersionSelect}
+                />
               </div>
-              <Button 
-                onClick={handleSave}
-                className="bg-[#2A6B6B] hover:bg-[#1F5555]"
-              >
-                {isNewCurve ? "Create Curve" : "Save Changes"}
-              </Button>
-            </div>
+            )}
+          </div>
+          
+          <div className="flex items-center justify-end pt-4 border-t border-white/10 mt-4">
+            <Button 
+              onClick={handleSave}
+              className="bg-[#2A6B6B] hover:bg-[#1F5555]"
+            >
+              {isNewCurve ? "Create Project" : editMode === "new" ? "Save as New Version" : "Save Changes"}
+            </Button>
           </div>
         </div>
         
@@ -260,7 +346,7 @@ const CurveEditPage = () => {
                 setMaterials={setMaterials}
                 tags={tags}
                 setTags={setTags}
-                handleSave={handleProjectDetailsSave}
+                handleSave={handleSave}
               />
             </TabsContent>
           </Tabs>
