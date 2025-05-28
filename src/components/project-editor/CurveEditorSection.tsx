@@ -46,9 +46,9 @@ const CurveEditorSection = ({
     getNextVersionNumber
   } = useCurves();
 
-  const curveState = useCurveState({ 
-    initialPhases: currentVersionData?.phases || templateCurveData?.phases || [] 
-  });
+  // Initialize curve state with current version phases or template phases
+  const initialPhases = currentVersionData?.phases || templateCurveData?.phases || [];
+  const curveState = useCurveState({ initialPhases });
 
   // Update curve state when version data changes
   React.useEffect(() => {
@@ -58,7 +58,7 @@ const CurveEditorSection = ({
       setMaterials(currentVersionData.version.materials || "");
       setTags(currentVersionData.version.tags || "");
       
-      // Update other curve settings
+      // Update other curve settings from version data
       if (currentVersionData.version.selected_glass) curveState.setSelectedGlass(currentVersionData.version.selected_glass);
       if (currentVersionData.version.room_temp) curveState.setRoomTemp(currentVersionData.version.room_temp);
       if (currentVersionData.version.glass_layers) curveState.setGlassLayers(currentVersionData.version.glass_layers);
@@ -66,8 +66,11 @@ const CurveEditorSection = ({
       if (currentVersionData.version.firing_type) curveState.setFiringType(currentVersionData.version.firing_type);
       if (currentVersionData.version.top_temp_minutes) curveState.setTopTempMinutes(currentVersionData.version.top_temp_minutes);
       if (currentVersionData.version.oven_type) curveState.setOvenType(currentVersionData.version.oven_type);
+    } else if (templateCurveData) {
+      // If no current version, initialize with template
+      curveState.setPhases(templateCurveData.phases || []);
     }
-  }, [currentVersionData]);
+  }, [currentVersionData, templateCurveData]);
 
   const handleSave = async () => {
     try {
@@ -207,6 +210,63 @@ const CurveEditorSection = ({
               roomTemp={curveState.roomTemp}
               templatePhases={templateCurveData?.phases || []}
             />
+            
+            {/* Phase Controls */}
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h4 className="text-lg font-medium">Curve Phases</h4>
+                <Button onClick={curveState.addPhase} variant="outline" size="sm">
+                  Add Phase
+                </Button>
+              </div>
+              
+              <div className="space-y-2">
+                {curveState.phases.map((phase, index) => (
+                  <div key={phase.id} className="flex items-center gap-4 p-3 bg-white/50 rounded-lg">
+                    <span className="min-w-[80px] text-sm font-medium">Phase {index + 1}</span>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        value={phase.targetTemp}
+                        onChange={(e) => curveState.updatePhase(phase.id, 'targetTemp', Number(e.target.value))}
+                        className="w-20 px-2 py-1 border rounded text-sm"
+                        placeholder="Temp"
+                      />
+                      <span className="text-xs self-center">°C</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        value={phase.duration}
+                        onChange={(e) => curveState.updatePhase(phase.id, 'duration', Number(e.target.value))}
+                        className="w-20 px-2 py-1 border rounded text-sm"
+                        placeholder="Duration"
+                      />
+                      <span className="text-xs self-center">min</span>
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="number"
+                        value={phase.holdTime}
+                        onChange={(e) => curveState.updatePhase(phase.id, 'holdTime', Number(e.target.value))}
+                        className="w-20 px-2 py-1 border rounded text-sm"
+                        placeholder="Hold"
+                      />
+                      <span className="text-xs self-center">min</span>
+                    </div>
+                    {curveState.phases.length > 1 && (
+                      <Button 
+                        onClick={() => curveState.removePhase(phase.id)}
+                        variant="destructive"
+                        size="sm"
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="table" className="mt-6 space-y-6">

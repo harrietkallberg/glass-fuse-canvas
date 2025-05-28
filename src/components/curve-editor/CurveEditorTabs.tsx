@@ -20,6 +20,7 @@ interface CurveEditorTabsProps {
   setOvenType?: (type: string) => void;
   roomTemp?: number;
   templatePhases?: Phase[];
+  isTemplateMode?: boolean;
 }
 
 const CurveEditorTabs = ({
@@ -34,7 +35,8 @@ const CurveEditorTabs = ({
   ovenType,
   setOvenType,
   roomTemp = 20,
-  templatePhases = []
+  templatePhases = [],
+  isTemplateMode = false
 }: CurveEditorTabsProps) => {
   return (
     <div>
@@ -48,7 +50,7 @@ const CurveEditorTabs = ({
           <CurveChart 
             phases={phases}
             roomTemp={roomTemp}
-            templatePhases={templatePhases}
+            templatePhases={isTemplateMode ? [] : templatePhases}
           />
         </TabsContent>
         
@@ -74,7 +76,7 @@ const CurveEditorTabs = ({
           className="w-full bg-orange-500 hover:bg-orange-600"
         >
           <Save className="h-4 w-4 mr-2" />
-          Save Current Curve
+          {isTemplateMode ? "Save Template Curve" : "Save Current Curve"}
         </Button>
       </div>
     </div>

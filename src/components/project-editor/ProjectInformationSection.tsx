@@ -43,12 +43,19 @@ const ProjectInformationSection = ({
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState<"celsius" | "fahrenheit">("celsius");
+  const [thickness, setThickness] = useState("");
+  const [glassType, setGlassType] = useState("");
+  const [ovenType, setOvenType] = useState("");
+  const [projectType, setProjectType] = useState("");
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
-      // Add other curve settings as needed
+      thickness,
+      glassType,
+      ovenType,
+      projectType,
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
@@ -58,7 +65,14 @@ const ProjectInformationSection = ({
     if (!projectTitle.trim()) {
       return;
     }
-    onCreateProject(projectTitle, projectDescription, { ...localCurveData, temperatureUnit });
+    onCreateProject(projectTitle, projectDescription, { 
+      ...localCurveData, 
+      temperatureUnit,
+      thickness,
+      glassType,
+      ovenType,
+      projectType
+    });
   };
 
   const handleUpdateProject = () => {
@@ -113,17 +127,59 @@ const ProjectInformationSection = ({
             />
           </div>
 
-          <div>
-            <Label htmlFor="temperatureUnit">Temperature Unit</Label>
-            <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="celsius">Celsius (°C)</SelectItem>
-                <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="temperatureUnit">Temperature Unit</Label>
+              <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="celsius">Celsius (°C)</SelectItem>
+                  <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="thickness">Glass Thickness</Label>
+              <Input
+                id="thickness"
+                value={thickness}
+                onChange={(e) => setThickness(e.target.value)}
+                placeholder="e.g., 3mm"
+                className="mt-1"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="glassType">Glass Type</Label>
+              <Input
+                id="glassType"
+                value={glassType}
+                onChange={(e) => setGlassType(e.target.value)}
+                placeholder="e.g., COE 96, COE 90"
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="projectType">Project Type</Label>
+              <Select value={projectType} onValueChange={setProjectType}>
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="Select project type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fusing">Fusing</SelectItem>
+                  <SelectItem value="slumping">Slumping</SelectItem>
+                  <SelectItem value="casting">Casting</SelectItem>
+                  <SelectItem value="annealing">Annealing</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>
@@ -134,7 +190,7 @@ const ProjectInformationSection = ({
           <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
           {!isNewCurve && (
             <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-              Read Only - Project Template
+              Project Template
             </span>
           )}
         </div>
@@ -142,13 +198,14 @@ const ProjectInformationSection = ({
         <div className="text-sm text-gray-600 mb-4">
           {isNewCurve 
             ? "Configure your base firing curve template. This will serve as the starting point for all versions."
-            : "This is your project's base template curve. All versions are modifications of this template."
+            : "This is your project's base template curve. Changes here affect the project identity."
           }
         </div>
         
         <CurveEditor
           initialPhases={templateCurveData?.phases || defaultPhases}
           onSave={isNewCurve ? handleSaveTemplate : undefined}
+          isTemplateMode={true}
         />
       </div>
 
