@@ -4,6 +4,7 @@ export interface Phase {
   targetTemp: number;
   duration: number;
   holdTime: number;
+  velocity?: number; // Store the original velocity used to create this phase
 }
 
 export interface ChartDataPoint {

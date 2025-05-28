@@ -122,7 +122,7 @@ export const createGlassTemplatePhases = (
     phase5Duration
   });
 
-  // Create phases exactly like Python script order:
+  // Create phases exactly like Python script order and store the original velocities:
   // curve.newPhase(first_heating_velocity, inledande_smaltpunkt)
   // curve.newPhase(second_heating_velocity, topptemp, minutes)
   // curve.newPhase(first_cooling_velocity, o_astemp)
@@ -133,31 +133,36 @@ export const createGlassTemplatePhases = (
       id: '1', 
       targetTemp: inledandeSmaltpunkt, 
       duration: phase1Duration, 
-      holdTime: 0 
+      holdTime: 0,
+      velocity: velocities.firstHeatingVelocity // Store original velocity
     },
     { 
       id: '2', 
       targetTemp: toppTemp, 
       duration: phase2Duration,
-      holdTime: topTempHoldTime 
+      holdTime: topTempHoldTime,
+      velocity: velocities.secondHeatingVelocity // Store original velocity
     },
     { 
       id: '3', 
       targetTemp: oAstemp, 
       duration: phase3Duration, 
-      holdTime: 0 
+      holdTime: 0,
+      velocity: Math.abs(velocities.firstCoolingVelocity) // Store original velocity
     },
     { 
       id: '4', 
       targetTemp: nAstemp, 
       duration: phase4Duration, 
-      holdTime: 0 
+      holdTime: 0,
+      velocity: Math.abs(velocities.secondCoolingVelocity) // Store original velocity
     },
     { 
       id: '5', 
       targetTemp: roomTemp, 
       duration: phase5Duration,
-      holdTime: 0 
+      holdTime: 0,
+      velocity: Math.abs(velocities.lastCoolingVelocity) // Store original velocity
     }
   ];
 };

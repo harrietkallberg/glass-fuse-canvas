@@ -28,11 +28,16 @@ const CurveTableView = ({
   roomTemp = 20
 }: CurveTableViewProps) => {
   
-  // Calculate velocity for each phase based on temperature difference and duration
-  const calculateVelocityFromPhase = (phase: Phase, index: number): number => {
+  // Get the velocity for display - use stored velocity if available, otherwise calculate
+  const getDisplayVelocity = (phase: Phase, index: number): number => {
+    // If velocity is stored in the phase (from glass template), use it
+    if (phase.velocity !== undefined) {
+      return phase.velocity;
+    }
+    
+    // Fallback: calculate from temperature difference and duration
     const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
     const tempDifference = phase.targetTemp - startTemp;
-    // Convert from °C/min to °C/hour by multiplying by 60
     return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
   };
 
@@ -183,7 +188,7 @@ const CurveTableView = ({
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
                 {item.current ? (
                   <>
-                    {calculateVelocityFromPhase(item.current, index)}°C/h
+                    {getDisplayVelocity(item.current, index)}°C/h
                   </>
                 ) : '—'}
               </TableCell>
