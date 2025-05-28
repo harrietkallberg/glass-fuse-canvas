@@ -33,14 +33,14 @@ const CurveVersionChart = ({
 
   const maxGeneration = Math.max(...sortedGenerations);
   const maxDrafts = Math.max(...sortedGenerations.map(gen => Object.keys(groupedVersions[gen]).length));
-  const chartWidth = Math.max(800, (maxGeneration * 250) + 300);
-  const chartHeight = Math.max(300, (maxDrafts * 100) + 250);
+  const chartWidth = Math.max(1200, (maxGeneration * 350) + 400); // Increased minimum and spacing
+  const chartHeight = Math.max(500, (maxDrafts * 150) + 350); // Increased minimum and spacing
 
   return (
     <div className="w-full">
-      <div className="glass-card bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-sm rounded-3xl border border-white/40 p-6 shadow-2xl">
+      <div className="glass-card bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-sm rounded-3xl border border-white/40 p-8 shadow-2xl">
         {/* Header with Add New Version button */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-8">
           <h3 className="text-xl font-semibold text-gray-800">Version Progress</h3>
           <Button 
             onClick={onNewVersion}
@@ -51,50 +51,52 @@ const CurveVersionChart = ({
           </Button>
         </div>
 
-        <svg
-          width={chartWidth}
-          height={chartHeight}
-          className="w-full"
-          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-        >
-          {/* Background gradient */}
-          <defs>
-            <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="rgba(249, 115, 22, 0.08)" />
-              <stop offset="100%" stopColor="rgba(51, 195, 240, 0.08)" />
-            </linearGradient>
-          </defs>
-          
-          <rect width="100%" height="100%" fill="url(#bgGradient)" rx="16" />
-          
-          {/* Connection lines */}
-          <ConnectionLines 
-            groupedVersions={groupedVersions} 
-            sortedGenerations={sortedGenerations} 
-          />
-          
-          {/* Version nodes */}
-          {sortedGenerations.map((generation) => {
-            const draftsInGeneration = Object.keys(groupedVersions[generation]).map(Number).sort((a, b) => a - b);
+        <div className="overflow-x-auto overflow-y-auto max-h-[600px]">
+          <svg
+            width={chartWidth}
+            height={chartHeight}
+            className="min-w-full"
+            viewBox={`0 0 ${chartWidth} ${chartHeight}`}
+          >
+            {/* Background gradient */}
+            <defs>
+              <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.08)" />
+                <stop offset="100%" stopColor="rgba(51, 195, 240, 0.08)" />
+              </linearGradient>
+            </defs>
             
-            return draftsInGeneration.map((draft) => 
-              groupedVersions[generation][draft].map((version, subIndex) => (
-                <VersionNode
-                  key={version.id}
-                  version={version}
-                  generation={generation}
-                  draft={draft}
-                  subIndex={subIndex}
-                  position={getNodePosition(generation, draft, subIndex)}
-                  isSelected={version.id === currentVersionId}
-                  selectedVersionColor={selectedVersionColor}
-                  onVersionSelect={onVersionSelect}
-                  onSetMainVersion={onSetMainVersion}
-                />
-              ))
-            );
-          })}
-        </svg>
+            <rect width="100%" height="100%" fill="url(#bgGradient)" rx="16" />
+            
+            {/* Connection lines */}
+            <ConnectionLines 
+              groupedVersions={groupedVersions} 
+              sortedGenerations={sortedGenerations} 
+            />
+            
+            {/* Version nodes */}
+            {sortedGenerations.map((generation) => {
+              const draftsInGeneration = Object.keys(groupedVersions[generation]).map(Number).sort((a, b) => a - b);
+              
+              return draftsInGeneration.map((draft) => 
+                groupedVersions[generation][draft].map((version, subIndex) => (
+                  <VersionNode
+                    key={version.id}
+                    version={version}
+                    generation={generation}
+                    draft={draft}
+                    subIndex={subIndex}
+                    position={getNodePosition(generation, draft, subIndex)}
+                    isSelected={version.id === currentVersionId}
+                    selectedVersionColor={selectedVersionColor}
+                    onVersionSelect={onVersionSelect}
+                    onSetMainVersion={onSetMainVersion}
+                  />
+                ))
+              );
+            })}
+          </svg>
+        </div>
       </div>
       
       {/* Legend */}

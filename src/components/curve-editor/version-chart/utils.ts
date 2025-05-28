@@ -19,12 +19,12 @@ export const groupVersionsByGeneration = (versions: Version[]) => {
 };
 
 export const getNodePosition = (generation: number, draft: number, subIndex: number = 0): NodePosition => {
-  const generationSpacing = 250;
-  const draftSpacing = 100;
-  const subSpacing = 60;
+  const generationSpacing = 350; // Increased from 250
+  const draftSpacing = 150; // Increased from 100
+  const subSpacing = 80; // Increased from 60
   
-  const baseX = 100 + (generation - 1) * generationSpacing;
-  const baseY = 120 + draft * draftSpacing;
+  const baseX = 150 + (generation - 1) * generationSpacing; // Increased starting position
+  const baseY = 150 + draft * draftSpacing; // Increased starting position
   
   return { 
     x: baseX + (subIndex * subSpacing), 
