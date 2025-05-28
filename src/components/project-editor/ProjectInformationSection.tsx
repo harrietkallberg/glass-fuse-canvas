@@ -16,6 +16,7 @@ interface ProjectInformationSectionProps {
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
   onCreateProject: (title: string, description: string, curveData: any) => void;
+  onUpdateProject?: (title: string, description: string) => void;
 }
 
 // Default template phases
@@ -35,9 +36,11 @@ const ProjectInformationSection = ({
   setProjectDescription,
   templateCurveData,
   setTemplateCurveData,
-  onCreateProject
+  onCreateProject,
+  onUpdateProject
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
+  const [hasChanges, setHasChanges] = useState(false);
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
@@ -55,6 +58,23 @@ const ProjectInformationSection = ({
     onCreateProject(projectTitle, projectDescription, localCurveData);
   };
 
+  const handleUpdateProject = () => {
+    if (onUpdateProject) {
+      onUpdateProject(projectTitle, projectDescription);
+      setHasChanges(false);
+    }
+  };
+
+  const handleTitleChange = (value: string) => {
+    setProjectTitle(value);
+    if (!isNewCurve) setHasChanges(true);
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setProjectDescription(value);
+    if (!isNewCurve) setHasChanges(true);
+  };
+
   return (
     <div className="space-y-8">
       {/* Project Details */}
@@ -67,9 +87,8 @@ const ProjectInformationSection = ({
             <Input
               id="projectTitle"
               value={projectTitle}
-              onChange={(e) => setProjectTitle(e.target.value)}
+              onChange={(e) => handleTitleChange(e.target.value)}
               placeholder="Enter project name..."
-              disabled={!isNewCurve}
               className="mt-1"
             />
           </div>
@@ -79,9 +98,8 @@ const ProjectInformationSection = ({
             <Textarea
               id="projectDescription"
               value={projectDescription}
-              onChange={(e) => setProjectDescription(e.target.value)}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
               placeholder="Describe your project..."
-              disabled={!isNewCurve}
               className="mt-1"
               rows={3}
             />
@@ -114,8 +132,8 @@ const ProjectInformationSection = ({
       </div>
 
       {/* Action Buttons */}
-      {isNewCurve && (
-        <div className="flex justify-end">
+      <div className="flex justify-end">
+        {isNewCurve ? (
           <Button 
             onClick={handleCreateProject}
             className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-3 text-lg"
@@ -123,8 +141,15 @@ const ProjectInformationSection = ({
           >
             Create Project
           </Button>
-        </div>
-      )}
+        ) : hasChanges && (
+          <Button 
+            onClick={handleUpdateProject}
+            className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2"
+          >
+            Update Project Info
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

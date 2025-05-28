@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
 import ProjectInformationSection from "@/components/project-editor/ProjectInformationSection";
 import CurveEditorSection from "@/components/project-editor/CurveEditorSection";
+import { supabase } from "@/integrations/supabase/client";
 
 const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -49,16 +50,24 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
+        // First get the curve info to get the project title and description
+        const { data: curveInfo } = await supabase
+          .from('curves')
+          .select('title, description')
+          .eq('id', id)
+          .single();
+
+        if (curveInfo) {
+          setProjectTitle(curveInfo.title);
+          setProjectDescription(curveInfo.description || '');
+        }
+        
         const versionsList = await getCurveVersions(id);
         const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
         
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // Set project-level data (these should come from the curves table)
-            setProjectTitle(curveData.version.name || 'Untitled Project');
-            setProjectDescription(curveData.version.notes || '');
-            
             // Store template curve data (this would be the original curve configuration)
             setTemplateCurveData({
               phases: curveData.phases,
@@ -117,6 +126,47 @@ const CurveEditPage = () => {
       toast({
         title: "Error",
         description: "Failed to create project",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleUpdateProject = async (title: string, description: string) => {
+    if (!currentCurveId || !user) return;
+
+    try {
+      const { error } = await supabase
+        .from('curves')
+        .update({ 
+          title, 
+          description,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', currentCurveId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        console.error('Error updating project:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update project information",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      setProjectTitle(title);
+      setProjectDescription(description);
+      
+      toast({
+        title: "Project updated!",
+        description: "Project information has been updated successfully.",
+      });
+    } catch (error) {
+      console.error('Error updating project:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update project information",
         variant: "destructive"
       });
     }
@@ -192,6 +242,7 @@ const CurveEditPage = () => {
                 templateCurveData={templateCurveData}
                 setTemplateCurveData={setTemplateCurveData}
                 onCreateProject={handleCreateProject}
+                onUpdateProject={handleUpdateProject}
               />
             )}
             

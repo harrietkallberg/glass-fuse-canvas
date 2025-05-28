@@ -1,20 +1,28 @@
 
 import React from "react";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Edit, Minus } from "lucide-react";
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from "@/components/ui/table";
+import { Edit, Plus, Minus } from "lucide-react";
 import { Phase } from "@/utils/curveUtils";
 
-interface VersionComparisonTableProps {
+interface CurveStaticDisplayProps {
   templatePhases: Phase[];
   currentPhases: Phase[];
   versionName: string;
 }
 
-const VersionComparisonTable = ({
+const CurveStaticDisplay = ({
   templatePhases,
   currentPhases,
   versionName
-}: VersionComparisonTableProps) => {
+}: CurveStaticDisplayProps) => {
   
   // Compare phases to determine modifications
   const getPhaseComparison = () => {
@@ -76,8 +84,6 @@ const VersionComparisonTable = ({
         return <Badge variant="default" className="bg-orange-100 text-orange-800">Modified</Badge>;
       case 'removed':
         return <Badge variant="default" className="bg-red-100 text-red-800">Removed</Badge>;
-      case 'unchanged':
-        return <Badge variant="outline" className="bg-gray-50 text-gray-600">Unchanged</Badge>;
       default:
         return null;
     }
@@ -100,68 +106,53 @@ const VersionComparisonTable = ({
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-gray-800">
-          Template vs Version {versionName} Comparison
+          Version {versionName} Curve
         </h3>
         <p className="text-gray-600 mt-2">
-          See what has changed from your original template curve
+          Differences from template are marked
         </p>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-gray-200">
-        <div className="grid grid-cols-8 gap-4 px-4 py-3 bg-gray-50 font-medium text-sm">
-          <div>Phase</div>
-          <div>Status</div>
-          <div>Template Temp (°C)</div>
-          <div>Current Temp (°C)</div>
-          <div>Template Duration (min)</div>
-          <div>Current Duration (min)</div>
-          <div>Template Hold (min)</div>
-          <div>Current Hold (min)</div>
-        </div>
-        
-        {comparison.map((item, index) => (
-          <div 
-            key={index} 
-            className={`grid grid-cols-8 gap-4 px-4 py-3 border-t border-gray-200 ${getRowStyle(item.status)}`}
-          >
-            <div className="flex items-center gap-2">
-              <span>Phase {index + 1}</span>
-              {getStatusIcon(item.status)}
-            </div>
-            
-            <div>
-              {getStatusBadge(item.status)}
-            </div>
-            
-            <div className={item.status === 'added' ? 'text-gray-400' : ''}>
-              {item.template ? `${item.template.targetTemp}°C` : '—'}
-            </div>
-            
-            <div className={item.status === 'removed' ? 'text-gray-400' : ''}>
-              {item.current ? `${item.current.targetTemp}°C` : '—'}
-            </div>
-            
-            <div className={item.status === 'added' ? 'text-gray-400' : ''}>
-              {item.template ? `${item.template.duration} min` : '—'}
-            </div>
-            
-            <div className={item.status === 'removed' ? 'text-gray-400' : ''}>
-              {item.current ? `${item.current.duration} min` : '—'}
-            </div>
-            
-            <div className={item.status === 'added' ? 'text-gray-400' : ''}>
-              {item.template ? `${item.template.holdTime} min` : '—'}
-            </div>
-            
-            <div className={item.status === 'removed' ? 'text-gray-400' : ''}>
-              {item.current ? `${item.current.holdTime} min` : '—'}
-            </div>
-          </div>
-        ))}
-      </div>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Phase</TableHead>
+            <TableHead>Temperature (°C)</TableHead>
+            <TableHead>Duration (min)</TableHead>
+            <TableHead>Hold Time (min)</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {comparison.map((item, index) => (
+            <TableRow key={index} className={getRowStyle(item.status)}>
+              <TableCell className="flex items-center gap-2">
+                <span>Phase {index + 1}</span>
+                {getStatusIcon(item.status)}
+              </TableCell>
+              
+              <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
+                {item.current ? `${item.current.targetTemp}°C` : '—'}
+              </TableCell>
+              
+              <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
+                {item.current ? `${item.current.duration} min` : '—'}
+              </TableCell>
+              
+              <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
+                {item.current ? `${item.current.holdTime} min` : '—'}
+              </TableCell>
+              
+              <TableCell>
+                {getStatusBadge(item.status)}
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
 
       {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         <div className="text-center p-4 bg-gray-50 rounded-lg">
           <div className="text-2xl font-bold text-gray-600">
             {comparison.filter(item => item.status === 'unchanged').length}
@@ -180,15 +171,9 @@ const VersionComparisonTable = ({
           </div>
           <div className="text-sm text-green-600">Added</div>
         </div>
-        <div className="text-center p-4 bg-red-50 rounded-lg">
-          <div className="text-2xl font-bold text-red-600">
-            {comparison.filter(item => item.status === 'removed').length}
-          </div>
-          <div className="text-sm text-red-600">Removed</div>
-        </div>
       </div>
     </div>
   );
 };
 
-export default VersionComparisonTable;
+export default CurveStaticDisplay;

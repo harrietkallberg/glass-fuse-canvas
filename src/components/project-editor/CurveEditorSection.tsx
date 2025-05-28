@@ -4,12 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import CurveVersionChart from "@/components/CurveVersionChart";
-import CurveEditor from "@/components/curve-editor/CurveEditor";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
-import VersionComparisonTable from "@/components/project-editor/VersionComparisonTable";
+import CurveStaticDisplay from "@/components/project-editor/CurveStaticDisplay";
 import { useCurves } from "@/hooks/useCurves";
 import { useCurveState } from "@/hooks/useCurveState";
-import { Phase } from "@/utils/curveUtils";
 
 interface CurveEditorSectionProps {
   curveId: string;
@@ -190,12 +188,6 @@ const CurveEditorSection = ({
               Version {currentVersionName}
             </span>
           </div>
-          <Button 
-            onClick={handleSave}
-            className="px-6 py-2 bg-[#F97316] hover:bg-[#F97316]/90 text-white"
-          >
-            Save Changes
-          </Button>
         </div>
       </div>
 
@@ -203,20 +195,12 @@ const CurveEditorSection = ({
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full mb-6 p-2 bg-white/50">
-            <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve Editor</TabsTrigger>
-            <TabsTrigger value="comparison" className="flex-1 text-lg py-3">Template Comparison</TabsTrigger>
+            <TabsTrigger value="curve" className="flex-1 text-lg py-3">Current Curve</TabsTrigger>
             <TabsTrigger value="notes" className="flex-1 text-lg py-3">Notes & Results</TabsTrigger>
           </TabsList>
           
           <TabsContent value="curve" className="mt-6 space-y-6">
-            <CurveEditor 
-              initialPhases={curveState.phases} 
-              onSave={() => {}} 
-            />
-          </TabsContent>
-          
-          <TabsContent value="comparison" className="mt-6 space-y-6">
-            <VersionComparisonTable
+            <CurveStaticDisplay
               templatePhases={templateCurveData?.phases || []}
               currentPhases={curveState.phases}
               versionName={currentVersionName}
@@ -231,10 +215,19 @@ const CurveEditorSection = ({
               setMaterials={setMaterials}
               tags={tags}
               setTags={setTags}
-              handleSave={handleSave}
             />
           </TabsContent>
         </Tabs>
+      </div>
+
+      {/* Single Save Button at Bottom */}
+      <div className="flex justify-center">
+        <Button 
+          onClick={handleSave}
+          className="px-8 py-3 bg-[#F97316] hover:bg-[#F97316]/90 text-white text-lg"
+        >
+          Save Changes
+        </Button>
       </div>
     </div>
   );
