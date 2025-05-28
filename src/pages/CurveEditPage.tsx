@@ -1,50 +1,48 @@
 
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Settings, Edit3 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import Navigation from "@/components/Navigation";
+import { ArrowLeft, FileText, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
-import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
 import ProjectInformationSection from "@/components/project-editor/ProjectInformationSection";
 import CurveEditorSection from "@/components/project-editor/CurveEditorSection";
+import { supabase } from "@/integrations/supabase/client";
 
 const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
+    createCurve, 
     loadCurveVersion, 
-    getCurveVersions, 
-    numberToSemantic 
+    getCurveVersions,
+    numberToSemantic
   } = useCurves();
-
-  const isNewCurve = !id;
-  const [loading, setLoading] = useState(!isNewCurve);
-  const [activeSection, setActiveSection] = useState<"project" | "editor">("project");
   
-  // Project state
+  const isNewCurve = !id || id === "new";
+  const [activeSection, setActiveSection] = useState<"project" | "editor">("project");
+  const [currentCurveId, setCurrentCurveId] = useState<string | null>(null);
+  const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(!isNewCurve);
+  
+  // Project-level data (static across versions)
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
-  const [currentCurveId, setCurrentCurveId] = useState<string | null>(id || null);
+  const [templateCurveData, setTemplateCurveData] = useState<any>(null);
   
-  // Version state
+  // Version-specific data
   const [versions, setVersions] = useState<any[]>([]);
-  const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
   const [currentVersionData, setCurrentVersionData] = useState<any>(null);
-  
-  // Template state
-  const [templateCurveData, setTemplateCurveData] = useState<any>({
-    phases: [
-      { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
-      { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
-      { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
-      { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
-      { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
-    ],
-    temperatureUnit: 'celsius'
-  });
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, authLoading, navigate]);
 
   // Load existing curve if editing
   useEffect(() => {
@@ -53,22 +51,11 @@ const CurveEditPage = () => {
         setLoading(true);
         
         // First get the curve info to get the project title and description
-        const { data: curveInfo, error: curveError } = await supabase
+        const { data: curveInfo } = await supabase
           .from('curves')
           .select('title, description')
           .eq('id', id)
           .single();
-
-        if (curveError) {
-          console.error('Error loading curve info:', curveError);
-          toast({
-            title: "Error",
-            description: "Failed to load project information",
-            variant: "destructive"
-          });
-          navigate('/');
-          return;
-        }
 
         if (curveInfo) {
           setProjectTitle(curveInfo.title);
@@ -81,7 +68,7 @@ const CurveEditPage = () => {
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // Use first version as template fallback
+            // Store template curve data (this would be the original curve configuration)
             setTemplateCurveData({
               phases: curveData.phases,
               settings: {
@@ -113,18 +100,8 @@ const CurveEditPage = () => {
     if (!user) return;
 
     try {
-      const { data: newCurve, error } = await supabase
-        .from('curves')
-        .insert({
-          user_id: user.id,
-          title,
-          description
-        })
-        .select()
-        .single();
-
-      if (error) {
-        console.error('Error creating curve:', error);
+      const newCurve = await createCurve(title, description);
+      if (!newCurve) {
         toast({
           title: "Error",
           description: "Failed to create project",
@@ -195,86 +172,94 @@ const CurveEditPage = () => {
     }
   };
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97316] mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading project...</p>
-        </div>
+      <div className="min-h-screen bg-glass-gradient-1 flex items-center justify-center">
+        <div className="text-xl">Loading...</div>
       </div>
     );
   }
-
+  
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-4">
-            <Link to="/">
-              <Button variant="ghost" size="sm" className="gap-2">
-                <ArrowLeft className="h-4 w-4" />
-                Back to Dashboard
-              </Button>
-            </Link>
-            <h1 className="text-3xl font-bold text-gray-800">
-              {isNewCurve ? "Create New Project" : projectTitle || "Edit Project"}
+    <div className="min-h-screen pb-20 bg-gradient-to-br from-blue-50/30 to-orange-50/30">
+      <Navigation />
+      
+      <div className="container mx-auto pt-24 px-4">
+        <div className="mb-6">
+          <Link to="/dashboard">
+            <Button variant="ghost" size="sm" className="gap-1">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Dashboard
+            </Button>
+          </Link>
+        </div>
+        
+        {/* Project Header */}
+        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl mb-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-gray-800">
+              {isNewCurve ? "Create New Project" : projectTitle}
             </h1>
+            {!isNewCurve && (
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
+            )}
           </div>
-          
+        </div>
+        
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-8">
+          {/* Sidebar Navigation */}
           {!isNewCurve && (
-            <div className="flex gap-2">
+            <div className="w-64 space-y-2">
               <Button
-                variant={activeSection === "project" ? "default" : "outline"}
+                variant={activeSection === "project" ? "default" : "ghost"}
+                className="w-full justify-start gap-3 h-12"
                 onClick={() => setActiveSection("project")}
-                className="gap-2"
               >
-                <Settings className="h-4 w-4" />
-                Project Info
+                <FileText className="h-5 w-5" />
+                Project Information
               </Button>
               <Button
-                variant={activeSection === "editor" ? "default" : "outline"}
+                variant={activeSection === "editor" ? "default" : "ghost"}
+                className="w-full justify-start gap-3 h-12"
                 onClick={() => setActiveSection("editor")}
-                className="gap-2"
               >
-                <Edit3 className="h-4 w-4" />
+                <TrendingUp className="h-5 w-5" />
                 Curve Editor
               </Button>
             </div>
           )}
-        </div>
-
-        {/* Main Content Area */}
-        <div className="flex-1">
-          {(isNewCurve || activeSection === "project") && (
-            <ProjectInformationSection
-              isNewCurve={isNewCurve}
-              projectTitle={projectTitle}
-              setProjectTitle={setProjectTitle}
-              projectDescription={projectDescription}
-              setProjectDescription={setProjectDescription}
-              templateCurveData={templateCurveData}
-              setTemplateCurveData={setTemplateCurveData}
-              onCreateProject={handleCreateProject}
-              onUpdateProject={handleUpdateProject}
-              curveId={currentCurveId}
-            />
-          )}
           
-          {!isNewCurve && activeSection === "editor" && (
-            <CurveEditorSection
-              curveId={currentCurveId!}
-              versions={versions}
-              setVersions={setVersions}
-              currentVersionId={currentVersionId}
-              setCurrentVersionId={setCurrentVersionId}
-              currentVersionData={currentVersionData}
-              setCurrentVersionData={setCurrentVersionData}
-              templateCurveData={templateCurveData}
-              numberToSemantic={numberToSemantic}
-            />
-          )}
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {(isNewCurve || activeSection === "project") && (
+              <ProjectInformationSection
+                isNewCurve={isNewCurve}
+                projectTitle={projectTitle}
+                setProjectTitle={setProjectTitle}
+                projectDescription={projectDescription}
+                setProjectDescription={setProjectDescription}
+                templateCurveData={templateCurveData}
+                setTemplateCurveData={setTemplateCurveData}
+                onCreateProject={handleCreateProject}
+                onUpdateProject={handleUpdateProject}
+              />
+            )}
+            
+            {!isNewCurve && activeSection === "editor" && (
+              <CurveEditorSection
+                curveId={currentCurveId!}
+                versions={versions}
+                setVersions={setVersions}
+                currentVersionId={currentVersionId}
+                setCurrentVersionId={setCurrentVersionId}
+                currentVersionData={currentVersionData}
+                setCurrentVersionData={setCurrentVersionData}
+                templateCurveData={templateCurveData}
+                numberToSemantic={numberToSemantic}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>

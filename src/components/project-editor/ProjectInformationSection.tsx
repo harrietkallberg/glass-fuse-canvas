@@ -17,7 +17,6 @@ interface ProjectInformationSectionProps {
   setTemplateCurveData: (data: any) => void;
   onCreateProject: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
-  curveId?: string;
 }
 
 // Default template phases
@@ -38,14 +37,13 @@ const ProjectInformationSection = ({
   templateCurveData,
   setTemplateCurveData,
   onCreateProject,
-  onUpdateProject,
-  curveId
+  onUpdateProject
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
-  const handleSaveTemplate = async (phases: Phase[]) => {
+  const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
@@ -123,22 +121,24 @@ const ProjectInformationSection = ({
       {/* Template Curve Configuration */}
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Project Template Configuration</h3>
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            Project Template
-          </span>
+          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+          {!isNewCurve && (
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              Project Template
+            </span>
+          )}
         </div>
         
         <div className="text-sm text-gray-600 mb-6">
           {isNewCurve 
-            ? "Configure your base project template. This will serve as the starting point for all versions and defines your project's identity."
-            : "This is your project's template curve. Changes here affect the project template and will be reflected in the version chart."
+            ? "Configure your base firing curve template. This will serve as the starting point for all versions."
+            : "This is your project's base template curve. Changes here affect the project identity."
           }
         </div>
         
         <CurveEditor
           initialPhases={templateCurveData?.phases || defaultPhases}
-          onSave={handleSaveTemplate}
+          onSave={isNewCurve ? handleSaveTemplate : undefined}
           isTemplateMode={true}
         />
       </div>
