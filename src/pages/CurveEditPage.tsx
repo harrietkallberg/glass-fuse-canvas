@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -45,15 +44,41 @@ const CurveEditPage = () => {
   const [projectDescription, setProjectDescription] = useState("");
   
   // Version-specific data
-  const [currentVersionName, setCurrentVersionName] = useState("Version 1");
+  const [currentVersionName, setCurrentVersionName] = useState("1.0");
   const [notes, setNotes] = useState("");
   const [materials, setMaterials] = useState("");
   const [tags, setTags] = useState("");
   const [activeTab, setActiveTab] = useState("curve");
   const [versions, setVersions] = useState<any[]>([]);
   const [editMode, setEditMode] = useState<"edit" | "new">("edit");
+  const [selectedVersionColor, setSelectedVersionColor] = useState("#F97316");
 
   const curveState = useCurveState({ initialPhases: defaultPhases });
+
+  // Generate dynamic background gradient based on selected version
+  const getBackgroundGradient = () => {
+    const baseColor = selectedVersionColor;
+    return `linear-gradient(135deg, ${baseColor}08 0%, ${baseColor}15 50%, #33C3F008 100%)`;
+  };
+
+  // Generate semantic version number
+  const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean) => {
+    if (existingVersions.length === 0) return "1.0";
+    
+    const currentVersion = existingVersions.find(v => v.id === currentVersionId);
+    if (!currentVersion) return `${existingVersions.length + 1}.0`;
+    
+    if (isNewVersion) {
+      // Create new major version
+      const majorVersions = existingVersions.map(v => parseInt(v.version_number.split('.')[0]));
+      const maxMajor = Math.max(...majorVersions);
+      return `${maxMajor + 1}.0`;
+    } else {
+      // Create minor version increment
+      const [major, minor = "0"] = currentVersion.version_number.split('.');
+      return `${major}.${parseInt(minor) + 1}`;
+    }
+  };
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -129,15 +154,13 @@ const CurveEditPage = () => {
 
       if (!curveId) return;
 
-      // Determine version name based on edit mode
-      const versionName = editMode === "new" 
-        ? `Version ${versions.length + 1}` 
-        : currentVersionName;
+      // Generate semantic version number
+      const versionNumber = getNextVersionNumber(versions, editMode === "new");
 
       // Save the curve version
       const savedVersion = await saveCurveVersion(
         curveId,
-        versionName,
+        `Version ${versionNumber}`,
         {
           selectedGlass: curveState.selectedGlass,
           roomTemp: curveState.roomTemp,
@@ -155,7 +178,7 @@ const CurveEditPage = () => {
 
       if (savedVersion) {
         setCurrentVersionId(savedVersion.id);
-        setCurrentVersionName(versionName);
+        setCurrentVersionName(versionNumber);
         
         // Refresh versions list
         const updatedVersions = await getCurveVersions(curveId);
@@ -164,7 +187,7 @@ const CurveEditPage = () => {
         toast({
           title: "Curve saved!",
           description: editMode === "new" 
-            ? "New version created successfully." 
+            ? `New version ${versionNumber} created successfully.` 
             : "Your firing curve has been saved successfully.",
         });
 
@@ -191,7 +214,12 @@ const CurveEditPage = () => {
     const curveData = await loadCurveVersion(versionId);
     if (curveData) {
       setCurrentVersionId(versionId);
-      setCurrentVersionName(curveData.version.name);
+      setCurrentVersionName(curveData.version.version_number);
+      
+      // Generate new color for selected version
+      const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
+      const versionIndex = versions.findIndex(v => v.id === versionId);
+      setSelectedVersionColor(colors[versionIndex % colors.length]);
       
       // Update curve state with loaded data
       curveState.setPhases(curveData.phases);
@@ -210,6 +238,14 @@ const CurveEditPage = () => {
     }
   };
 
+  const handleNewVersion = () => {
+    setEditMode("new");
+    toast({
+      title: "New Version Mode",
+      description: "You're now creating a new version. Save to create it.",
+    });
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-glass-gradient-1 flex items-center justify-center">
@@ -219,7 +255,10 @@ const CurveEditPage = () => {
   }
   
   return (
-    <div className="min-h-screen bg-glass-gradient-1 pb-20">
+    <div 
+      className="min-h-screen pb-20"
+      style={{ background: getBackgroundGradient() }}
+    >
       <Navigation />
       
       <div className="container mx-auto pt-24 px-4">
@@ -232,113 +271,106 @@ const CurveEditPage = () => {
           </Link>
         </div>
         
-        {/* Project Header - Read-only after creation */}
-        <div className="mb-6 glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Project Info */}
-            <div className="lg:col-span-2 space-y-4">
-              {isNewCurve ? (
-                <>
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Project Name
-                    </label>
-                    <input
-                      type="text"
-                      value={projectTitle}
-                      onChange={(e) => setProjectTitle(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
-                      placeholder="Enter project name..."
-                    />
-                  </div>
-                  
-                  <div>
-                    <label className="text-sm font-medium text-gray-700 mb-2 block">
-                      Project Description
-                    </label>
-                    <textarea
-                      value={projectDescription}
-                      onChange={(e) => setProjectDescription(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2A6B6B] focus:border-transparent"
-                      rows={2}
-                      placeholder="Describe your project..."
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-800">{projectTitle}</h1>
-                    <p className="text-gray-600 mt-1">{projectDescription}</p>
-                  </div>
-                  
-                  {/* Current Version Info */}
-                  <div className="flex items-center justify-between bg-white/50 rounded-lg p-3">
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Currently editing: </span>
-                      <span className="font-semibold text-[#2A6B6B]">{currentVersionName}</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant={editMode === "edit" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setEditMode("edit")}
-                        className="gap-1"
-                      >
-                        <Edit className="h-3 w-3" />
-                        Edit Current
-                      </Button>
-                      <Button 
-                        variant={editMode === "new" ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => setEditMode("new")}
-                        className="gap-1"
-                      >
-                        <Plus className="h-3 w-3" />
-                        New Version
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-            
-            {/* Version Chart */}
-            {!isNewCurve && (
-              <div className="lg:col-span-1">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Version History</h3>
-                <CurveVersionChart 
-                  versions={versions}
-                  currentVersionId={currentVersionId}
-                  onVersionSelect={handleVersionSelect}
+        {/* Project Header */}
+        <div className="mb-8 glass-card p-8 bg-white/30 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
+          {isNewCurve ? (
+            <div className="space-y-6">
+              <div>
+                <label className="text-lg font-semibold text-gray-800 mb-3 block">
+                  Project Name
+                </label>
+                <input
+                  type="text"
+                  value={projectTitle}
+                  onChange={(e) => setProjectTitle(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent text-lg"
+                  placeholder="Enter project name..."
                 />
               </div>
-            )}
-          </div>
-          
-          <div className="flex items-center justify-end pt-4 border-t border-white/10 mt-4">
-            <Button 
-              onClick={handleSave}
-              className="bg-[#2A6B6B] hover:bg-[#1F5555]"
-            >
-              {isNewCurve ? "Create Project" : editMode === "new" ? "Save as New Version" : "Save Changes"}
-            </Button>
-          </div>
+              
+              <div>
+                <label className="text-lg font-semibold text-gray-800 mb-3 block">
+                  Project Description
+                </label>
+                <textarea
+                  value={projectDescription}
+                  onChange={(e) => setProjectDescription(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent text-lg"
+                  rows={3}
+                  placeholder="Describe your project..."
+                />
+              </div>
+              
+              <div className="flex justify-end">
+                <Button 
+                  onClick={handleSave}
+                  className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-3 text-lg"
+                >
+                  Create Project
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div>
+                <h1 className="text-4xl font-bold text-gray-800 mb-2">{projectTitle}</h1>
+                <p className="text-xl text-gray-600">{projectDescription}</p>
+              </div>
+              
+              {/* Current Version Info */}
+              <div className="flex items-center justify-between bg-white/50 rounded-xl p-4">
+                <div>
+                  <span className="text-lg font-medium text-gray-700">Currently editing: </span>
+                  <span className="font-bold text-2xl" style={{ color: selectedVersionColor }}>
+                    Version {currentVersionName}
+                  </span>
+                  {editMode === "new" && (
+                    <span className="ml-3 text-sm bg-green-500/20 text-green-700 px-3 py-1 rounded-full">
+                      New Version Mode
+                    </span>
+                  )}
+                </div>
+                <Button 
+                  onClick={handleSave}
+                  className="px-8 py-3 text-lg font-medium"
+                  style={{ 
+                    backgroundColor: selectedVersionColor,
+                    color: 'white'
+                  }}
+                >
+                  {editMode === "new" ? "Save as New Version" : "Save Changes"}
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
         
+        {/* Version Chart */}
+        {!isNewCurve && (
+          <div className="mb-8">
+            <CurveVersionChart 
+              versions={versions}
+              currentVersionId={currentVersionId}
+              onVersionSelect={handleVersionSelect}
+              onNewVersion={handleNewVersion}
+              selectedVersionColor={selectedVersionColor}
+            />
+          </div>
+        )}
+        
         {/* Main Editor */}
-        <div className="glass-card p-6 bg-glass-100/20 backdrop-blur-sm rounded-2xl border border-white/10">
+        <div className="glass-card p-8 bg-white/30 backdrop-blur-sm rounded-3xl border border-white/20 shadow-xl">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full mb-4">
-              <TabsTrigger value="curve" className="flex-1">Curve Editor</TabsTrigger>
-              <TabsTrigger value="notes" className="flex-1">Notes & Results</TabsTrigger>
+            <TabsList className="w-full mb-6 p-2 bg-white/50">
+              <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve Editor</TabsTrigger>
+              <TabsTrigger value="notes" className="flex-1 text-lg py-3">Notes & Results</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="curve" className="mt-4 space-y-6">
+            <TabsContent value="curve" className="mt-6 space-y-6">
               <CurveEditor initialPhases={curveState.phases} onSave={handleSave} />
             </TabsContent>
             
-            <TabsContent value="notes" className="mt-4 space-y-6">
+            <TabsContent value="notes" className="mt-6 space-y-6">
               <ProjectDetailsTab 
                 notes={notes} 
                 setNotes={setNotes}

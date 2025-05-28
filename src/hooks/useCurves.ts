@@ -19,7 +19,7 @@ export interface CurveData {
 export interface CurveVersion {
   id: string;
   curve_id: string;
-  version_number: number;
+  version_number: string; // Changed from number to string for semantic versioning
   name: string;
   is_current: boolean;
   selected_glass?: string;
@@ -78,13 +78,13 @@ export const useCurves = () => {
       return null;
     }
 
-    // Create initial version
+    // Create initial version with semantic versioning
     const { data: versionData, error: versionError } = await supabase
       .from('curve_versions')
       .insert({
         curve_id: curveData.id,
-        version_number: 1,
-        name: 'Version 1',
+        version_number: "1.0", // Start with semantic version
+        name: 'Version 1.0',
         is_current: true,
       })
       .select()
@@ -99,7 +99,7 @@ export const useCurves = () => {
     return curveData;
   };
 
-  // Save curve version
+  // Save curve version with semantic versioning
   const saveCurveVersion = async (
     curveId: string,
     versionName: string,
@@ -108,17 +108,8 @@ export const useCurves = () => {
   ) => {
     if (!user) return null;
 
-    // Get next version number
-    const { data: existingVersions } = await supabase
-      .from('curve_versions')
-      .select('version_number')
-      .eq('curve_id', curveId)
-      .order('version_number', { ascending: false })
-      .limit(1);
-
-    const nextVersionNumber = existingVersions && existingVersions.length > 0 
-      ? existingVersions[0].version_number + 1 
-      : 1;
+    // Extract version number from version name (e.g., "Version 2.1" -> "2.1")
+    const versionNumber = versionName.replace('Version ', '');
 
     // First, set all existing versions to not current
     const { error: updateError } = await supabase
@@ -136,7 +127,7 @@ export const useCurves = () => {
       .from('curve_versions')
       .insert({
         curve_id: curveId,
-        version_number: nextVersionNumber,
+        version_number: versionNumber,
         name: versionName,
         is_current: true,
         selected_glass: curveState.selectedGlass,
@@ -217,13 +208,13 @@ export const useCurves = () => {
     };
   };
 
-  // Get versions for a curve
+  // Get versions for a curve with semantic version sorting
   const getCurveVersions = async (curveId: string) => {
     const { data, error } = await supabase
       .from('curve_versions')
       .select('*')
       .eq('curve_id', curveId)
-      .order('version_number', { ascending: false });
+      .order('created_at', { ascending: true }); // Sort by creation time for proper semantic ordering
 
     if (error) {
       console.error('Error fetching versions:', error);
