@@ -83,7 +83,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
           {/* Glass-like shadow */}
           <path
             d={pathData}
-            stroke="rgba(42, 107, 107, 0.1)"
+            stroke="rgba(249, 115, 22, 0.1)"
             strokeWidth="4"
             fill="none"
             transform="translate(1, 2)"
@@ -91,7 +91,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
           {/* Main connection line */}
           <path
             d={pathData}
-            stroke="rgba(42, 107, 107, 0.3)"
+            stroke="rgba(249, 115, 22, 0.3)"
             strokeWidth="2"
             fill="none"
             className="transition-all duration-300"
@@ -122,7 +122,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
             cx="25"
             cy="25"
             r="28"
-            fill={isSelected ? "rgba(42, 107, 107, 0.15)" : "rgba(59, 130, 246, 0.15)"}
+            fill={isSelected ? "rgba(249, 115, 22, 0.15)" : "rgba(51, 195, 240, 0.15)"}
             className="animate-pulse-soft"
           />
         )}
@@ -141,10 +141,10 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
           cx="25"
           cy="25"
           r="22"
-          fill={isSelected ? "#2A6B6B" : isCurrent ? "#3b82f6" : "rgba(255, 255, 255, 0.9)"}
-          stroke={isSelected ? "#2A6B6B" : isCurrent ? "#3b82f6" : "rgba(42, 107, 107, 0.2)"}
+          fill={isSelected ? "#F97316" : isCurrent ? "#33C3F0" : "rgba(255, 255, 255, 0.9)"}
+          stroke={isSelected ? "#F97316" : isCurrent ? "#33C3F0" : "rgba(249, 115, 22, 0.2)"}
           strokeWidth="2"
-          className="cursor-pointer transition-all duration-300 hover:stroke-[#2A6B6B] hover:stroke-[3px] filter drop-shadow-sm"
+          className="cursor-pointer transition-all duration-300 hover:stroke-[#F97316] hover:stroke-[3px] filter drop-shadow-sm"
           onClick={() => onVersionSelect(version.id)}
         />
         
@@ -178,7 +178,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
               size="sm"
               className={`w-full h-auto p-3 text-xs backdrop-blur-sm transition-all duration-300 ${
                 isSelected 
-                  ? 'bg-gradient-to-br from-[#2A6B6B]/20 to-[#2A6B6B]/10 border border-[#2A6B6B]/30 text-[#2A6B6B] shadow-lg' 
+                  ? 'bg-gradient-to-br from-[#F97316]/20 to-[#F97316]/10 border border-[#F97316]/30 text-[#F97316] shadow-lg' 
                   : 'bg-white/60 hover:bg-white/80 border border-white/40 shadow-md hover:shadow-lg'
               }`}
               onClick={() => onVersionSelect(version.id)}
@@ -187,7 +187,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
                 <div className="font-semibold">
                   Version {version.version_number}
                   {isCurrent && (
-                    <div className="text-xs bg-blue-500/20 text-blue-700 px-2 py-1 rounded-full mt-1 backdrop-blur-sm">
+                    <div className="text-xs bg-[#33C3F0]/20 text-[#33C3F0] px-2 py-1 rounded-full mt-1 backdrop-blur-sm">
                       Current
                     </div>
                   )}
@@ -227,8 +227,8 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
             {/* Background gradient */}
             <defs>
               <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="rgba(42, 107, 107, 0.05)" />
-                <stop offset="100%" stopColor="rgba(255, 255, 255, 0.1)" />
+                <stop offset="0%" stopColor="rgba(249, 115, 22, 0.05)" />
+                <stop offset="100%" stopColor="rgba(51, 195, 240, 0.05)" />
               </linearGradient>
               <filter id="glow">
                 <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
@@ -247,7 +247,7 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
               y1="105"
               x2={chartWidth - 80}
               y2="105"
-              stroke="rgba(42, 107, 107, 0.2)"
+              stroke="rgba(249, 115, 22, 0.2)"
               strokeWidth="3"
               strokeDasharray="4,4"
             />
@@ -264,11 +264,11 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
       {/* Legend with glass styling */}
       <div className="mt-4 flex justify-center gap-6 text-xs">
         <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-3 py-2 rounded-full border border-white/20">
-          <div className="w-4 h-4 rounded-full bg-[#2A6B6B] shadow-sm"></div>
+          <div className="w-4 h-4 rounded-full bg-[#F97316] shadow-sm"></div>
           <span className="text-gray-700 font-medium">Selected</span>
         </div>
         <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-3 py-2 rounded-full border border-white/20">
-          <div className="w-4 h-4 rounded-full bg-blue-500 shadow-sm"></div>
+          <div className="w-4 h-4 rounded-full bg-[#33C3F0] shadow-sm"></div>
           <span className="text-gray-700 font-medium">Current</span>
         </div>
         <div className="flex items-center gap-2 bg-white/30 backdrop-blur-sm px-3 py-2 rounded-full border border-white/20">
