@@ -20,6 +20,15 @@ interface UseCurveStateProps {
   initialPhases?: Phase[];
 }
 
+// Helper function to calculate duration based on velocity (matching Python's _calculateTime)
+const calculatePhaseDuration = (startTemp: number, endTemp: number, velocity: number, holdTime: number): number => {
+  if (velocity === 0) {
+    return holdTime;
+  } else {
+    return Math.ceil(Math.abs((endTemp - startTemp) / (velocity / 60)) + holdTime);
+  }
+};
+
 export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
   const [phases, setPhases] = useState<Phase[]>(
     initialPhases.length > 0 
@@ -69,7 +78,7 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     );
   };
 
-  // Apply template based on glass info
+  // Apply template based on glass info - matching Python's firing_curve_creator logic exactly
   const applyGlassTemplate = () => {
     if (!selectedGlassInfo) return;
     
@@ -112,7 +121,7 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     const avspanningTime = avspanningTable ? 
       getTimeFromTable(avspanningTable, glassRadius, glassLayers) : 60;
 
-    // Create phases based on the firing curve algorithm
+    // Create phases based on the firing curve algorithm - EXACTLY like Python
     const inledandeSmaltpunkt = glassData["Inledande_smaltpunkt"];
     const oAstemp = selectedGlassInfo.o_astemp;
     const nAstemp = selectedGlassInfo.n_astemp;
@@ -120,57 +129,70 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     // Parse the user-provided top temperature hold time
     const topTempHoldTime = parseInt(topTempMinutes) || 10;
 
-    // Calculate velocities like in Python code
-    const firstHeatingVelocity = Math.min(999, Math.trunc(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime));
+    // Calculate velocities EXACTLY like in Python code using Math.trunc
+    const firstHeatingVelocity = Math.trunc(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime) >= 999 
+      ? 999 
+      : Math.trunc(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime);
     const secondHeatingVelocity = 999; // Very high velocity to top temp
     const firstCoolingVelocity = Math.trunc(60 * (oAstemp - toppTemp) / halltiderTime);
     const secondCoolingVelocity = Math.trunc(60 * (nAstemp - oAstemp) / avspanningTime);
     const lastCoolingVelocity = -20;
 
-    // Calculate actual durations based on velocities (converting from °C/hour to minutes)
-    const secondHeatingDuration = Math.max(1, Math.round((toppTemp - inledandeSmaltpunkt) * 60 / secondHeatingVelocity));
+    // Calculate durations using the Python _calculateTime logic
+    const phase1Duration = calculatePhaseDuration(roomTemp, inledandeSmaltpunkt, firstHeatingVelocity, 0);
+    const phase2Duration = calculatePhaseDuration(inledandeSmaltpunkt, toppTemp, secondHeatingVelocity, topTempHoldTime);
+    const phase3Duration = calculatePhaseDuration(toppTemp, oAstemp, Math.abs(firstCoolingVelocity), 0);
+    const phase4Duration = calculatePhaseDuration(oAstemp, nAstemp, Math.abs(secondCoolingVelocity), 0);
+    const phase5Duration = calculatePhaseDuration(nAstemp, roomTemp, Math.abs(lastCoolingVelocity), 0);
 
-    // Create the new phases with calculated durations
+    // Create the new phases with calculated durations matching Python logic
     const newPhases = [
       { 
         id: '1', 
         targetTemp: inledandeSmaltpunkt, 
-        duration: uppvarmningTime, 
+        duration: phase1Duration, 
         holdTime: 0 
       },
       { 
         id: '2', 
         targetTemp: toppTemp, 
-        duration: secondHeatingDuration, // Now calculated based on high velocity
+        duration: phase2Duration,
         holdTime: topTempHoldTime 
       },
       { 
         id: '3', 
         targetTemp: oAstemp, 
-        duration: halltiderTime, 
+        duration: phase3Duration, 
         holdTime: 0 
       },
       { 
         id: '4', 
         targetTemp: nAstemp, 
-        duration: avspanningTime, 
+        duration: phase4Duration, 
         holdTime: 0 
       },
       { 
         id: '5', 
         targetTemp: roomTemp, 
-        duration: 60, // Slow cooling to room temp
+        duration: phase5Duration,
         holdTime: 0 
       }
     ];
     
-    console.log('Calculated velocities:', {
+    console.log('Calculated velocities (matching Python):', {
       firstHeatingVelocity,
       secondHeatingVelocity,
       firstCoolingVelocity,
       secondCoolingVelocity,
-      lastCoolingVelocity,
-      secondHeatingDuration
+      lastCoolingVelocity
+    });
+    
+    console.log('Calculated durations (matching Python):', {
+      phase1Duration,
+      phase2Duration,
+      phase3Duration,
+      phase4Duration,
+      phase5Duration
     });
     
     setPhases(newPhases);
