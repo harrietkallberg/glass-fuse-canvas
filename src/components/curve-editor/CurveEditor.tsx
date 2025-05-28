@@ -59,7 +59,6 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
         <CurveEditorTabs
           activeTab={curveState.activeTab}
           setActiveTab={curveState.setActiveTab}
-          chartData={curveState.chartData}
           selectedGlassInfo={curveState.selectedGlassInfo}
           phases={curveState.phases}
           updatePhase={curveState.updatePhase}
@@ -68,6 +67,8 @@ const CurveEditor = ({ initialPhases = [], onSave }: CurveEditorProps) => {
           handleSave={handleSave}
           ovenType={curveState.ovenType}
           setOvenType={curveState.setOvenType}
+          roomTemp={curveState.roomTemp}
+          templatePhases={[]}
         />
       </div>
     </div>
