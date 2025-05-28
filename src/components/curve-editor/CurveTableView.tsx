@@ -1,5 +1,5 @@
 
-import React from "react";
+import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { 
   Table, 
@@ -12,32 +12,42 @@ import {
 import { Edit, Plus, Minus } from "lucide-react";
 import { Phase } from "@/utils/curveUtils";
 
-interface CurveStaticDisplayProps {
-  templatePhases: Phase[];
-  currentPhases: Phase[];
-  versionName: string;
+interface CurveTableViewProps {
+  phases: Phase[];
+  templatePhases?: Phase[];
+  versionName?: string;
+  isTemplateMode?: boolean;
 }
 
-const CurveStaticDisplay = ({
-  templatePhases,
-  currentPhases,
-  versionName
-}: CurveStaticDisplayProps) => {
+const CurveTableView = ({
+  phases,
+  templatePhases = [],
+  versionName,
+  isTemplateMode = false
+}: CurveTableViewProps) => {
   
-  // Compare phases to determine modifications
+  // Compare phases to determine modifications (only for version mode)
   const getPhaseComparison = () => {
+    if (isTemplateMode || templatePhases.length === 0) {
+      return phases.map((phase, index) => ({
+        index,
+        current: phase,
+        status: 'current' as const
+      }));
+    }
+
     const comparison: Array<{
       index: number;
       template?: Phase;
       current?: Phase;
-      status: 'unchanged' | 'modified' | 'added' | 'removed';
+      status: 'unchanged' | 'modified' | 'added' | 'removed' | 'current';
     }> = [];
 
-    const maxLength = Math.max(templatePhases.length, currentPhases.length);
+    const maxLength = Math.max(templatePhases.length, phases.length);
     
     for (let i = 0; i < maxLength; i++) {
       const templatePhase = templatePhases[i];
-      const currentPhase = currentPhases[i];
+      const currentPhase = phases[i];
       
       if (!templatePhase && currentPhase) {
         comparison.push({ index: i, current: currentPhase, status: 'added' });
@@ -103,7 +113,7 @@ const CurveStaticDisplay = ({
   };
 
   const formatValueWithTemplate = (currentValue: number, templateValue?: number, status?: string) => {
-    if (status === 'added') {
+    if (status === 'added' || isTemplateMode) {
       return currentValue.toString();
     }
     if (status === 'modified' && templateValue !== undefined) {
@@ -116,11 +126,13 @@ const CurveStaticDisplay = ({
     <div className="space-y-6">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-gray-800">
-          Version {versionName} Curve
+          {isTemplateMode ? 'Template Curve' : `Version ${versionName} Curve`}
         </h3>
-        <p className="text-gray-600 mt-2">
-          Modifications from template shown with original values in parentheses
-        </p>
+        {!isTemplateMode && (
+          <p className="text-gray-600 mt-2">
+            Modifications from template shown with original values in parentheses
+          </p>
+        )}
       </div>
 
       <Table>
@@ -130,7 +142,7 @@ const CurveStaticDisplay = ({
             <TableHead>Temperature (°C)</TableHead>
             <TableHead>Duration (min)</TableHead>
             <TableHead>Hold Time (min)</TableHead>
-            <TableHead>Status</TableHead>
+            {!isTemplateMode && <TableHead>Status</TableHead>}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -165,37 +177,40 @@ const CurveStaticDisplay = ({
                 ) : '—'}
               </TableCell>
               
-              <TableCell>
-                {getStatusBadge(item.status)}
-              </TableCell>
+              {!isTemplateMode && (
+                <TableCell>
+                  {getStatusBadge(item.status)}
+                </TableCell>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
 
-      {/* Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <div className="text-center p-4 bg-gray-50 rounded-lg">
-          <div className="text-2xl font-bold text-gray-600">
-            {comparison.filter(item => item.status === 'unchanged').length}
+      {!isTemplateMode && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="text-center p-4 bg-gray-50 rounded-lg">
+            <div className="text-2xl font-bold text-gray-600">
+              {comparison.filter(item => item.status === 'unchanged').length}
+            </div>
+            <div className="text-sm text-gray-600">Unchanged</div>
           </div>
-          <div className="text-sm text-gray-600">Unchanged</div>
-        </div>
-        <div className="text-center p-4 bg-orange-50 rounded-lg">
-          <div className="text-2xl font-bold text-orange-600">
-            {comparison.filter(item => item.status === 'modified').length}
+          <div className="text-center p-4 bg-orange-50 rounded-lg">
+            <div className="text-2xl font-bold text-orange-600">
+              {comparison.filter(item => item.status === 'modified').length}
+            </div>
+            <div className="text-sm text-orange-600">Modified</div>
           </div>
-          <div className="text-sm text-orange-600">Modified</div>
-        </div>
-        <div className="text-center p-4 bg-green-50 rounded-lg">
-          <div className="text-2xl font-bold text-green-600">
-            {comparison.filter(item => item.status === 'added').length}
+          <div className="text-center p-4 bg-green-50 rounded-lg">
+            <div className="text-2xl font-bold text-green-600">
+              {comparison.filter(item => item.status === 'added').length}
+            </div>
+            <div className="text-sm text-green-600">Added</div>
           </div>
-          <div className="text-sm text-green-600">Added</div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
 
-export default CurveStaticDisplay;
+export default CurveTableView;

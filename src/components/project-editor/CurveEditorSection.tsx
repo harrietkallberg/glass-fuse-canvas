@@ -5,8 +5,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
-import CurveStaticDisplay from "@/components/project-editor/CurveStaticDisplay";
 import CurveChart from "@/components/curve-editor/CurveChart";
+import CurveTableView from "@/components/curve-editor/CurveTableView";
+import PhaseControls from "@/components/curve-editor/PhaseControls";
 import { useCurves } from "@/hooks/useCurves";
 import { useCurveState } from "@/hooks/useCurveState";
 
@@ -211,73 +212,24 @@ const CurveEditorSection = ({
               templatePhases={templateCurveData?.phases || []}
             />
             
-            {/* Phase Controls */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h4 className="text-lg font-medium">Curve Phases</h4>
-                <Button onClick={curveState.addPhase} variant="outline" size="sm">
-                  Add Phase
-                </Button>
-              </div>
-              
-              <div className="space-y-2">
-                {curveState.phases.map((phase, index) => (
-                  <div key={phase.id} className="flex items-center gap-4 p-3 bg-white/50 rounded-lg">
-                    <span className="min-w-[80px] text-sm font-medium">Phase {index + 1}</span>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        value={phase.targetTemp}
-                        onChange={(e) => curveState.updatePhase(phase.id, 'targetTemp', Number(e.target.value))}
-                        className="w-20 px-2 py-1 border rounded text-sm"
-                        placeholder="Temp"
-                      />
-                      <span className="text-xs self-center">°C</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        value={phase.duration}
-                        onChange={(e) => curveState.updatePhase(phase.id, 'duration', Number(e.target.value))}
-                        className="w-20 px-2 py-1 border rounded text-sm"
-                        placeholder="Duration"
-                      />
-                      <span className="text-xs self-center">min</span>
-                    </div>
-                    <div className="flex gap-2">
-                      <input
-                        type="number"
-                        value={phase.holdTime}
-                        onChange={(e) => curveState.updatePhase(phase.id, 'holdTime', Number(e.target.value))}
-                        className="w-20 px-2 py-1 border rounded text-sm"
-                        placeholder="Hold"
-                      />
-                      <span className="text-xs self-center">min</span>
-                    </div>
-                    {curveState.phases.length > 1 && (
-                      <Button 
-                        onClick={() => curveState.removePhase(phase.id)}
-                        variant="destructive"
-                        size="sm"
-                      >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
+            <PhaseControls 
+              phases={curveState.phases}
+              onUpdatePhase={curveState.updatePhase}
+              onAddPhase={curveState.addPhase}
+              onRemovePhase={curveState.removePhase}
+            />
           </TabsContent>
 
-          <TabsContent value="table" className="mt-6 space-y-6">
-            <CurveStaticDisplay
+          <TabsContent value="table" className="mt-6">
+            <CurveTableView 
+              phases={curveState.phases}
               templatePhases={templateCurveData?.phases || []}
-              currentPhases={curveState.phases}
               versionName={currentVersionName}
+              isTemplateMode={false}
             />
           </TabsContent>
           
-          <TabsContent value="notes" className="mt-6 space-y-6">
+          <TabsContent value="notes" className="mt-6">
             <ProjectDetailsTab 
               notes={notes} 
               setNotes={setNotes}
