@@ -43,19 +43,11 @@ const ProjectInformationSection = ({
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
   const [temperatureUnit, setTemperatureUnit] = useState<"celsius" | "fahrenheit">("celsius");
-  const [thickness, setThickness] = useState("");
-  const [glassType, setGlassType] = useState("");
-  const [ovenType, setOvenType] = useState("");
-  const [projectType, setProjectType] = useState("");
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
-      thickness,
-      glassType,
-      ovenType,
-      projectType,
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
@@ -67,11 +59,7 @@ const ProjectInformationSection = ({
     }
     onCreateProject(projectTitle, projectDescription, { 
       ...localCurveData, 
-      temperatureUnit,
-      thickness,
-      glassType,
-      ovenType,
-      projectType
+      temperatureUnit
     });
   };
 
@@ -127,59 +115,17 @@ const ProjectInformationSection = ({
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="temperatureUnit">Temperature Unit</Label>
-              <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="celsius">Celsius (°C)</SelectItem>
-                  <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="thickness">Glass Thickness</Label>
-              <Input
-                id="thickness"
-                value={thickness}
-                onChange={(e) => setThickness(e.target.value)}
-                placeholder="e.g., 3mm"
-                className="mt-1"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="glassType">Glass Type</Label>
-              <Input
-                id="glassType"
-                value={glassType}
-                onChange={(e) => setGlassType(e.target.value)}
-                placeholder="e.g., COE 96, COE 90"
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="projectType">Project Type</Label>
-              <Select value={projectType} onValueChange={setProjectType}>
-                <SelectTrigger className="mt-1">
-                  <SelectValue placeholder="Select project type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fusing">Fusing</SelectItem>
-                  <SelectItem value="slumping">Slumping</SelectItem>
-                  <SelectItem value="casting">Casting</SelectItem>
-                  <SelectItem value="annealing">Annealing</SelectItem>
-                  <SelectItem value="other">Other</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div>
+            <Label htmlFor="temperatureUnit">Temperature Unit</Label>
+            <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="celsius">Celsius (°C)</SelectItem>
+                <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>
