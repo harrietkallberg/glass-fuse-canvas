@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
 
@@ -42,7 +41,7 @@ const ProjectInformationSection = ({
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
-  const [temperatureUnit, setTemperatureUnit] = useState<"celsius" | "fahrenheit">("celsius");
+  const temperatureUnit = "celsius"; // Fixed to celsius only
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
@@ -80,11 +79,6 @@ const ProjectInformationSection = ({
     if (!isNewCurve) setHasChanges(true);
   };
 
-  const handleTemperatureUnitChange = (value: "celsius" | "fahrenheit") => {
-    setTemperatureUnit(value);
-    if (!isNewCurve) setHasChanges(true);
-  };
-
   return (
     <div className="space-y-8">
       {/* Project Details */}
@@ -117,15 +111,9 @@ const ProjectInformationSection = ({
 
           <div>
             <Label htmlFor="temperatureUnit">Temperature Unit</Label>
-            <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="celsius">Celsius (°C)</SelectItem>
-                <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="mt-1 p-2 bg-gray-50 rounded-md border">
+              <span className="text-sm text-gray-600">Celsius (°C)</span>
+            </div>
           </div>
         </div>
       </div>
