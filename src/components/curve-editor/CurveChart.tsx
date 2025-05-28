@@ -46,7 +46,7 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
           <Tooltip 
             formatter={(value, name) => [
               value ? `${value}°C` : 'N/A', 
-              name === 'currentTemp' ? 'Current Version' : 'Template'
+              name === 'currentTemp' ? 'Firing Curve' : 'Template'
             ]}
             labelFormatter={(value) => `Time: ${value} minutes`}
           />
@@ -68,7 +68,7 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
             dataKey="currentTemp" 
             stroke="#F97316" 
             strokeWidth={3}
-            name="Current Version"
+            name="Firing Curve"
             connectNulls={false}
             dot={{ fill: '#F97316', strokeWidth: 2, r: 4 }}
           />
