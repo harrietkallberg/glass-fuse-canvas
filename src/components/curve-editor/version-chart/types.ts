@@ -5,6 +5,7 @@ export interface Version {
   name: string;
   is_current: boolean;
   created_at: string;
+  is_template?: boolean;
 }
 
 export interface CurveVersionChartProps {
@@ -14,6 +15,7 @@ export interface CurveVersionChartProps {
   onNewVersion: () => void;
   onSetMainVersion?: (versionId: string) => void;
   selectedVersionColor?: string;
+  templateData?: any;
 }
 
 export interface NodePosition {

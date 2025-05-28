@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProjectInformationSectionProps {
   isNewCurve: boolean;
@@ -17,6 +19,7 @@ interface ProjectInformationSectionProps {
   setTemplateCurveData: (data: any) => void;
   onCreateProject: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
+  curveId?: string;
 }
 
 // Default template phases
@@ -37,19 +40,41 @@ const ProjectInformationSection = ({
   templateCurveData,
   setTemplateCurveData,
   onCreateProject,
-  onUpdateProject
+  onUpdateProject,
+  curveId
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
+  const { user } = useAuth();
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
-  const handleSaveTemplate = (phases: Phase[]) => {
+  const handleSaveTemplate = async (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
+
+    // If updating existing project, save template to database
+    if (!isNewCurve && curveId && user) {
+      try {
+        const { error } = await supabase
+          .from('curves')
+          .update({
+            template_data: JSON.stringify(curveData),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', curveId)
+          .eq('user_id', user.id);
+
+        if (error) {
+          console.error('Error saving template:', error);
+        }
+      } catch (error) {
+        console.error('Error saving template:', error);
+      }
+    }
   };
 
   const handleCreateProject = () => {
@@ -121,24 +146,22 @@ const ProjectInformationSection = ({
       {/* Template Curve Configuration */}
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
-          {!isNewCurve && (
-            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-              Project Template
-            </span>
-          )}
+          <h3 className="text-xl font-semibold">Project Template Configuration</h3>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Project Template
+          </span>
         </div>
         
         <div className="text-sm text-gray-600 mb-6">
           {isNewCurve 
-            ? "Configure your base firing curve template. This will serve as the starting point for all versions."
-            : "This is your project's base template curve. Changes here affect the project identity."
+            ? "Configure your base project template. This will serve as the starting point for all versions and defines your project's identity."
+            : "This is your project's template curve. Changes here affect the project template and will be reflected in the version chart."
           }
         </div>
         
         <CurveEditor
           initialPhases={templateCurveData?.phases || defaultPhases}
-          onSave={isNewCurve ? handleSaveTemplate : undefined}
+          onSave={handleSaveTemplate}
           isTemplateMode={true}
         />
       </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -50,16 +49,26 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
-        // First get the curve info to get the project title and description
+        // First get the curve info to get the project title, description and template
         const { data: curveInfo } = await supabase
           .from('curves')
-          .select('title, description')
+          .select('title, description, template_data')
           .eq('id', id)
           .single();
 
         if (curveInfo) {
           setProjectTitle(curveInfo.title);
           setProjectDescription(curveInfo.description || '');
+          
+          // Load template data if it exists
+          if (curveInfo.template_data) {
+            try {
+              const parsedTemplate = JSON.parse(curveInfo.template_data);
+              setTemplateCurveData(parsedTemplate);
+            } catch (error) {
+              console.error('Error parsing template data:', error);
+            }
+          }
         }
         
         const versionsList = await getCurveVersions(id);
@@ -68,25 +77,39 @@ const CurveEditPage = () => {
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // Store template curve data (this would be the original curve configuration)
-            setTemplateCurveData({
-              phases: curveData.phases,
-              settings: {
-                selectedGlass: curveData.version.selected_glass,
-                roomTemp: curveData.version.room_temp,
-                glassLayers: curveData.version.glass_layers,
-                glassRadius: curveData.version.glass_radius,
-                firingType: curveData.version.firing_type,
-                topTempMinutes: curveData.version.top_temp_minutes,
-                ovenType: curveData.version.oven_type,
-              }
-            });
+            // If no template data was loaded from curve, use first version as template fallback
+            if (!curveInfo?.template_data) {
+              setTemplateCurveData({
+                phases: curveData.phases,
+                settings: {
+                  selectedGlass: curveData.version.selected_glass,
+                  roomTemp: curveData.version.room_temp,
+                  glassLayers: curveData.version.glass_layers,
+                  glassRadius: curveData.version.glass_radius,
+                  firingType: curveData.version.firing_type,
+                  topTempMinutes: curveData.version.top_temp_minutes,
+                  ovenType: curveData.version.oven_type,
+                }
+              });
+            }
             
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
             setVersions(versionsList);
             setCurrentVersionData(curveData);
           }
+        } else if (!curveInfo?.template_data) {
+          // No versions and no template - set default template
+          setTemplateCurveData({
+            phases: [
+              { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
+              { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
+              { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
+              { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
+              { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
+            ],
+            temperatureUnit: 'celsius'
+          });
         }
         
         setLoading(false);
@@ -100,8 +123,19 @@ const CurveEditPage = () => {
     if (!user) return;
 
     try {
-      const newCurve = await createCurve(title, description);
-      if (!newCurve) {
+      const { data: newCurve, error } = await supabase
+        .from('curves')
+        .insert({
+          user_id: user.id,
+          title,
+          description,
+          template_data: JSON.stringify(curveData)
+        })
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error creating curve:', error);
         toast({
           title: "Error",
           description: "Failed to create project",
@@ -243,6 +277,7 @@ const CurveEditPage = () => {
                 setTemplateCurveData={setTemplateCurveData}
                 onCreateProject={handleCreateProject}
                 onUpdateProject={handleUpdateProject}
+                curveId={currentCurveId}
               />
             )}
             

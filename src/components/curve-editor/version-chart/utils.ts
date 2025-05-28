@@ -18,13 +18,15 @@ export const groupVersionsByGeneration = (versions: Version[]) => {
   }, {} as Record<number, Record<number, Version[]>>);
 };
 
-export const getNodePosition = (generation: number, draft: number, subIndex: number = 0): NodePosition => {
-  const generationSpacing = 350; // Increased from 250
-  const draftSpacing = 150; // Increased from 100
-  const subSpacing = 80; // Increased from 60
+export const getNodePosition = (generation: number, draft: number, subIndex: number = 0, hasTemplate: boolean = false): NodePosition => {
+  const generationSpacing = 350;
+  const draftSpacing = 150;
+  const subSpacing = 80;
   
-  const baseX = 150 + (generation - 1) * generationSpacing; // Increased starting position
-  const baseY = 150 + draft * draftSpacing; // Increased starting position
+  // Offset for template node if it exists
+  const templateOffset = hasTemplate ? 200 : 0;
+  const baseX = 150 + templateOffset + (generation - 1) * generationSpacing;
+  const baseY = 150 + draft * draftSpacing;
   
   return { 
     x: baseX + (subIndex * subSpacing), 
