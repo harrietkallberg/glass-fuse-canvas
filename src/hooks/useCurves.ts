@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -19,7 +20,7 @@ export interface CurveData {
 export interface CurveVersion {
   id: string;
   curve_id: string;
-  version_number: string; // Changed from number to string for semantic versioning
+  version_number: number; // Keep as number to match database
   name: string;
   is_current: boolean;
   selected_glass?: string;
@@ -78,12 +79,12 @@ export const useCurves = () => {
       return null;
     }
 
-    // Create initial version with semantic versioning
+    // Create initial version with numeric versioning
     const { data: versionData, error: versionError } = await supabase
       .from('curve_versions')
       .insert({
         curve_id: curveData.id,
-        version_number: "1.0", // Start with semantic version
+        version_number: 1, // Start with numeric version
         name: 'Version 1.0',
         is_current: true,
       })
@@ -99,6 +100,27 @@ export const useCurves = () => {
     return curveData;
   };
 
+  // Convert semantic version to number for database storage
+  const semanticToNumber = (semanticVersion: string): number => {
+    const parts = semanticVersion.split('.');
+    const major = parseInt(parts[0]) || 0;
+    const minor = parseInt(parts[1]) || 0;
+    const patch = parseInt(parts[2]) || 0;
+    // Convert to a single number: major * 10000 + minor * 100 + patch
+    return major * 10000 + minor * 100 + patch;
+  };
+
+  // Convert number back to semantic version
+  const numberToSemantic = (versionNumber: number): string => {
+    const major = Math.floor(versionNumber / 10000);
+    const minor = Math.floor((versionNumber % 10000) / 100);
+    const patch = versionNumber % 100;
+    if (patch > 0) {
+      return `${major}.${minor}.${patch}`;
+    }
+    return `${major}.${minor}`;
+  };
+
   // Save curve version with semantic versioning
   const saveCurveVersion = async (
     curveId: string,
@@ -109,7 +131,8 @@ export const useCurves = () => {
     if (!user) return null;
 
     // Extract version number from version name (e.g., "Version 2.1" -> "2.1")
-    const versionNumber = versionName.replace('Version ', '');
+    const semanticVersion = versionName.replace('Version ', '');
+    const numericVersion = semanticToNumber(semanticVersion);
 
     // First, set all existing versions to not current
     const { error: updateError } = await supabase
@@ -127,7 +150,7 @@ export const useCurves = () => {
       .from('curve_versions')
       .insert({
         curve_id: curveId,
-        version_number: versionNumber,
+        version_number: numericVersion,
         name: versionName,
         is_current: true,
         selected_glass: curveState.selectedGlass,
@@ -214,7 +237,7 @@ export const useCurves = () => {
       .from('curve_versions')
       .select('*')
       .eq('curve_id', curveId)
-      .order('created_at', { ascending: true }); // Sort by creation time for proper semantic ordering
+      .order('version_number', { ascending: true }); // Sort by numeric version
 
     if (error) {
       console.error('Error fetching versions:', error);
@@ -222,6 +245,27 @@ export const useCurves = () => {
     }
 
     return data || [];
+  };
+
+  // Generate semantic version number
+  const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean) => {
+    if (existingVersions.length === 0) return "1.0";
+    
+    const currentVersion = existingVersions.find(v => v.id === existingVersions[0]?.id);
+    if (!currentVersion) return `${existingVersions.length + 1}.0`;
+    
+    const currentSemantic = numberToSemantic(currentVersion.version_number);
+    
+    if (isNewVersion) {
+      // Create new major version
+      const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 10000));
+      const maxMajor = Math.max(...majorVersions);
+      return `${maxMajor + 1}.0`;
+    } else {
+      // Create minor version increment
+      const [major, minor = "0"] = currentSemantic.split('.');
+      return `${major}.${parseInt(minor) + 1}`;
+    }
   };
 
   // Delete a curve and all its versions
@@ -300,5 +344,6 @@ export const useCurves = () => {
     loadCurveVersion,
     getCurveVersions,
     refetchCurves: fetchCurves,
+    numberToSemantic, // Export helper function
   };
 };

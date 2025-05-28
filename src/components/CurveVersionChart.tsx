@@ -5,7 +5,7 @@ import { Plus } from "lucide-react";
 
 interface Version {
   id: string;
-  version_number: string; // Changed to support semantic versioning like "2.1", "3.4.1"
+  version_number: string; // Now expecting semantic version string for display
   name: string;
   is_current: boolean;
   created_at: string;

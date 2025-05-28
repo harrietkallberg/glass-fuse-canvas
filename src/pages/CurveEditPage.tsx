@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -32,7 +33,7 @@ const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { createCurve, saveCurveVersion, loadCurveVersion, getCurveVersions } = useCurves();
+  const { createCurve, saveCurveVersion, loadCurveVersion, getCurveVersions, numberToSemantic } = useCurves();
   
   const isNewCurve = !id || id === "new";
   const [currentCurveId, setCurrentCurveId] = useState<string | null>(null);
@@ -68,14 +69,16 @@ const CurveEditPage = () => {
     const currentVersion = existingVersions.find(v => v.id === currentVersionId);
     if (!currentVersion) return `${existingVersions.length + 1}.0`;
     
+    const currentSemantic = numberToSemantic(currentVersion.version_number);
+    
     if (isNewVersion) {
       // Create new major version
-      const majorVersions = existingVersions.map(v => parseInt(v.version_number.split('.')[0]));
+      const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 10000));
       const maxMajor = Math.max(...majorVersions);
       return `${maxMajor + 1}.0`;
     } else {
       // Create minor version increment
-      const [major, minor = "0"] = currentVersion.version_number.split('.');
+      const [major, minor = "0"] = currentSemantic.split('.');
       return `${major}.${parseInt(minor) + 1}`;
     }
   };
@@ -105,7 +108,7 @@ const CurveEditPage = () => {
             
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
-            setCurrentVersionName(`Version ${currentVersion.version_number}`);
+            setCurrentVersionName(numberToSemantic(currentVersion.version_number));
             setVersions(versionsList);
             
             // Update curve state with loaded data
@@ -214,7 +217,7 @@ const CurveEditPage = () => {
     const curveData = await loadCurveVersion(versionId);
     if (curveData) {
       setCurrentVersionId(versionId);
-      setCurrentVersionName(curveData.version.version_number);
+      setCurrentVersionName(numberToSemantic(curveData.version.version_number));
       
       // Generate new color for selected version
       const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
@@ -349,7 +352,10 @@ const CurveEditPage = () => {
         {!isNewCurve && (
           <div className="mb-8">
             <CurveVersionChart 
-              versions={versions}
+              versions={versions.map(v => ({
+                ...v,
+                version_number: numberToSemantic(v.version_number) // Convert to semantic version for display
+              }))}
               currentVersionId={currentVersionId}
               onVersionSelect={handleVersionSelect}
               onNewVersion={handleNewVersion}
