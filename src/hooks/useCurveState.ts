@@ -120,7 +120,17 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     // Parse the user-provided top temperature hold time
     const topTempHoldTime = parseInt(topTempMinutes) || 10;
 
-    // Create the new phases
+    // Calculate velocities like in Python code
+    const firstHeatingVelocity = Math.min(999, Math.trunc(60 * (inledandeSmaltpunkt - roomTemp) / uppvarmningTime));
+    const secondHeatingVelocity = 999; // Very high velocity to top temp
+    const firstCoolingVelocity = Math.trunc(60 * (oAstemp - toppTemp) / halltiderTime);
+    const secondCoolingVelocity = Math.trunc(60 * (nAstemp - oAstemp) / avspanningTime);
+    const lastCoolingVelocity = -20;
+
+    // Calculate actual durations based on velocities (converting from °C/hour to minutes)
+    const secondHeatingDuration = Math.max(1, Math.round((toppTemp - inledandeSmaltpunkt) * 60 / secondHeatingVelocity));
+
+    // Create the new phases with calculated durations
     const newPhases = [
       { 
         id: '1', 
@@ -131,8 +141,8 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
       { 
         id: '2', 
         targetTemp: toppTemp, 
-        duration: 15, // Fast rise to top temp
-        holdTime: topTempHoldTime // User specified hold time
+        duration: secondHeatingDuration, // Now calculated based on high velocity
+        holdTime: topTempHoldTime 
       },
       { 
         id: '3', 
@@ -153,6 +163,15 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
         holdTime: 0 
       }
     ];
+    
+    console.log('Calculated velocities:', {
+      firstHeatingVelocity,
+      secondHeatingVelocity,
+      firstCoolingVelocity,
+      secondCoolingVelocity,
+      lastCoolingVelocity,
+      secondHeatingDuration
+    });
     
     setPhases(newPhases);
   };
