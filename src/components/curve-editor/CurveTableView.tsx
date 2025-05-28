@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -17,15 +16,24 @@ interface CurveTableViewProps {
   templatePhases?: Phase[];
   versionName?: string;
   isTemplateMode?: boolean;
+  roomTemp?: number;
 }
 
 const CurveTableView = ({
   phases,
   templatePhases = [],
   versionName,
-  isTemplateMode = false
+  isTemplateMode = false,
+  roomTemp = 20
 }: CurveTableViewProps) => {
   
+  // Calculate velocity for each phase
+  const calculateVelocity = (phase: Phase, index: number): number => {
+    const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
+    const tempDifference = phase.targetTemp - startTemp;
+    return phase.duration > 0 ? Math.round(tempDifference / phase.duration) : 0;
+  };
+
   // Compare phases to determine modifications (only for version mode)
   const getPhaseComparison = () => {
     if (isTemplateMode || templatePhases.length === 0) {
@@ -141,6 +149,7 @@ const CurveTableView = ({
             <TableHead>Phase</TableHead>
             <TableHead>Temperature (°C)</TableHead>
             <TableHead>Duration (min)</TableHead>
+            <TableHead>Velocity (°C/min)</TableHead>
             <TableHead>Hold Time (min)</TableHead>
             {!isTemplateMode && <TableHead>Status</TableHead>}
           </TableRow>
@@ -165,6 +174,14 @@ const CurveTableView = ({
                 {item.current ? (
                   <>
                     {formatValueWithTemplate(item.current.duration, item.template?.duration, item.status)} min
+                  </>
+                ) : '—'}
+              </TableCell>
+              
+              <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
+                {item.current ? (
+                  <>
+                    {calculateVelocity(item.current, index)}°C/min
                   </>
                 ) : '—'}
               </TableCell>

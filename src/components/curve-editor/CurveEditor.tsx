@@ -96,6 +96,7 @@ const CurveEditor = ({
                   <CurveTableView 
                     phases={curveState.phases}
                     isTemplateMode={true}
+                    roomTemp={curveState.roomTemp}
                   />
                 </TabsContent>
               </Tabs>
