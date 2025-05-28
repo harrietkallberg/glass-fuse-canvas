@@ -5,8 +5,8 @@ import { calculatePhaseDuration, calculateVelocities } from './phaseCalculations
 interface GlassInfo {
   namn: string;
   kategori: string;
-  f_topptemp: [number, number];
-  s_topptemp: [number, number];
+  f_topptemp: number[];
+  s_topptemp: number[];
   t_topptemp: number;
   o_astemp: number;
   n_astemp: number;
