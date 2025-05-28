@@ -1,47 +1,50 @@
+
 import React, { useState, useEffect } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
-import Navigation from "@/components/Navigation";
-import { ArrowLeft, FileText, TrendingUp } from "lucide-react";
+import { ArrowLeft, Settings, Edit3 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
 import ProjectInformationSection from "@/components/project-editor/ProjectInformationSection";
 import CurveEditorSection from "@/components/project-editor/CurveEditorSection";
-import { supabase } from "@/integrations/supabase/client";
 
 const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, loading: authLoading } = useAuth();
+  const { user } = useAuth();
   const { 
-    createCurve, 
     loadCurveVersion, 
-    getCurveVersions,
-    numberToSemantic
+    getCurveVersions, 
+    numberToSemantic 
   } = useCurves();
-  
-  const isNewCurve = !id || id === "new";
-  const [activeSection, setActiveSection] = useState<"project" | "editor">("project");
-  const [currentCurveId, setCurrentCurveId] = useState<string | null>(null);
-  const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
+
+  const isNewCurve = !id;
   const [loading, setLoading] = useState(!isNewCurve);
+  const [activeSection, setActiveSection] = useState<"project" | "editor">("project");
   
-  // Project-level data (static across versions)
+  // Project state
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
-  const [templateCurveData, setTemplateCurveData] = useState<any>(null);
+  const [currentCurveId, setCurrentCurveId] = useState<string | null>(id || null);
   
-  // Version-specific data
+  // Version state
   const [versions, setVersions] = useState<any[]>([]);
+  const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
   const [currentVersionData, setCurrentVersionData] = useState<any>(null);
-
-  // Redirect to login if not authenticated
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/login");
-    }
-  }, [user, authLoading, navigate]);
+  
+  // Template state
+  const [templateCurveData, setTemplateCurveData] = useState<any>({
+    phases: [
+      { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
+      { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
+      { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
+      { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
+      { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
+    ],
+    temperatureUnit: 'celsius'
+  });
 
   // Load existing curve if editing
   useEffect(() => {
@@ -49,26 +52,27 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
-        // First get the curve info to get the project title, description and template
-        const { data: curveInfo } = await supabase
+        // First get the curve info to get the project title and description
+        const { data: curveInfo, error: curveError } = await supabase
           .from('curves')
-          .select('title, description, template_data')
+          .select('title, description')
           .eq('id', id)
           .single();
+
+        if (curveError) {
+          console.error('Error loading curve info:', curveError);
+          toast({
+            title: "Error",
+            description: "Failed to load project information",
+            variant: "destructive"
+          });
+          navigate('/');
+          return;
+        }
 
         if (curveInfo) {
           setProjectTitle(curveInfo.title);
           setProjectDescription(curveInfo.description || '');
-          
-          // Load template data if it exists
-          if (curveInfo.template_data) {
-            try {
-              const parsedTemplate = JSON.parse(curveInfo.template_data);
-              setTemplateCurveData(parsedTemplate);
-            } catch (error) {
-              console.error('Error parsing template data:', error);
-            }
-          }
         }
         
         const versionsList = await getCurveVersions(id);
@@ -77,39 +81,25 @@ const CurveEditPage = () => {
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // If no template data was loaded from curve, use first version as template fallback
-            if (!curveInfo?.template_data) {
-              setTemplateCurveData({
-                phases: curveData.phases,
-                settings: {
-                  selectedGlass: curveData.version.selected_glass,
-                  roomTemp: curveData.version.room_temp,
-                  glassLayers: curveData.version.glass_layers,
-                  glassRadius: curveData.version.glass_radius,
-                  firingType: curveData.version.firing_type,
-                  topTempMinutes: curveData.version.top_temp_minutes,
-                  ovenType: curveData.version.oven_type,
-                }
-              });
-            }
+            // Use first version as template fallback
+            setTemplateCurveData({
+              phases: curveData.phases,
+              settings: {
+                selectedGlass: curveData.version.selected_glass,
+                roomTemp: curveData.version.room_temp,
+                glassLayers: curveData.version.glass_layers,
+                glassRadius: curveData.version.glass_radius,
+                firingType: curveData.version.firing_type,
+                topTempMinutes: curveData.version.top_temp_minutes,
+                ovenType: curveData.version.oven_type,
+              }
+            });
             
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
             setVersions(versionsList);
             setCurrentVersionData(curveData);
           }
-        } else if (!curveInfo?.template_data) {
-          // No versions and no template - set default template
-          setTemplateCurveData({
-            phases: [
-              { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
-              { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
-              { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
-              { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
-              { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
-            ],
-            temperatureUnit: 'celsius'
-          });
         }
         
         setLoading(false);
@@ -128,8 +118,7 @@ const CurveEditPage = () => {
         .insert({
           user_id: user.id,
           title,
-          description,
-          template_data: JSON.stringify(curveData)
+          description
         })
         .select()
         .single();
@@ -206,95 +195,86 @@ const CurveEditPage = () => {
     }
   };
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-glass-gradient-1 flex items-center justify-center">
-        <div className="text-xl">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#F97316] mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading project...</p>
+        </div>
       </div>
     );
   }
-  
+
   return (
-    <div className="min-h-screen pb-20 bg-gradient-to-br from-blue-50/30 to-orange-50/30">
-      <Navigation />
-      
-      <div className="container mx-auto pt-24 px-4">
-        <div className="mb-6">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Dashboard
-            </Button>
-          </Link>
-        </div>
-        
-        {/* Project Header */}
-        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl mb-8">
-          <div className="text-center space-y-4">
-            <h1 className="text-4xl font-bold text-gray-800">
-              {isNewCurve ? "Create New Project" : projectTitle}
+    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-blue-50">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <Link to="/">
+              <Button variant="ghost" size="sm" className="gap-2">
+                <ArrowLeft className="h-4 w-4" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <h1 className="text-3xl font-bold text-gray-800">
+              {isNewCurve ? "Create New Project" : projectTitle || "Edit Project"}
             </h1>
-            {!isNewCurve && (
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
-            )}
           </div>
-        </div>
-        
-        {/* Main Content with Sidebar */}
-        <div className="flex gap-8">
-          {/* Sidebar Navigation */}
+          
           {!isNewCurve && (
-            <div className="w-64 space-y-2">
+            <div className="flex gap-2">
               <Button
-                variant={activeSection === "project" ? "default" : "ghost"}
-                className="w-full justify-start gap-3 h-12"
+                variant={activeSection === "project" ? "default" : "outline"}
                 onClick={() => setActiveSection("project")}
+                className="gap-2"
               >
-                <FileText className="h-5 w-5" />
-                Project Information
+                <Settings className="h-4 w-4" />
+                Project Info
               </Button>
               <Button
-                variant={activeSection === "editor" ? "default" : "ghost"}
-                className="w-full justify-start gap-3 h-12"
+                variant={activeSection === "editor" ? "default" : "outline"}
                 onClick={() => setActiveSection("editor")}
+                className="gap-2"
               >
-                <TrendingUp className="h-5 w-5" />
+                <Edit3 className="h-4 w-4" />
                 Curve Editor
               </Button>
             </div>
           )}
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1">
+          {(isNewCurve || activeSection === "project") && (
+            <ProjectInformationSection
+              isNewCurve={isNewCurve}
+              projectTitle={projectTitle}
+              setProjectTitle={setProjectTitle}
+              projectDescription={projectDescription}
+              setProjectDescription={setProjectDescription}
+              templateCurveData={templateCurveData}
+              setTemplateCurveData={setTemplateCurveData}
+              onCreateProject={handleCreateProject}
+              onUpdateProject={handleUpdateProject}
+              curveId={currentCurveId}
+            />
+          )}
           
-          {/* Main Content Area */}
-          <div className="flex-1">
-            {(isNewCurve || activeSection === "project") && (
-              <ProjectInformationSection
-                isNewCurve={isNewCurve}
-                projectTitle={projectTitle}
-                setProjectTitle={setProjectTitle}
-                projectDescription={projectDescription}
-                setProjectDescription={setProjectDescription}
-                templateCurveData={templateCurveData}
-                setTemplateCurveData={setTemplateCurveData}
-                onCreateProject={handleCreateProject}
-                onUpdateProject={handleUpdateProject}
-                curveId={currentCurveId}
-              />
-            )}
-            
-            {!isNewCurve && activeSection === "editor" && (
-              <CurveEditorSection
-                curveId={currentCurveId!}
-                versions={versions}
-                setVersions={setVersions}
-                currentVersionId={currentVersionId}
-                setCurrentVersionId={setCurrentVersionId}
-                currentVersionData={currentVersionData}
-                setCurrentVersionData={setCurrentVersionData}
-                templateCurveData={templateCurveData}
-                numberToSemantic={numberToSemantic}
-              />
-            )}
-          </div>
+          {!isNewCurve && activeSection === "editor" && (
+            <CurveEditorSection
+              curveId={currentCurveId!}
+              versions={versions}
+              setVersions={setVersions}
+              currentVersionId={currentVersionId}
+              setCurrentVersionId={setCurrentVersionId}
+              currentVersionData={currentVersionData}
+              setCurrentVersionData={setCurrentVersionData}
+              templateCurveData={templateCurveData}
+              numberToSemantic={numberToSemantic}
+            />
+          )}
         </div>
       </div>
     </div>

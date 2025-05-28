@@ -6,8 +6,6 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/useAuth";
 
 interface ProjectInformationSectionProps {
   isNewCurve: boolean;
@@ -45,7 +43,6 @@ const ProjectInformationSection = ({
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
-  const { user } = useAuth();
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
   const handleSaveTemplate = async (phases: Phase[]) => {
@@ -55,26 +52,6 @@ const ProjectInformationSection = ({
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
-
-    // If updating existing project, save template to database
-    if (!isNewCurve && curveId && user) {
-      try {
-        const { error } = await supabase
-          .from('curves')
-          .update({
-            template_data: JSON.stringify(curveData),
-            updated_at: new Date().toISOString()
-          })
-          .eq('id', curveId)
-          .eq('user_id', user.id);
-
-        if (error) {
-          console.error('Error saving template:', error);
-        }
-      } catch (error) {
-        console.error('Error saving template:', error);
-      }
-    }
   };
 
   const handleCreateProject = () => {

@@ -1,6 +1,6 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import VersionInfoDisplay from "@/components/curve-editor/VersionInfoDisplay";
@@ -127,7 +127,6 @@ const CurveEditorSection = ({
       <VersionInfoDisplay 
         currentVersionName={currentVersionName}
         selectedVersionColor={selectedVersionColor}
-        isTemplate={isTemplateSelected}
       />
 
       {/* Main Editor - Only show if not template or if template has no versions */}
@@ -149,7 +148,6 @@ const CurveEditorSection = ({
             setMaterials={setMaterials}
             tags={tags}
             setTags={setTags}
-            isTemplate={isTemplateSelected}
           />
 
           {/* Single Save Button at Bottom - Only show if not template */}

@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Crown, FileTemplate } from "lucide-react";
+import { Crown, FileText } from "lucide-react";
 import { Version } from './types';
 import { getGenerationColor } from './utils';
 
@@ -97,7 +97,7 @@ const VersionNode = ({
       
       {/* Template icon */}
       {isTemplate && (
-        <FileTemplate className="h-4 w-4 text-gray-500" style={{ transform: 'translate(45px, 10px)' }} />
+        <FileText className="h-4 w-4 text-gray-500" style={{ transform: 'translate(45px, 10px)' }} />
       )}
       
       {/* Version info card */}
