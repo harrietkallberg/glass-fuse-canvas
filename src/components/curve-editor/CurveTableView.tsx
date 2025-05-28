@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/table";
 import { Edit, Plus, Minus } from "lucide-react";
 import { Phase } from "@/utils/curveUtils";
-import { calculateVelocities } from "@/utils/phaseCalculations";
-import glassData from '../../tables.json';
 
 interface CurveTableViewProps {
   phases: Phase[];
@@ -30,51 +28,13 @@ const CurveTableView = ({
   roomTemp = 20
 }: CurveTableViewProps) => {
   
-  // Calculate the actual velocities used to create the phases (matching Python logic)
-  const getActualVelocities = () => {
-    // For glass template phases, we need to calculate the velocities that were used
-    // This assumes the phases follow the standard glass template pattern
-    if (phases.length === 5) {
-      // Try to reverse-engineer the glass settings from the phases
-      const inledandeSmaltpunkt = glassData["Inledande_smaltpunkt"];
-      const toppTemp = phases[1]?.targetTemp || 800;
-      const oAstemp = phases[2]?.targetTemp || 520;
-      const nAstemp = phases[3]?.targetTemp || 460;
-      
-      // Estimate the times from the durations (this is approximate)
-      const uppvarmningTime = phases[0]?.duration || 60;
-      const halltiderTime = phases[2]?.duration || 60;
-      const avspanningTime = phases[3]?.duration || 60;
-      
-      const velocities = calculateVelocities(
-        inledandeSmaltpunkt,
-        roomTemp,
-        uppvarmningTime,
-        oAstemp,
-        toppTemp,
-        halltiderTime,
-        nAstemp,
-        avspanningTime
-      );
-      
-      return [
-        velocities.firstHeatingVelocity,
-        velocities.secondHeatingVelocity,
-        Math.abs(velocities.firstCoolingVelocity),
-        Math.abs(velocities.secondCoolingVelocity),
-        Math.abs(velocities.lastCoolingVelocity)
-      ];
-    }
-    
-    // Fallback: calculate from temperature differences and durations
-    return phases.map((phase, index) => {
-      const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
-      const tempDifference = phase.targetTemp - startTemp;
-      return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
-    });
+  // Calculate velocity for each phase based on temperature difference and duration
+  const calculateVelocityFromPhase = (phase: Phase, index: number): number => {
+    const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
+    const tempDifference = phase.targetTemp - startTemp;
+    // Convert from °C/min to °C/hour by multiplying by 60
+    return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
   };
-
-  const actualVelocities = getActualVelocities();
 
   // Compare phases to determine modifications (only for version mode)
   const getPhaseComparison = () => {
@@ -223,7 +183,7 @@ const CurveTableView = ({
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
                 {item.current ? (
                   <>
-                    {actualVelocities[index] || 0}°C/h
+                    {calculateVelocityFromPhase(item.current, index)}°C/h
                   </>
                 ) : '—'}
               </TableCell>
