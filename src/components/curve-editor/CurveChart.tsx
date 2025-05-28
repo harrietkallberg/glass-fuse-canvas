@@ -8,59 +8,28 @@ interface CurveChartProps {
   phases: Phase[];
   roomTemp?: number;
   templatePhases?: Phase[];
-  isTemplateMode?: boolean;
 }
 
-const CurveChart = ({ phases, roomTemp = 20, templatePhases = [], isTemplateMode = false }: CurveChartProps) => {
+const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartProps) => {
   const currentData = generateChartData(phases, roomTemp);
   const templateData = generateChartData(templatePhases, roomTemp);
 
-  // Create more linear time points for smoother visualization
-  const maxTime = Math.max(
-    currentData.length > 0 ? Math.max(...currentData.map(d => d.time)) : 0,
-    templateData.length > 0 ? Math.max(...templateData.map(d => d.time)) : 0
-  );
+  // Combine data for display, ensuring all time points are included
+  const allTimePoints = new Set([
+    ...currentData.map(d => d.time),
+    ...templateData.map(d => d.time)
+  ]);
 
-  // Generate linear time intervals
-  const timeInterval = Math.max(1, Math.floor(maxTime / 100)); // Create ~100 points for smooth curve
-  const linearTimePoints = [];
-  for (let t = 0; t <= maxTime; t += timeInterval) {
-    linearTimePoints.push(t);
-  }
-  if (linearTimePoints[linearTimePoints.length - 1] !== maxTime) {
-    linearTimePoints.push(maxTime);
-  }
-
-  // Interpolate data for linear time points
-  const interpolateTemperature = (data: any[], time: number) => {
-    if (data.length === 0) return null;
+  const combinedData = Array.from(allTimePoints).sort((a, b) => a - b).map(time => {
+    const currentPoint = currentData.find(d => d.time === time);
+    const templatePoint = templateData.find(d => d.time === time);
     
-    // Find the two points that bracket this time
-    let beforePoint = data[0];
-    let afterPoint = data[data.length - 1];
-    
-    for (let i = 0; i < data.length - 1; i++) {
-      if (data[i].time <= time && data[i + 1].time >= time) {
-        beforePoint = data[i];
-        afterPoint = data[i + 1];
-        break;
-      }
-    }
-    
-    // Linear interpolation
-    if (beforePoint.time === afterPoint.time) {
-      return beforePoint.temperature;
-    }
-    
-    const ratio = (time - beforePoint.time) / (afterPoint.time - beforePoint.time);
-    return beforePoint.temperature + ratio * (afterPoint.temperature - beforePoint.temperature);
-  };
-
-  const combinedData = linearTimePoints.map(time => ({
-    time,
-    currentTemp: interpolateTemperature(currentData, time),
-    templateTemp: interpolateTemperature(templateData, time),
-  }));
+    return {
+      time,
+      currentTemp: currentPoint?.temperature || null,
+      templateTemp: templatePoint?.temperature || null,
+    };
+  });
 
   return (
     <div className="w-full h-96">
@@ -69,9 +38,6 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [], isTemplateMode
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="time" 
-            type="number"
-            scale="linear"
-            domain={['dataMin', 'dataMax']}
             label={{ value: 'Time (minutes)', position: 'insideBottom', offset: -10 }}
           />
           <YAxis 
@@ -79,12 +45,12 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [], isTemplateMode
           />
           <Tooltip 
             formatter={(value, name) => [
-              value ? `${Math.round(value as number)}°C` : 'N/A', 
+              value ? `${value}°C` : 'N/A', 
               name === 'currentTemp' ? 'Current Version' : 'Template'
             ]}
             labelFormatter={(value) => `Time: ${value} minutes`}
           />
-          {!isTemplateMode && <Legend />}
+          <Legend />
           {templatePhases.length > 0 && (
             <Line 
               type="linear" 
@@ -94,7 +60,7 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [], isTemplateMode
               strokeDasharray="5 5"
               name="Template Curve"
               connectNulls={false}
-              dot={false}
+              dot={{ fill: '#D1D5DB', strokeWidth: 2, r: 4 }}
             />
           )}
           <Line 
@@ -102,9 +68,9 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [], isTemplateMode
             dataKey="currentTemp" 
             stroke="#F97316" 
             strokeWidth={3}
-            name={isTemplateMode ? "Template Curve" : "Current Version"}
+            name="Current Version"
             connectNulls={false}
-            dot={false}
+            dot={{ fill: '#F97316', strokeWidth: 2, r: 4 }}
           />
         </LineChart>
       </ResponsiveContainer>
