@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
 
@@ -41,10 +42,12 @@ const ProjectInformationSection = ({
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
+  const [temperatureUnit, setTemperatureUnit] = useState<"celsius" | "fahrenheit">("celsius");
 
   const handleSaveTemplate = (phases: Phase[]) => {
     const curveData = {
       phases,
+      temperatureUnit,
       // Add other curve settings as needed
     };
     setLocalCurveData(curveData);
@@ -55,7 +58,7 @@ const ProjectInformationSection = ({
     if (!projectTitle.trim()) {
       return;
     }
-    onCreateProject(projectTitle, projectDescription, localCurveData);
+    onCreateProject(projectTitle, projectDescription, { ...localCurveData, temperatureUnit });
   };
 
   const handleUpdateProject = () => {
@@ -72,6 +75,11 @@ const ProjectInformationSection = ({
 
   const handleDescriptionChange = (value: string) => {
     setProjectDescription(value);
+    if (!isNewCurve) setHasChanges(true);
+  };
+
+  const handleTemperatureUnitChange = (value: "celsius" | "fahrenheit") => {
+    setTemperatureUnit(value);
     if (!isNewCurve) setHasChanges(true);
   };
 
@@ -103,6 +111,19 @@ const ProjectInformationSection = ({
               className="mt-1"
               rows={3}
             />
+          </div>
+
+          <div>
+            <Label htmlFor="temperatureUnit">Temperature Unit</Label>
+            <Select value={temperatureUnit} onValueChange={handleTemperatureUnitChange}>
+              <SelectTrigger className="mt-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="celsius">Celsius (°C)</SelectItem>
+                <SelectItem value="fahrenheit">Fahrenheit (°F)</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </div>

@@ -12,7 +12,6 @@ interface ProjectDetailsTabProps {
   setMaterials: (materials: string) => void;
   tags: string;
   setTags: (tags: string) => void;
-  handleSave: () => void;
 }
 
 const ProjectDetailsTab = ({
@@ -21,8 +20,7 @@ const ProjectDetailsTab = ({
   materials,
   setMaterials,
   tags,
-  setTags,
-  handleSave
+  setTags
 }: ProjectDetailsTabProps) => {
   return (
     <div className="glass p-6 rounded-2xl bg-glass-100/20 backdrop-blur-sm space-y-6">
@@ -71,8 +69,6 @@ const ProjectDetailsTab = ({
           onChange={(e) => setTags(e.target.value)}
         />
       </div>
-      
-      <Button className="w-full md:w-auto" onClick={handleSave}>Save Project Details</Button>
     </div>
   );
 };

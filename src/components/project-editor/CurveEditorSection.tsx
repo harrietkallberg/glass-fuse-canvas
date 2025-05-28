@@ -6,6 +6,7 @@ import { toast } from "@/components/ui/use-toast";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
 import CurveStaticDisplay from "@/components/project-editor/CurveStaticDisplay";
+import CurveChart from "@/components/curve-editor/CurveChart";
 import { useCurves } from "@/hooks/useCurves";
 import { useCurveState } from "@/hooks/useCurveState";
 
@@ -195,11 +196,20 @@ const CurveEditorSection = ({
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full mb-6 p-2 bg-white/50">
-            <TabsTrigger value="curve" className="flex-1 text-lg py-3">Current Curve</TabsTrigger>
+            <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve View</TabsTrigger>
+            <TabsTrigger value="table" className="flex-1 text-lg py-3">Table View</TabsTrigger>
             <TabsTrigger value="notes" className="flex-1 text-lg py-3">Notes & Results</TabsTrigger>
           </TabsList>
           
           <TabsContent value="curve" className="mt-6 space-y-6">
+            <CurveChart 
+              phases={curveState.phases}
+              roomTemp={curveState.roomTemp}
+              templatePhases={templateCurveData?.phases || []}
+            />
+          </TabsContent>
+
+          <TabsContent value="table" className="mt-6 space-y-6">
             <CurveStaticDisplay
               templatePhases={templateCurveData?.phases || []}
               currentPhases={curveState.phases}

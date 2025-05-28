@@ -102,6 +102,16 @@ const CurveStaticDisplay = ({
     }
   };
 
+  const formatValueWithTemplate = (currentValue: number, templateValue?: number, status?: string) => {
+    if (status === 'added') {
+      return currentValue.toString();
+    }
+    if (status === 'modified' && templateValue !== undefined) {
+      return `${currentValue} (${templateValue})`;
+    }
+    return currentValue.toString();
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -109,7 +119,7 @@ const CurveStaticDisplay = ({
           Version {versionName} Curve
         </h3>
         <p className="text-gray-600 mt-2">
-          Differences from template are marked
+          Modifications from template shown with original values in parentheses
         </p>
       </div>
 
@@ -132,15 +142,27 @@ const CurveStaticDisplay = ({
               </TableCell>
               
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
-                {item.current ? `${item.current.targetTemp}°C` : '—'}
+                {item.current ? (
+                  <>
+                    {formatValueWithTemplate(item.current.targetTemp, item.template?.targetTemp, item.status)}°C
+                  </>
+                ) : '—'}
               </TableCell>
               
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
-                {item.current ? `${item.current.duration} min` : '—'}
+                {item.current ? (
+                  <>
+                    {formatValueWithTemplate(item.current.duration, item.template?.duration, item.status)} min
+                  </>
+                ) : '—'}
               </TableCell>
               
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
-                {item.current ? `${item.current.holdTime} min` : '—'}
+                {item.current ? (
+                  <>
+                    {formatValueWithTemplate(item.current.holdTime, item.template?.holdTime, item.status)} min
+                  </>
+                ) : '—'}
               </TableCell>
               
               <TableCell>

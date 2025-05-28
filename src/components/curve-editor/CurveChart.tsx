@@ -1,69 +1,76 @@
 
 import React from 'react';
-import { 
-  LineChart, 
-  Line, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer
-} from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { generateChartData } from '@/utils/curveUtils';
+import { Phase } from '@/utils/curveUtils';
 
 interface CurveChartProps {
-  chartData: any[];
-  selectedGlassInfo: {
-    o_astemp?: number;
-    n_astemp?: number;
-    [key: string]: any;
-  } | undefined;
+  phases: Phase[];
+  roomTemp?: number;
+  templatePhases?: Phase[];
 }
 
-const CurveChart = ({ chartData, selectedGlassInfo }: CurveChartProps) => {
-  // Custom colors for the chart - these match the colors used in the CurveCard component
-  const chartColors = {
-    line: '#FEC6A1',
-    grid: '#F2FCE2',
-    text: '#333333'
-  };
-  
+const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartProps) => {
+  const currentData = generateChartData(phases, roomTemp);
+  const templateData = generateChartData(templatePhases, roomTemp);
+
+  // Combine data for display, ensuring all time points are included
+  const allTimePoints = new Set([
+    ...currentData.map(d => d.time),
+    ...templateData.map(d => d.time)
+  ]);
+
+  const combinedData = Array.from(allTimePoints).sort((a, b) => a - b).map(time => {
+    const currentPoint = currentData.find(d => d.time === time);
+    const templatePoint = templateData.find(d => d.time === time);
+    
+    return {
+      time,
+      currentTemp: currentPoint?.temperature || null,
+      templateTemp: templatePoint?.temperature || null,
+    };
+  });
+
   return (
-    <div className="h-[400px] w-full bg-glass-100/20 rounded-lg p-4">
+    <div className="w-full h-96">
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart 
-          data={chartData}
-          margin={{ top: 5, right: 20, left: 20, bottom: 30 }}
-        >
-          <CartesianGrid strokeDasharray="3 3" stroke={chartColors.grid} />
+        <LineChart data={combinedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis 
             dataKey="time" 
-            label={{ value: 'Time (minutes)', position: 'insideBottomRight', offset: -10 }}
-            stroke={chartColors.text}
+            label={{ value: 'Time (minutes)', position: 'insideBottom', offset: -10 }}
           />
           <YAxis 
             label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
-            domain={[0, 'auto']}
-            stroke={chartColors.text}
           />
           <Tooltip 
-            contentStyle={{ 
-              backgroundColor: 'rgba(255,255,255,0.9)', 
-              borderColor: chartColors.line,
-              borderRadius: '8px',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
-            }}
             formatter={(value, name) => [
-              `${Math.round(Number(value))}${name === 'temperature' ? '°C' : ' min'}`, 
-              name === 'temperature' ? 'Temperature' : 'Time'
+              value ? `${value}°C` : 'N/A', 
+              name === 'currentTemp' ? 'Current Version' : 'Template'
             ]}
+            labelFormatter={(value) => `Time: ${value} minutes`}
           />
+          <Legend />
+          {templatePhases.length > 0 && (
+            <Line 
+              type="linear" 
+              dataKey="templateTemp" 
+              stroke="#D1D5DB" 
+              strokeWidth={3}
+              strokeDasharray="5 5"
+              name="Template Curve"
+              connectNulls={false}
+              dot={{ fill: '#D1D5DB', strokeWidth: 2, r: 4 }}
+            />
+          )}
           <Line 
-            type="monotone" 
-            dataKey="temperature" 
-            stroke={chartColors.line} 
+            type="linear" 
+            dataKey="currentTemp" 
+            stroke="#F97316" 
             strokeWidth={3}
-            dot={{ fill: '#FFDEE2', strokeWidth: 2, r: 4, strokeDasharray: '' }}
-            activeDot={{ r: 6, fill: '#FDE1D3' }}
+            name="Current Version"
+            connectNulls={false}
+            dot={{ fill: '#F97316', strokeWidth: 2, r: 4 }}
           />
         </LineChart>
       </ResponsiveContainer>
