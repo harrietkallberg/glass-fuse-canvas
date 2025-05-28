@@ -72,17 +72,19 @@ const CurveEditor = ({
         <CurveEditorTabs
           activeTab={curveState.activeTab}
           setActiveTab={curveState.setActiveTab}
-          selectedGlassInfo={curveState.selectedGlassInfo}
           phases={curveState.phases}
-          updatePhase={curveState.updatePhase}
-          addPhase={curveState.addPhase}
-          removePhase={curveState.removePhase}
-          handleSave={handleSave}
-          ovenType={curveState.ovenType}
-          setOvenType={curveState.setOvenType}
-          roomTemp={curveState.roomTemp}
           templatePhases={templatePhases}
-          isTemplateMode={isTemplateMode}
+          roomTemp={curveState.roomTemp}
+          currentVersionName="1.0"
+          onUpdatePhase={curveState.updatePhase}
+          onAddPhase={curveState.addPhase}
+          onRemovePhase={curveState.removePhase}
+          notes=""
+          setNotes={() => {}}
+          materials=""
+          setMaterials={() => {}}
+          tags=""
+          setTags={() => {}}
         />
       </div>
     </div>
