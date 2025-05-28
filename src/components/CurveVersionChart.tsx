@@ -1,7 +1,6 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { git-branch, git-merge } from "lucide-react";
+import { GitBranch, GitMerge } from "lucide-react";
 
 interface Version {
   id: string;
@@ -47,9 +46,9 @@ const CurveVersionChart = ({ versions, currentVersionId, onVersionSelect }: Curv
                 }`}
               >
                 {index === 0 ? (
-                  <git-branch className="h-4 w-4" />
+                  <GitBranch className="h-4 w-4" />
                 ) : (
-                  <git-merge className="h-4 w-4" />
+                  <GitMerge className="h-4 w-4" />
                 )}
               </div>
               
