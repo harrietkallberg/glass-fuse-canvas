@@ -75,7 +75,6 @@ const CurveEditor = ({
             <TabsList className="w-full mb-6 p-2 bg-white/50">
               <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve View</TabsTrigger>
               <TabsTrigger value="table" className="flex-1 text-lg py-3">Table View</TabsTrigger>
-              <TabsTrigger value="editor" className="flex-1 text-lg py-3">Editor</TabsTrigger>
             </TabsList>
             
             <TabsContent value="curve" className="mt-6">
@@ -90,22 +89,6 @@ const CurveEditor = ({
                 phases={curveState.phases}
                 isTemplateMode={true}
               />
-            </TabsContent>
-            
-            <TabsContent value="editor" className="mt-6">
-              <div className="space-y-6">
-                <CurveChart 
-                  phases={curveState.phases}
-                  roomTemp={curveState.roomTemp}
-                />
-                
-                <PhaseControls 
-                  phases={curveState.phases}
-                  onUpdatePhase={curveState.updatePhase}
-                  onAddPhase={curveState.addPhase}
-                  onRemovePhase={curveState.removePhase}
-                />
-              </div>
             </TabsContent>
           </Tabs>
         </div>
