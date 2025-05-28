@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { generateChartData } from '@/utils/curveUtils';
 import { Phase } from '@/utils/curveUtils';
 
@@ -50,7 +50,6 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
             ]}
             labelFormatter={(value) => `Time: ${value} minutes`}
           />
-          <Legend />
           {templatePhases.length > 0 && (
             <Line 
               type="linear" 
