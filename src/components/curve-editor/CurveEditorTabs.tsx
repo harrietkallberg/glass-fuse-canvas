@@ -10,7 +10,6 @@ import { Phase } from '@/utils/curveUtils';
 interface CurveEditorTabsProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
-  chartData: any[];
   selectedGlassInfo: any;
   phases: Phase[];
   updatePhase: (id: string, field: keyof Phase, value: number) => void;
@@ -19,12 +18,13 @@ interface CurveEditorTabsProps {
   handleSave: () => void;
   ovenType?: string;
   setOvenType?: (type: string) => void;
+  roomTemp?: number;
+  templatePhases?: Phase[];
 }
 
 const CurveEditorTabs = ({
   activeTab,
   setActiveTab,
-  chartData,
   selectedGlassInfo,
   phases,
   updatePhase,
@@ -32,7 +32,9 @@ const CurveEditorTabs = ({
   removePhase,
   handleSave,
   ovenType,
-  setOvenType
+  setOvenType,
+  roomTemp = 20,
+  templatePhases = []
 }: CurveEditorTabsProps) => {
   return (
     <div>
@@ -44,8 +46,9 @@ const CurveEditorTabs = ({
         
         <TabsContent value="chart" className="mt-0">
           <CurveChart 
-            chartData={chartData} 
-            selectedGlassInfo={selectedGlassInfo} 
+            phases={phases}
+            roomTemp={roomTemp}
+            templatePhases={templatePhases}
           />
         </TabsContent>
         
