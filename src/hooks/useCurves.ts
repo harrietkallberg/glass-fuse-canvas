@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -83,7 +84,7 @@ export const useCurves = () => {
       .from('curve_versions')
       .insert({
         curve_id: curveData.id,
-        version_number: 1, // Start with numeric version
+        version_number: 10000, // 1.0 in numeric format
         name: 'Version 1.0',
         is_current: true,
       })
@@ -119,7 +120,7 @@ export const useCurves = () => {
     return `${major}.${minor}`;
   };
 
-  // Enhanced save function with automatic version refresh
+  // Enhanced save function with better transaction handling
   const saveCurveVersion = async (
     curveId: string,
     versionName: string,
@@ -128,67 +129,103 @@ export const useCurves = () => {
   ) => {
     if (!user) return null;
 
+    console.log('Starting to save curve version:', { curveId, versionName });
+
     const semanticVersion = versionName.replace('Version ', '');
     const numericVersion = semanticToNumber(semanticVersion);
 
-    // First, set all existing versions to not current
-    const { error: updateError } = await supabase
-      .from('curve_versions')
-      .update({ is_current: false })
-      .eq('curve_id', curveId);
+    try {
+      // First, get all existing versions for this curve
+      const { data: existingVersions, error: fetchError } = await supabase
+        .from('curve_versions')
+        .select('id, is_current')
+        .eq('curve_id', curveId);
 
-    if (updateError) {
-      console.error('Error updating existing versions:', updateError);
-      return null;
-    }
+      if (fetchError) {
+        console.error('Error fetching existing versions:', fetchError);
+        return null;
+      }
 
-    // Create new version
-    const { data: versionData, error: versionError } = await supabase
-      .from('curve_versions')
-      .insert({
+      console.log('Existing versions:', existingVersions);
+
+      // Update all existing versions to not be current using individual updates
+      if (existingVersions && existingVersions.length > 0) {
+        for (const version of existingVersions) {
+          if (version.is_current) {
+            const { error: updateError } = await supabase
+              .from('curve_versions')
+              .update({ is_current: false })
+              .eq('id', version.id);
+
+            if (updateError) {
+              console.error('Error updating existing version:', updateError);
+              return null;
+            }
+          }
+        }
+      }
+
+      console.log('Creating new version with data:', {
         curve_id: curveId,
         version_number: numericVersion,
         name: versionName,
         is_current: true,
-        selected_glass: curveState.selectedGlass,
-        room_temp: curveState.roomTemp,
-        glass_layers: curveState.glassLayers,
-        glass_radius: curveState.glassRadius,
-        firing_type: curveState.firingType,
-        top_temp_minutes: curveState.topTempMinutes,
-        oven_type: curveState.ovenType,
-        total_time: calculateTotalTime(phases),
-        notes: curveState.notes || '',
-        materials: curveState.materials || '',
-        tags: curveState.tags || '',
-      })
-      .select()
-      .single();
+      });
 
-    if (versionError) {
-      console.error('Error creating version:', versionError);
+      // Create new version
+      const { data: versionData, error: versionError } = await supabase
+        .from('curve_versions')
+        .insert({
+          curve_id: curveId,
+          version_number: numericVersion,
+          name: versionName,
+          is_current: true,
+          selected_glass: curveState.selectedGlass,
+          room_temp: curveState.roomTemp,
+          glass_layers: curveState.glassLayers,
+          glass_radius: curveState.glassRadius,
+          firing_type: curveState.firingType,
+          top_temp_minutes: curveState.topTempMinutes,
+          oven_type: curveState.ovenType,
+          total_time: calculateTotalTime(phases),
+          notes: curveState.notes || '',
+          materials: curveState.materials || '',
+          tags: curveState.tags || '',
+        })
+        .select()
+        .single();
+
+      if (versionError) {
+        console.error('Error creating version:', versionError);
+        return null;
+      }
+
+      console.log('Successfully created version:', versionData);
+
+      // Save phases
+      const phasesToInsert = phases.map((phase, index) => ({
+        version_id: versionData.id,
+        phase_order: index,
+        target_temp: phase.targetTemp,
+        duration: phase.duration,
+        hold_time: phase.holdTime,
+      }));
+
+      const { error: phasesError } = await supabase
+        .from('curve_phases')
+        .insert(phasesToInsert);
+
+      if (phasesError) {
+        console.error('Error saving phases:', phasesError);
+        return null;
+      }
+
+      console.log('Successfully saved phases');
+      return versionData;
+    } catch (error) {
+      console.error('Error in saveCurveVersion:', error);
       return null;
     }
-
-    // Save phases
-    const phasesToInsert = phases.map((phase, index) => ({
-      version_id: versionData.id,
-      phase_order: index,
-      target_temp: phase.targetTemp,
-      duration: phase.duration,
-      hold_time: phase.holdTime,
-    }));
-
-    const { error: phasesError } = await supabase
-      .from('curve_phases')
-      .insert(phasesToInsert);
-
-    if (phasesError) {
-      console.error('Error saving phases:', phasesError);
-      return null;
-    }
-
-    return versionData;
   };
 
   // Load curve version with phases
@@ -231,6 +268,7 @@ export const useCurves = () => {
   // Enhanced get versions function with better error handling
   const getCurveVersions = async (curveId: string) => {
     try {
+      console.log('Fetching versions for curve:', curveId);
       const { data, error } = await supabase
         .from('curve_versions')
         .select('*')
@@ -242,6 +280,7 @@ export const useCurves = () => {
         return [];
       }
 
+      console.log('Fetched versions:', data);
       return data || [];
     } catch (error) {
       console.error('Error in getCurveVersions:', error);
@@ -256,6 +295,8 @@ export const useCurves = () => {
 
   // Generate semantic version number with better logic
   const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean, currentVersionId?: string) => {
+    console.log('Generating next version number:', { existingVersions, isNewVersion, currentVersionId });
+    
     if (existingVersions.length === 0) return "1.0";
     
     // Find current version or latest version
@@ -266,16 +307,21 @@ export const useCurves = () => {
     if (!currentVersion) return "1.0";
     
     const currentSemantic = numberToSemantic(currentVersion.version_number);
+    console.log('Current semantic version:', currentSemantic);
     
     if (isNewVersion) {
       // Create new major version
       const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 10000));
       const maxMajor = Math.max(...majorVersions);
-      return `${maxMajor + 1}.0`;
+      const nextVersion = `${maxMajor + 1}.0`;
+      console.log('Next major version:', nextVersion);
+      return nextVersion;
     } else {
       // Create minor version increment
       const [major, minor = "0"] = currentSemantic.split('.');
-      return `${major}.${parseInt(minor) + 1}`;
+      const nextVersion = `${major}.${parseInt(minor) + 1}`;
+      console.log('Next minor version:', nextVersion);
+      return nextVersion;
     }
   };
 
@@ -354,7 +400,7 @@ export const useCurves = () => {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
-    refetchCurveVersions, // New function for refreshing versions
+    refetchCurveVersions,
     refetchCurves: fetchCurves,
     numberToSemantic,
     getNextVersionNumber,
