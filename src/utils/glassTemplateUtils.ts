@@ -22,17 +22,24 @@ interface GlassData {
 
 export const getTopTemperature = (selectedGlassInfo: GlassInfo, firingType: string): number => {
   if (firingType === "f") {
+    // Exact Python logic: round((glass_info.get("f_topptemp")[0] + glass_info.get("f_topptemp")[1]) / 2)
     return Math.round((selectedGlassInfo.f_topptemp[0] + selectedGlassInfo.f_topptemp[1]) / 2);
   } else if (firingType === "s") {
+    // Exact Python logic: round((glass_info.get("s_topptemp")[0] + glass_info.get("s_topptemp")[1]) / 2)
     return Math.round((selectedGlassInfo.s_topptemp[0] + selectedGlassInfo.s_topptemp[1]) / 2);
   } else {
+    // Exact Python logic: glass_info.get("t_topptemp")
     return selectedGlassInfo.t_topptemp;
   }
 };
 
 export const getTimeFromTable = (table: any, radius: string, layers: string): number => {
+  // Exact Python logic: for row in table: if str(radius) in row: return row[str(radius)][str(layers)]
   const radiusRow = table.tabell.find((row: any) => radius in row);
-  return radiusRow ? radiusRow[radius][layers] : 30; // Default to 30 if not found
+  if (!radiusRow) {
+    throw new Error("Radius or layers not found in the table");
+  }
+  return radiusRow[radius][layers];
 };
 
 export const extractTableTimes = (
@@ -42,6 +49,7 @@ export const extractTableTimes = (
   glassRadius: string,
   glassLayers: string
 ) => {
+  // Exact Python logic for extracting tables
   const uppvarmningTable = glassData["Tider for uppvarmning"].find(
     item => item.kategori === selectedGlassInfo.kategori && item.ugn === ovenType
   );
@@ -54,14 +62,13 @@ export const extractTableTimes = (
     item => item.kategori === selectedGlassInfo.kategori
   );
 
-  const uppvarmningTime = uppvarmningTable ? 
-    getTimeFromTable(uppvarmningTable, glassRadius, glassLayers) : 30;
-  
-  const halltiderTime = halltiderTable ? 
-    getTimeFromTable(halltiderTable, glassRadius, glassLayers) : 20;
-  
-  const avspanningTime = avspanningTable ? 
-    getTimeFromTable(avspanningTable, glassRadius, glassLayers) : 60;
+  if (!uppvarmningTable || !halltiderTable || !avspanningTable) {
+    throw new Error("Required table not found for the selected glass category and oven type");
+  }
+
+  const uppvarmningTime = getTimeFromTable(uppvarmningTable, glassRadius, glassLayers);
+  const halltiderTime = getTimeFromTable(halltiderTable, glassRadius, glassLayers);
+  const avspanningTime = getTimeFromTable(avspanningTable, glassRadius, glassLayers);
 
   return { uppvarmningTime, halltiderTime, avspanningTime };
 };
@@ -86,6 +93,7 @@ export const createGlassTemplatePhases = (
   const nAstemp = selectedGlassInfo.n_astemp;
   const topTempHoldTime = parseInt(topTempMinutes) || 10;
 
+  // Calculate velocities exactly like Python
   const velocities = calculateVelocities(
     inledandeSmaltpunkt,
     roomTemp,
@@ -98,6 +106,7 @@ export const createGlassTemplatePhases = (
   );
 
   // Calculate durations using the Python _calculateTime logic
+  // Note: Python uses velocities directly, then calculates time based on them
   const phase1Duration = calculatePhaseDuration(roomTemp, inledandeSmaltpunkt, velocities.firstHeatingVelocity, 0);
   const phase2Duration = calculatePhaseDuration(inledandeSmaltpunkt, toppTemp, velocities.secondHeatingVelocity, topTempHoldTime);
   const phase3Duration = calculatePhaseDuration(toppTemp, oAstemp, Math.abs(velocities.firstCoolingVelocity), 0);
@@ -113,6 +122,12 @@ export const createGlassTemplatePhases = (
     phase5Duration
   });
 
+  // Create phases exactly like Python script order:
+  // curve.newPhase(first_heating_velocity, inledande_smaltpunkt)
+  // curve.newPhase(second_heating_velocity, topptemp, minutes)
+  // curve.newPhase(first_cooling_velocity, o_astemp)
+  // curve.newPhase(second_cooling_velocity, n_astemp)
+  // curve.newPhase(last_cooling_velocity, room_temp)
   return [
     { 
       id: '1', 
