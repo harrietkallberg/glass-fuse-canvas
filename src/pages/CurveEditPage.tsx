@@ -1,32 +1,14 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import Navigation from "@/components/Navigation";
-import CurveEditor from "@/components/CurveEditor";
-import ProjectDetailsTab from "@/components/ProjectDetailsTab";
-import CurveVersionChart from "@/components/CurveVersionChart";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, FileText, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
-import { useCurveState } from "@/hooks/useCurveState";
-
-interface Phase {
-  id: string;
-  targetTemp: number;
-  duration: number;
-  holdTime: number;
-}
-
-// Default phases for new curves
-const defaultPhases = [
-  { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
-  { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
-  { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
-  { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
-  { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
-];
+import ProjectInformationSection from "@/components/project-editor/ProjectInformationSection";
+import CurveEditorSection from "@/components/project-editor/CurveEditorSection";
 
 const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -34,41 +16,25 @@ const CurveEditPage = () => {
   const { user, loading: authLoading } = useAuth();
   const { 
     createCurve, 
-    saveCurveVersion, 
     loadCurveVersion, 
     getCurveVersions,
-    numberToSemantic,
-    getNextVersionNumber
+    numberToSemantic
   } = useCurves();
   
   const isNewCurve = !id || id === "new";
+  const [activeSection, setActiveSection] = useState<"project" | "editor">("project");
   const [currentCurveId, setCurrentCurveId] = useState<string | null>(null);
   const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(!isNewCurve);
   
-  // Project-level info
+  // Project-level data (static across versions)
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
+  const [templateCurveData, setTemplateCurveData] = useState<any>(null);
   
   // Version-specific data
-  const [currentVersionName, setCurrentVersionName] = useState("1.0");
-  const [notes, setNotes] = useState("");
-  const [materials, setMaterials] = useState("");
-  const [tags, setTags] = useState("");
-  const [activeTab, setActiveTab] = useState("curve");
   const [versions, setVersions] = useState<any[]>([]);
-  const [selectedVersionColor, setSelectedVersionColor] = useState("#F97316");
-
-  const curveState = useCurveState({ initialPhases: defaultPhases });
-
-  // Function to refresh versions and update state
-  const refreshVersions = async (curveId: string) => {
-    console.log('Refreshing versions for curve:', curveId);
-    const updatedVersions = await getCurveVersions(curveId);
-    console.log('Updated versions:', updatedVersions);
-    setVersions(updatedVersions);
-    return updatedVersions;
-  };
+  const [currentVersionData, setCurrentVersionData] = useState<any>(null);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -89,27 +55,28 @@ const CurveEditPage = () => {
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
+            // Set project-level data (these should come from the curves table)
             setProjectTitle(curveData.version.name || 'Untitled Project');
             setProjectDescription(curveData.version.notes || '');
             
+            // Store template curve data (this would be the original curve configuration)
+            setTemplateCurveData({
+              phases: curveData.phases,
+              settings: {
+                selectedGlass: curveData.version.selected_glass,
+                roomTemp: curveData.version.room_temp,
+                glassLayers: curveData.version.glass_layers,
+                glassRadius: curveData.version.glass_radius,
+                firingType: curveData.version.firing_type,
+                topTempMinutes: curveData.version.top_temp_minutes,
+                ovenType: curveData.version.oven_type,
+              }
+            });
+            
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
-            setCurrentVersionName(numberToSemantic(currentVersion.version_number));
             setVersions(versionsList);
-            
-            // Update curve state with loaded data
-            curveState.setPhases(curveData.phases);
-            if (curveData.version.selected_glass) curveState.setSelectedGlass(curveData.version.selected_glass);
-            if (curveData.version.room_temp) curveState.setRoomTemp(curveData.version.room_temp);
-            if (curveData.version.glass_layers) curveState.setGlassLayers(curveData.version.glass_layers);
-            if (curveData.version.glass_radius) curveState.setGlassRadius(curveData.version.glass_radius);
-            if (curveData.version.firing_type) curveState.setFiringType(curveData.version.firing_type);
-            if (curveData.version.top_temp_minutes) curveState.setTopTempMinutes(curveData.version.top_temp_minutes);
-            if (curveData.version.oven_type) curveState.setOvenType(curveData.version.oven_type);
-            
-            setNotes(curveData.version.notes || '');
-            setMaterials(curveData.version.materials || '');
-            setTags(curveData.version.tags || '');
+            setCurrentVersionData(curveData);
           }
         }
         
@@ -120,158 +87,36 @@ const CurveEditPage = () => {
     loadCurve();
   }, [id, isNewCurve, user]);
 
-  const handleSave = async () => {
+  const handleCreateProject = async (title: string, description: string, curveData: any) => {
     if (!user) return;
 
     try {
-      let curveId = currentCurveId;
-
-      // Create new curve if this is a new curve
-      if (isNewCurve) {
-        const newCurve = await createCurve(projectTitle, projectDescription);
-        if (!newCurve) {
-          toast({
-            title: "Error",
-            description: "Failed to create curve",
-            variant: "destructive"
-          });
-          return;
-        }
-        curveId = newCurve.id;
-        setCurrentCurveId(curveId);
-      }
-
-      if (!curveId) return;
-
-      // Generate patch version number (e.g., 1.0 -> 1.0.1, 1.0.1 -> 1.0.2)
-      const versionNumber = getNextPatchVersion(currentVersionName);
-
-      // Save the curve version
-      const savedVersion = await saveCurveVersion(
-        curveId,
-        `Version ${versionNumber}`,
-        {
-          selectedGlass: curveState.selectedGlass,
-          roomTemp: curveState.roomTemp,
-          glassLayers: curveState.glassLayers,
-          glassRadius: curveState.glassRadius,
-          firingType: curveState.firingType,
-          topTempMinutes: curveState.topTempMinutes,
-          ovenType: curveState.ovenType,
-          notes,
-          materials,
-          tags,
-        },
-        curveState.phases
-      );
-
-      if (savedVersion) {
-        setCurrentVersionId(savedVersion.id);
-        setCurrentVersionName(versionNumber);
-        
-        // Refresh versions list to show the new version immediately
-        const updatedVersions = await refreshVersions(curveId);
-        
-        // Find the newly created version and make sure it's marked as current
-        const newVersion = updatedVersions.find(v => v.id === savedVersion.id);
-        if (newVersion) {
-          setCurrentVersionId(newVersion.id);
-          setCurrentVersionName(numberToSemantic(newVersion.version_number));
-        }
-        
+      const newCurve = await createCurve(title, description);
+      if (!newCurve) {
         toast({
-          title: "Changes saved!",
-          description: `New version ${versionNumber} created successfully.`,
+          title: "Error",
+          description: "Failed to create project",
+          variant: "destructive"
         });
-
-        // Navigate to the curve edit page if this was a new curve
-        if (isNewCurve) {
-          navigate(`/edit/${curveId}`);
-        }
+        return;
       }
+      
+      setCurrentCurveId(newCurve.id);
+      setProjectTitle(title);
+      setProjectDescription(description);
+      setTemplateCurveData(curveData);
+      
+      toast({
+        title: "Project created!",
+        description: "Your project has been created successfully.",
+      });
+
+      navigate(`/edit/${newCurve.id}`);
     } catch (error) {
-      console.error('Error saving curve:', error);
+      console.error('Error creating project:', error);
       toast({
         title: "Error",
-        description: "Failed to save curve",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Generate next patch version (e.g., 1.0 -> 1.0.1, 1.0.1 -> 1.0.2)
-  const getNextPatchVersion = (currentVersion: string): string => {
-    const parts = currentVersion.split('.');
-    if (parts.length === 2) {
-      // Major.Minor -> Major.Minor.1
-      return `${parts[0]}.${parts[1]}.1`;
-    } else if (parts.length === 3) {
-      // Major.Minor.Patch -> Major.Minor.(Patch+1)
-      const patch = parseInt(parts[2]) || 0;
-      return `${parts[0]}.${parts[1]}.${patch + 1}`;
-    } else if (parts.length === 4) {
-      // Major.Minor.Patch.SubPatch -> Major.Minor.Patch.(SubPatch+1)
-      const subPatch = parseInt(parts[3]) || 0;
-      return `${parts[0]}.${parts[1]}.${parts[2]}.${subPatch + 1}`;
-    }
-    return `${currentVersion}.1`;
-  };
-
-  const handleVersionSelect = async (versionId: string) => {
-    if (!versionId || versionId === currentVersionId) return;
-    
-    const curveData = await loadCurveVersion(versionId);
-    if (curveData) {
-      setCurrentVersionId(versionId);
-      setCurrentVersionName(numberToSemantic(curveData.version.version_number));
-      
-      // Generate new color for selected version
-      const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
-      const versionIndex = versions.findIndex(v => v.id === versionId);
-      setSelectedVersionColor(colors[versionIndex % colors.length]);
-      
-      // Update curve state with loaded data
-      curveState.setPhases(curveData.phases);
-      if (curveData.version.selected_glass) curveState.setSelectedGlass(curveData.version.selected_glass);
-      if (curveData.version.room_temp) curveState.setRoomTemp(curveData.version.room_temp);
-      if (curveData.version.glass_layers) curveState.setGlassLayers(curveData.version.glass_layers);
-      if (curveData.version.glass_radius) curveState.setGlassRadius(curveData.version.glass_radius);
-      if (curveData.version.firing_type) curveState.setFiringType(curveData.version.firing_type);
-      if (curveData.version.top_temp_minutes) curveState.setTopTempMinutes(curveData.version.top_temp_minutes);
-      if (curveData.version.oven_type) curveState.setOvenType(curveData.version.oven_type);
-      
-      setNotes(curveData.version.notes || '');
-      setMaterials(curveData.version.materials || '');
-      setTags(curveData.version.tags || '');
-    }
-  };
-
-  const handleNewMainVersion = () => {
-    // Create a new main version (e.g., 1.0 -> 2.0)
-    const parts = currentVersionName.split('.');
-    const major = parseInt(parts[0]) || 1;
-    const newVersion = `${major + 1}.0`;
-    setCurrentVersionName(newVersion);
-    
-    toast({
-      title: "New Main Version",
-      description: `Ready to create version ${newVersion}. Save to create it.`,
-    });
-  };
-
-  const handleSetAsMainVersion = async (versionId: string) => {
-    // Set the selected version as the current/main version
-    try {
-      // This would need to be implemented in the useCurves hook
-      // For now, just show a toast
-      toast({
-        title: "Main Version Set",
-        description: "This version is now the main version.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to set as main version",
+        description: "Failed to create project",
         variant: "destructive"
       });
     }
@@ -289,7 +134,7 @@ const CurveEditPage = () => {
     <div className="min-h-screen pb-20 bg-gradient-to-br from-blue-50/30 to-orange-50/30">
       <Navigation />
       
-      <div className="container mx-auto pt-24 px-4 space-y-8">
+      <div className="container mx-auto pt-24 px-4">
         <div className="mb-6">
           <Link to="/dashboard">
             <Button variant="ghost" size="sm" className="gap-1">
@@ -300,109 +145,70 @@ const CurveEditPage = () => {
         </div>
         
         {/* Project Header */}
-        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl">
-          {isNewCurve ? (
-            <div className="space-y-6">
-              <div>
-                <label className="text-lg font-semibold text-gray-800 mb-3 block">
-                  Project Name
-                </label>
-                <input
-                  type="text"
-                  value={projectTitle}
-                  onChange={(e) => setProjectTitle(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent text-lg"
-                  placeholder="Enter project name..."
-                />
-              </div>
-              
-              <div>
-                <label className="text-lg font-semibold text-gray-800 mb-3 block">
-                  Project Description
-                </label>
-                <textarea
-                  value={projectDescription}
-                  onChange={(e) => setProjectDescription(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#F97316] focus:border-transparent text-lg"
-                  rows={3}
-                  placeholder="Describe your project..."
-                />
-              </div>
-              
-              <div className="flex justify-end">
-                <Button 
-                  onClick={handleSave}
-                  className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-3 text-lg"
-                >
-                  Create Project
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center space-y-4">
-              <h1 className="text-4xl font-bold text-gray-800">{projectTitle}</h1>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
-              <div className="text-lg text-gray-700">
-                Currently editing: <span className="font-bold text-2xl" style={{ color: selectedVersionColor }}>
-                  Version {currentVersionName}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
-        
-        {/* Version Chart */}
-        {!isNewCurve && (
-          <CurveVersionChart 
-            versions={versions.map(v => ({
-              ...v,
-              version_number: numberToSemantic(v.version_number)
-            }))}
-            currentVersionId={currentVersionId}
-            onVersionSelect={handleVersionSelect}
-            onNewVersion={handleNewMainVersion}
-            selectedVersionColor={selectedVersionColor}
-          />
-        )}
-        
-        {/* Main Editor */}
-        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              {isNewCurve ? "Create New Project" : `Editing Version ${currentVersionName}`}
-            </h2>
+        <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl mb-8">
+          <div className="text-center space-y-4">
+            <h1 className="text-4xl font-bold text-gray-800">
+              {isNewCurve ? "Create New Project" : projectTitle}
+            </h1>
             {!isNewCurve && (
-              <Button 
-                onClick={handleSave}
-                className="px-8 py-3 text-lg font-medium bg-[#F97316] hover:bg-[#F97316]/90 text-white"
-              >
-                Save Changes
-              </Button>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
             )}
           </div>
+        </div>
+        
+        {/* Main Content with Sidebar */}
+        <div className="flex gap-8">
+          {/* Sidebar Navigation */}
+          {!isNewCurve && (
+            <div className="w-64 space-y-2">
+              <Button
+                variant={activeSection === "project" ? "default" : "ghost"}
+                className="w-full justify-start gap-3 h-12"
+                onClick={() => setActiveSection("project")}
+              >
+                <FileText className="h-5 w-5" />
+                Project Information
+              </Button>
+              <Button
+                variant={activeSection === "editor" ? "default" : "ghost"}
+                className="w-full justify-start gap-3 h-12"
+                onClick={() => setActiveSection("editor")}
+              >
+                <TrendingUp className="h-5 w-5" />
+                Curve Editor
+              </Button>
+            </div>
+          )}
           
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full mb-6 p-2 bg-white/50">
-              <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve Editor</TabsTrigger>
-              <TabsTrigger value="notes" className="flex-1 text-lg py-3">Notes & Results</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="curve" className="mt-6 space-y-6">
-              <CurveEditor initialPhases={curveState.phases} onSave={handleSave} />
-            </TabsContent>
-            
-            <TabsContent value="notes" className="mt-6 space-y-6">
-              <ProjectDetailsTab 
-                notes={notes} 
-                setNotes={setNotes}
-                materials={materials}
-                setMaterials={setMaterials}
-                tags={tags}
-                setTags={setTags}
-                handleSave={handleSave}
+          {/* Main Content Area */}
+          <div className="flex-1">
+            {(isNewCurve || activeSection === "project") && (
+              <ProjectInformationSection
+                isNewCurve={isNewCurve}
+                projectTitle={projectTitle}
+                setProjectTitle={setProjectTitle}
+                projectDescription={projectDescription}
+                setProjectDescription={setProjectDescription}
+                templateCurveData={templateCurveData}
+                setTemplateCurveData={setTemplateCurveData}
+                onCreateProject={handleCreateProject}
               />
-            </TabsContent>
-          </Tabs>
+            )}
+            
+            {!isNewCurve && activeSection === "editor" && (
+              <CurveEditorSection
+                curveId={currentCurveId!}
+                versions={versions}
+                setVersions={setVersions}
+                currentVersionId={currentVersionId}
+                setCurrentVersionId={setCurrentVersionId}
+                currentVersionData={currentVersionData}
+                setCurrentVersionData={setCurrentVersionData}
+                templateCurveData={templateCurveData}
+                numberToSemantic={numberToSemantic}
+              />
+            )}
+          </div>
         </div>
       </div>
     </div>
