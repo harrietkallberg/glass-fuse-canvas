@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -20,7 +19,7 @@ export interface CurveData {
 export interface CurveVersion {
   id: string;
   curve_id: string;
-  version_number: number; // Keep as number to match database
+  version_number: number;
   name: string;
   is_current: boolean;
   selected_glass?: string;
@@ -106,7 +105,6 @@ export const useCurves = () => {
     const major = parseInt(parts[0]) || 0;
     const minor = parseInt(parts[1]) || 0;
     const patch = parseInt(parts[2]) || 0;
-    // Convert to a single number: major * 10000 + minor * 100 + patch
     return major * 10000 + minor * 100 + patch;
   };
 
@@ -121,7 +119,7 @@ export const useCurves = () => {
     return `${major}.${minor}`;
   };
 
-  // Save curve version with semantic versioning
+  // Enhanced save function with automatic version refresh
   const saveCurveVersion = async (
     curveId: string,
     versionName: string,
@@ -130,7 +128,6 @@ export const useCurves = () => {
   ) => {
     if (!user) return null;
 
-    // Extract version number from version name (e.g., "Version 2.1" -> "2.1")
     const semanticVersion = versionName.replace('Version ', '');
     const numericVersion = semanticToNumber(semanticVersion);
 
@@ -231,28 +228,42 @@ export const useCurves = () => {
     };
   };
 
-  // Get versions for a curve with semantic version sorting
+  // Enhanced get versions function with better error handling
   const getCurveVersions = async (curveId: string) => {
-    const { data, error } = await supabase
-      .from('curve_versions')
-      .select('*')
-      .eq('curve_id', curveId)
-      .order('version_number', { ascending: true }); // Sort by numeric version
+    try {
+      const { data, error } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .order('version_number', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching versions:', error);
+      if (error) {
+        console.error('Error fetching versions:', error);
+        return [];
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Error in getCurveVersions:', error);
       return [];
     }
-
-    return data || [];
   };
 
-  // Generate semantic version number
-  const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean) => {
+  // New function to refresh versions for a specific curve
+  const refetchCurveVersions = async (curveId: string) => {
+    return await getCurveVersions(curveId);
+  };
+
+  // Generate semantic version number with better logic
+  const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean, currentVersionId?: string) => {
     if (existingVersions.length === 0) return "1.0";
     
-    const currentVersion = existingVersions.find(v => v.id === existingVersions[0]?.id);
-    if (!currentVersion) return `${existingVersions.length + 1}.0`;
+    // Find current version or latest version
+    const currentVersion = currentVersionId 
+      ? existingVersions.find(v => v.id === currentVersionId)
+      : existingVersions.find(v => v.is_current) || existingVersions[existingVersions.length - 1];
+    
+    if (!currentVersion) return "1.0";
     
     const currentSemantic = numberToSemantic(currentVersion.version_number);
     
@@ -343,7 +354,9 @@ export const useCurves = () => {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
+    refetchCurveVersions, // New function for refreshing versions
     refetchCurves: fetchCurves,
-    numberToSemantic, // Export helper function
+    numberToSemantic,
+    getNextVersionNumber,
   };
 };

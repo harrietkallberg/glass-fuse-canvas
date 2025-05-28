@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,7 +7,7 @@ import Navigation from "@/components/Navigation";
 import CurveEditor from "@/components/CurveEditor";
 import ProjectDetailsTab from "@/components/ProjectDetailsTab";
 import CurveVersionChart from "@/components/CurveVersionChart";
-import { ArrowLeft, Edit, Plus } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurves } from "@/hooks/useCurves";
 import { useCurveState } from "@/hooks/useCurveState";
@@ -33,14 +32,21 @@ const CurveEditPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
-  const { createCurve, saveCurveVersion, loadCurveVersion, getCurveVersions, numberToSemantic } = useCurves();
+  const { 
+    createCurve, 
+    saveCurveVersion, 
+    loadCurveVersion, 
+    refetchCurveVersions, 
+    numberToSemantic,
+    getNextVersionNumber
+  } = useCurves();
   
   const isNewCurve = !id || id === "new";
   const [currentCurveId, setCurrentCurveId] = useState<string | null>(null);
   const [currentVersionId, setCurrentVersionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(!isNewCurve);
   
-  // Project-level info (read-only after creation)
+  // Project-level info
   const [projectTitle, setProjectTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
   
@@ -62,25 +68,11 @@ const CurveEditPage = () => {
     return `linear-gradient(135deg, ${baseColor}08 0%, ${baseColor}15 50%, #33C3F008 100%)`;
   };
 
-  // Generate semantic version number
-  const getNextVersionNumber = (existingVersions: any[], isNewVersion: boolean) => {
-    if (existingVersions.length === 0) return "1.0";
-    
-    const currentVersion = existingVersions.find(v => v.id === currentVersionId);
-    if (!currentVersion) return `${existingVersions.length + 1}.0`;
-    
-    const currentSemantic = numberToSemantic(currentVersion.version_number);
-    
-    if (isNewVersion) {
-      // Create new major version
-      const majorVersions = existingVersions.map(v => Math.floor(v.version_number / 10000));
-      const maxMajor = Math.max(...majorVersions);
-      return `${maxMajor + 1}.0`;
-    } else {
-      // Create minor version increment
-      const [major, minor = "0"] = currentSemantic.split('.');
-      return `${major}.${parseInt(minor) + 1}`;
-    }
+  // Function to refresh versions and update state
+  const refreshVersions = async (curveId: string) => {
+    const updatedVersions = await refetchCurveVersions(curveId);
+    setVersions(updatedVersions);
+    return updatedVersions;
   };
 
   // Redirect to login if not authenticated
@@ -96,13 +88,12 @@ const CurveEditPage = () => {
       if (!isNewCurve && id && user) {
         setLoading(true);
         
-        const versionsList = await getCurveVersions(id);
+        const versionsList = await refetchCurveVersions(id);
         const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
         
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // Set project-level info (read-only)
             setProjectTitle(curveData.version.name || 'Untitled Project');
             setProjectDescription(curveData.version.notes || '');
             
@@ -158,7 +149,7 @@ const CurveEditPage = () => {
       if (!curveId) return;
 
       // Generate semantic version number
-      const versionNumber = getNextVersionNumber(versions, editMode === "new");
+      const versionNumber = getNextVersionNumber(versions, editMode === "new", currentVersionId);
 
       // Save the curve version
       const savedVersion = await saveCurveVersion(
@@ -183,9 +174,8 @@ const CurveEditPage = () => {
         setCurrentVersionId(savedVersion.id);
         setCurrentVersionName(versionNumber);
         
-        // Refresh versions list
-        const updatedVersions = await getCurveVersions(curveId);
-        setVersions(updatedVersions);
+        // Refresh versions list to show the new version immediately
+        await refreshVersions(curveId);
         
         toast({
           title: "Curve saved!",
@@ -203,6 +193,7 @@ const CurveEditPage = () => {
         setEditMode("edit");
       }
     } catch (error) {
+      console.error('Error saving curve:', error);
       toast({
         title: "Error",
         description: "Failed to save curve",
@@ -354,7 +345,7 @@ const CurveEditPage = () => {
             <CurveVersionChart 
               versions={versions.map(v => ({
                 ...v,
-                version_number: numberToSemantic(v.version_number) // Convert to semantic version for display
+                version_number: numberToSemantic(v.version_number)
               }))}
               currentVersionId={currentVersionId}
               onVersionSelect={handleVersionSelect}
