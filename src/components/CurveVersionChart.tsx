@@ -1,11 +1,11 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Crown } from "lucide-react";
+import { Plus, Crown, ArrowRight } from "lucide-react";
 
 interface Version {
   id: string;
-  version_number: string; // Now expecting semantic version string for display
+  version_number: string;
   name: string;
   is_current: boolean;
   created_at: string;
@@ -28,54 +28,52 @@ const CurveVersionChart = ({
   onSetMainVersion,
   selectedVersionColor = "#F97316"
 }: CurveVersionChartProps) => {
-  // Group versions by main version (major.minor)
+  // Group versions by generation (horizontal position) and draft level (vertical position)
   const groupedVersions = versions.reduce((acc, version) => {
     const parts = version.version_number.split('.');
-    const mainVersion = `${parts[0]}.${parts[1] || '0'}`;
-    if (!acc[mainVersion]) {
-      acc[mainVersion] = [];
-    }
-    acc[mainVersion].push(version);
-    return acc;
-  }, {} as Record<string, Version[]>);
-
-  // Sort main versions
-  const sortedMainVersions = Object.keys(groupedVersions).sort((a, b) => {
-    const aNum = parseFloat(a);
-    const bNum = parseFloat(b);
-    return aNum - bNum;
-  });
-
-  // Generate colors for main version branches
-  const getMainVersionColor = (mainVersion: string, isSelected: boolean) => {
-    const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
-    const index = sortedMainVersions.indexOf(mainVersion);
-    return isSelected ? selectedVersionColor : colors[index % colors.length];
-  };
-
-  // Generate positions for version nodes
-  const getNodePosition = (mainVersionIndex: number, patchIndex: number, totalMainVersions: number) => {
-    const chartWidth = Math.max(1000, totalMainVersions * 300 + 200);
-    const mainSpacing = (chartWidth - 200) / Math.max(1, totalMainVersions - 1);
-    const baseX = 100 + (mainVersionIndex * mainSpacing);
-    const baseY = 120;
+    const generation = parseInt(parts[0]) || 1; // Horizontal level
+    const draft = parseInt(parts[1]) || 0; // Vertical level within generation
     
-    if (patchIndex === 0) {
-      // Main version node
-      return { x: baseX, y: baseY };
-    } else {
-      // Patch version nodes branch off
-      return { x: baseX + (patchIndex * 80), y: baseY + 80 };
+    if (!acc[generation]) {
+      acc[generation] = {};
     }
+    if (!acc[generation][draft]) {
+      acc[generation][draft] = [];
+    }
+    acc[generation][draft].push(version);
+    return acc;
+  }, {} as Record<number, Record<number, Version[]>>);
+
+  // Sort generations and drafts
+  const sortedGenerations = Object.keys(groupedVersions).map(Number).sort((a, b) => a - b);
+  
+  // Generate positions for version nodes with vertical/horizontal layout
+  const getNodePosition = (generation: number, draft: number, subIndex: number = 0) => {
+    const generationSpacing = 250; // Horizontal spacing between generations
+    const draftSpacing = 100; // Vertical spacing between drafts
+    const subSpacing = 60; // Spacing for multiple versions in same generation.draft
+    
+    const baseX = 100 + (generation - 1) * generationSpacing;
+    const baseY = 120 + draft * draftSpacing;
+    
+    return { 
+      x: baseX + (subIndex * subSpacing), 
+      y: baseY 
+    };
   };
 
-  const renderVersionNode = (version: Version, mainVersionIndex: number, patchIndex: number, isMainVersion: boolean) => {
-    const position = getNodePosition(mainVersionIndex, patchIndex, sortedMainVersions.length);
+  // Generate colors for different generations
+  const getGenerationColor = (generation: number, isSelected: boolean) => {
+    const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
+    return isSelected ? selectedVersionColor : colors[(generation - 1) % colors.length];
+  };
+
+  const renderVersionNode = (version: Version, generation: number, draft: number, subIndex: number) => {
+    const position = getNodePosition(generation, draft, subIndex);
     const isSelected = version.id === currentVersionId;
     const isCurrent = version.is_current;
-    const mainVersion = `${version.version_number.split('.')[0]}.${version.version_number.split('.')[1] || '0'}`;
-    const nodeColor = getMainVersionColor(mainVersion, isSelected);
-    const isPatchVersion = version.version_number.split('.').length > 2;
+    const nodeColor = getGenerationColor(generation, isSelected);
+    const isMainVersion = draft === 0; // Main versions are at draft level 0
 
     return (
       <g key={version.id} transform={`translate(${position.x}, ${position.y})`}>
@@ -94,7 +92,7 @@ const CurveVersionChart = ({
         <circle
           cx="32"
           cy="32"
-          r={isPatchVersion ? "20" : "28"}
+          r={isMainVersion ? "28" : "20"}
           fill="rgba(0, 0, 0, 0.15)"
           className="blur-sm"
         />
@@ -103,7 +101,7 @@ const CurveVersionChart = ({
         <circle
           cx="30"
           cy="30"
-          r={isPatchVersion ? "20" : "28"}
+          r={isMainVersion ? "28" : "20"}
           fill={nodeColor}
           stroke={isSelected ? selectedVersionColor : nodeColor}
           strokeWidth={isSelected ? "4" : "2"}
@@ -115,7 +113,7 @@ const CurveVersionChart = ({
         <circle
           cx="24"
           cy="24"
-          r={isPatchVersion ? "8" : "12"}
+          r={isMainVersion ? "12" : "8"}
           fill="rgba(255, 255, 255, 0.4)"
           className="pointer-events-none"
         />
@@ -125,21 +123,21 @@ const CurveVersionChart = ({
           x="30"
           y="36"
           textAnchor="middle"
-          className={`${isPatchVersion ? 'text-xs' : 'text-base'} font-bold cursor-pointer transition-colors duration-300 ${
+          className={`${isMainVersion ? 'text-base' : 'text-xs'} font-bold cursor-pointer transition-colors duration-300 ${
             isSelected || isCurrent ? "fill-white" : "fill-gray-800"
           }`}
           onClick={() => onVersionSelect(version.id)}
         >
-          {isPatchVersion ? version.version_number.split('.')[2] : version.version_number}
+          {version.version_number}
         </text>
         
         {/* Crown for current version */}
         {isCurrent && (
-          <Crown className="h-4 w-4 text-yellow-500 absolute -top-2 -right-2" style={{ transform: 'translate(45px, 10px)' }} />
+          <Crown className="h-4 w-4 text-yellow-500" style={{ transform: 'translate(45px, 10px)' }} />
         )}
         
         {/* Version info card */}
-        <foreignObject x="-60" y={isPatchVersion ? "60" : "80"} width="180" height="120">
+        <foreignObject x="-60" y={isMainVersion ? "80" : "60"} width="180" height="120">
           <div className="text-center">
             <Button
               variant="ghost"
@@ -173,7 +171,7 @@ const CurveVersionChart = ({
                     }}
                     className="text-xs mt-2"
                   >
-                    Set as Main
+                    Move to Next Level
                   </Button>
                 )}
               </div>
@@ -187,44 +185,51 @@ const CurveVersionChart = ({
   const renderConnectionLines = () => {
     const lines: JSX.Element[] = [];
     
-    sortedMainVersions.forEach((mainVersion, mainIndex) => {
-      const versionsInGroup = groupedVersions[mainVersion].sort((a, b) => {
-        const aNum = parseFloat(a.version_number);
-        const bNum = parseFloat(b.version_number);
-        return aNum - bNum;
-      });
+    sortedGenerations.forEach((generation, genIndex) => {
+      const draftsInGeneration = Object.keys(groupedVersions[generation]).map(Number).sort((a, b) => a - b);
       
-      // Connect patch versions to main version
-      versionsInGroup.forEach((version, patchIndex) => {
-        if (patchIndex > 0) {
-          const mainPos = getNodePosition(mainIndex, 0, sortedMainVersions.length);
-          const patchPos = getNodePosition(mainIndex, patchIndex, sortedMainVersions.length);
+      // Connect drafts vertically within same generation
+      draftsInGeneration.forEach((draft, draftIndex) => {
+        if (draftIndex > 0) {
+          const parentPos = getNodePosition(generation, draftsInGeneration[draftIndex - 1]);
+          const currentPos = getNodePosition(generation, draft);
           
           lines.push(
             <path
-              key={`patch-connection-${version.id}`}
-              d={`M ${mainPos.x + 30} ${mainPos.y + 30} L ${patchPos.x + 30} ${patchPos.y + 30}`}
-              stroke="rgba(249, 115, 22, 0.3)"
+              key={`vertical-${generation}-${draft}`}
+              d={`M ${parentPos.x + 30} ${parentPos.y + 30} L ${parentPos.x + 30} ${currentPos.y + 30} L ${currentPos.x + 30} ${currentPos.y + 30}`}
+              stroke="rgba(249, 115, 22, 0.4)"
               strokeWidth="2"
-              strokeDasharray="4,4"
               fill="none"
             />
           );
         }
       });
       
-      // Connect main versions
-      if (mainIndex < sortedMainVersions.length - 1) {
-        const currentPos = getNodePosition(mainIndex, 0, sortedMainVersions.length);
-        const nextPos = getNodePosition(mainIndex + 1, 0, sortedMainVersions.length);
+      // Connect main versions horizontally between generations
+      if (genIndex < sortedGenerations.length - 1) {
+        const currentMainPos = getNodePosition(generation, 0);
+        const nextMainPos = getNodePosition(sortedGenerations[genIndex + 1], 0);
         
         lines.push(
           <path
-            key={`main-connection-${mainIndex}`}
-            d={`M ${currentPos.x + 30} ${currentPos.y + 30} L ${nextPos.x + 30} ${nextPos.y + 30}`}
-            stroke="rgba(249, 115, 22, 0.4)"
+            key={`horizontal-${generation}`}
+            d={`M ${currentMainPos.x + 30} ${currentMainPos.y + 30} L ${nextMainPos.x + 30} ${nextMainPos.y + 30}`}
+            stroke="rgba(51, 195, 240, 0.6)"
             strokeWidth="3"
             fill="none"
+          />
+        );
+        
+        // Add arrow marker for progression
+        lines.push(
+          <ArrowRight 
+            key={`arrow-${generation}`}
+            className="h-4 w-4 text-[#33C3F0]" 
+            style={{ 
+              transform: `translate(${(currentMainPos.x + nextMainPos.x) / 2 + 22}px, ${currentMainPos.y + 22}px)`,
+              position: 'absolute'
+            }} 
           />
         );
       }
@@ -239,27 +244,29 @@ const CurveVersionChart = ({
         <p className="text-lg mb-4">No versions available</p>
         <Button onClick={onNewVersion} className="gap-2">
           <Plus className="h-4 w-4" />
-          Create First Version
+          Add New Version
         </Button>
       </div>
     );
   }
 
-  const chartWidth = Math.max(1000, sortedMainVersions.length * 300 + 200);
-  const chartHeight = 350;
+  const maxGeneration = Math.max(...sortedGenerations);
+  const maxDrafts = Math.max(...sortedGenerations.map(gen => Object.keys(groupedVersions[gen]).length));
+  const chartWidth = Math.max(800, (maxGeneration * 250) + 300);
+  const chartHeight = Math.max(300, (maxDrafts * 100) + 250);
 
   return (
     <div className="w-full">
       <div className="glass-card bg-gradient-to-br from-white/50 to-white/30 backdrop-blur-sm rounded-3xl border border-white/40 p-6 shadow-2xl">
-        {/* Header with New Version button */}
+        {/* Header with Add New Version button */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-800">Version Timeline</h3>
+          <h3 className="text-xl font-semibold text-gray-800">Version Progress</h3>
           <Button 
             onClick={onNewVersion}
             className="gap-2 bg-gradient-to-r from-[#F97316] to-[#33C3F0] hover:from-[#F97316]/90 hover:to-[#33C3F0]/90 text-white font-medium px-6"
           >
             <Plus className="h-4 w-4" />
-            New Main Version
+            Add New Version
           </Button>
         </div>
 
@@ -283,15 +290,13 @@ const CurveVersionChart = ({
           {renderConnectionLines()}
           
           {/* Version nodes */}
-          {sortedMainVersions.map((mainVersion, mainIndex) => {
-            const versionsInGroup = groupedVersions[mainVersion].sort((a, b) => {
-              const aNum = parseFloat(a.version_number);
-              const bNum = parseFloat(b.version_number);
-              return aNum - bNum;
-            });
+          {sortedGenerations.map((generation) => {
+            const draftsInGeneration = Object.keys(groupedVersions[generation]).map(Number).sort((a, b) => a - b);
             
-            return versionsInGroup.map((version, patchIndex) => 
-              renderVersionNode(version, mainIndex, patchIndex, patchIndex === 0)
+            return draftsInGeneration.map((draft) => 
+              groupedVersions[generation][draft].map((version, subIndex) => 
+                renderVersionNode(version, generation, draft, subIndex)
+              )
             );
           })}
         </svg>
@@ -304,13 +309,16 @@ const CurveVersionChart = ({
           <span className="text-gray-700 font-medium">Selected</span>
         </div>
         <div className="flex items-center gap-2 bg-white/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-          <div className="w-5 h-5 rounded-full bg-[#33C3F0] shadow-md"></div>
           <Crown className="h-4 w-4 text-yellow-500" />
-          <span className="text-gray-700 font-medium">Main Version</span>
+          <span className="text-gray-700 font-medium">Current Version</span>
+        </div>
+        <div className="flex items-center gap-2 bg-white/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+          <ArrowRight className="h-4 w-4 text-[#33C3F0]" />
+          <span className="text-gray-700 font-medium">Progress →</span>
         </div>
         <div className="flex items-center gap-2 bg-white/40 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
           <div className="w-3 h-3 rounded-full bg-gradient-to-r from-[#FFB3D1] to-[#B3E5FF] shadow-md"></div>
-          <span className="text-gray-700 font-medium">Patch Versions</span>
+          <span className="text-gray-700 font-medium">Draft Versions ↓</span>
         </div>
       </div>
     </div>
