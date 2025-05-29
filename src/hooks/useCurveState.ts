@@ -91,6 +91,11 @@ export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMo
     }
   };
 
+  // Get selected glass information
+  const getSelectedGlassInfo = () => {
+    return glassData.Glassorter.find(glass => glass.namn === selectedGlass);
+  };
+
   // Load template settings into the state (for editing template)
   const loadTemplateSettings = (templateSettings: any) => {
     if (templateSettings) {
@@ -147,6 +152,7 @@ export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMo
     
     // Template operations
     generateTemplateFromSettings,
+    getSelectedGlassInfo,
     loadTemplateSettings,
     getTemplateSettings,
   };
