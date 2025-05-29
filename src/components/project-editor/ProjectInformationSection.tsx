@@ -31,19 +31,7 @@ const ProjectInformationSection = ({
   curveId
 }: ProjectInformationSectionProps) => {
   const [hasChanges, setHasChanges] = useState(false);
-  const [templateConfirmed, setTemplateConfirmed] = useState(!isNewCurve); // Existing projects start as confirmed
   const { user } = useAuth();
-  const temperatureUnit = "celsius";
-
-  const handleCreateProject = () => {
-    if (!projectTitle.trim() || !templateConfirmed) {
-      return;
-    }
-    onCreateProject(projectTitle, projectDescription, { 
-      ...templateCurveData, 
-      temperatureUnit
-    });
-  };
 
   const handleUpdateProject = () => {
     if (onUpdateProject) {
@@ -62,8 +50,11 @@ const ProjectInformationSection = ({
     if (!isNewCurve) setHasChanges(true);
   };
 
-  const handleTemplateConfirmed = () => {
-    setTemplateConfirmed(true);
+  const handleTemplateConfirmed = (newProjectData?: { title: string; description: string; curveData: any }) => {
+    if (isNewCurve && newProjectData) {
+      // For new projects, create the project when template is confirmed
+      onCreateProject(newProjectData.title, newProjectData.description, newProjectData.curveData);
+    }
   };
 
   return (
@@ -84,14 +75,14 @@ const ProjectInformationSection = ({
         setTemplateCurveData={setTemplateCurveData}
         curveId={curveId}
         onTemplateConfirmed={handleTemplateConfirmed}
+        projectTitle={projectTitle}
+        projectDescription={projectDescription}
       />
 
       <ProjectActions
         isNewCurve={isNewCurve}
         hasChanges={hasChanges}
         projectTitle={projectTitle}
-        templateConfirmed={templateConfirmed}
-        onCreateProject={handleCreateProject}
         onUpdateProject={handleUpdateProject}
       />
     </div>

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -13,7 +12,9 @@ interface TemplateCurveEditorProps {
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
   curveId?: string;
-  onTemplateConfirmed?: () => void;
+  onTemplateConfirmed?: (newProjectData?: { title: string; description: string; curveData: any }) => void;
+  projectTitle?: string;
+  projectDescription?: string;
 }
 
 // Default template phases
@@ -30,7 +31,9 @@ const TemplateCurveEditor = ({
   templateCurveData,
   setTemplateCurveData,
   curveId,
-  onTemplateConfirmed
+  onTemplateConfirmed,
+  projectTitle = "",
+  projectDescription = ""
 }: TemplateCurveEditorProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
@@ -90,21 +93,34 @@ const TemplateCurveEditor = ({
       return;
     }
 
-    // For new projects, we don't save to database yet - that happens when project is created
+    // For new projects, create the project with the template
     if (isNewCurve) {
+      if (!projectTitle.trim()) {
+        toast({
+          title: "Project title required",
+          description: "Please enter a project title before confirming the template.",
+          variant: "destructive"
+        });
+        return;
+      }
+
       setHasTemplateChanges(false);
       setOriginalPhases([...localCurveData.phases]);
+      
       if (onTemplateConfirmed) {
-        onTemplateConfirmed();
+        onTemplateConfirmed({
+          title: projectTitle,
+          description: projectDescription,
+          curveData: { 
+            ...localCurveData, 
+            temperatureUnit
+          }
+        });
       }
-      toast({
-        title: "Template confirmed!",
-        description: "Template is ready. Click 'Create Project' to save your project.",
-      });
       return;
     }
 
-    // For existing projects, save to database
+    // For existing projects, save template to database
     if (!curveId) {
       return;
     }
@@ -210,8 +226,8 @@ const TemplateCurveEditor = ({
     }
   };
 
-  // Show button for both new and existing projects when there are template changes
-  const showConfirmButton = hasTemplateChanges;
+  // Show button when there are template changes OR for new projects that need template confirmation
+  const showConfirmButton = hasTemplateChanges || (isNewCurve && localCurveData?.phases);
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
@@ -226,7 +242,7 @@ const TemplateCurveEditor = ({
       
       <div className="text-sm text-gray-600 mb-6">
         {isNewCurve 
-          ? "Configure your base firing curve template. This will serve as the starting point for all versions."
+          ? "Configure your base firing curve template. This will serve as the starting point for all versions and create your project."
           : "This is your project's base template curve. Make changes and click 'Confirm Template for Project' to save them across all project sections."
         }
       </div>
@@ -242,14 +258,18 @@ const TemplateCurveEditor = ({
         <div className="mt-6 flex justify-center">
           <Button 
             onClick={handleConfirmTemplate}
-            disabled={isSavingTemplate}
+            disabled={isSavingTemplate || (isNewCurve && !projectTitle.trim())}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
           >
-            {isSavingTemplate ? "Saving..." : "Confirm Template for Project"}
+            {isSavingTemplate ? "Saving..." : 
+             isNewCurve ? "Confirm Template & Create Project" : 
+             "Confirm Template for Project"}
           </Button>
-          <div className="ml-3 flex items-center text-sm text-orange-600">
-            <span>• Unsaved template changes</span>
-          </div>
+          {hasTemplateChanges && (
+            <div className="ml-3 flex items-center text-sm text-orange-600">
+              <span>• Unsaved template changes</span>
+            </div>
+          )}
         </div>
       )}
     </div>
