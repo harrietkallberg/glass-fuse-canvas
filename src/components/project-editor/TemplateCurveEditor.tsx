@@ -1,7 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import CurveEditor from "@/components/curve-editor/CurveEditor";
+import { useCurveState } from "@/hooks/useCurveState";
+import GlassSettings from "@/components/curve-editor/GlassSettings";
+import CurveChart from "@/components/curve-editor/CurveChart";
 import { Phase } from "@/utils/curveUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -17,15 +19,6 @@ interface TemplateCurveEditorProps {
   projectDescription?: string;
 }
 
-// Default template phases
-const defaultPhases: Phase[] = [
-  { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
-  { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
-  { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
-  { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
-  { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
-];
-
 const TemplateCurveEditor = ({
   isNewCurve,
   templateCurveData,
@@ -37,9 +30,23 @@ const TemplateCurveEditor = ({
 }: TemplateCurveEditorProps) => {
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const { user } = useAuth();
 
-  // Show template editor if template exists or user wants to create one
+  // Initialize curve state - if template exists, use it, otherwise use empty
+  const curveState = useCurveState({ 
+    initialPhases: templateCurveData?.phases || [],
+    isTemplateMode: true 
+  });
+
+  // Load existing template settings when component mounts
+  useEffect(() => {
+    if (templateCurveData?.settings) {
+      curveState.loadTemplateSettings(templateCurveData.settings);
+    }
+  }, [templateCurveData]);
+
+  // Show template editor if template exists
   useEffect(() => {
     if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
       setShowTemplateEditor(true);
@@ -48,9 +55,25 @@ const TemplateCurveEditor = ({
 
   const handleCreateTemplate = () => {
     setShowTemplateEditor(true);
+    setHasUnsavedChanges(false);
   };
 
-  const handleSaveTemplate = async (phases: Phase[]) => {
+  const handleGenerateFromSettings = () => {
+    const generatedPhases = curveState.generateTemplateFromSettings();
+    if (generatedPhases) {
+      setHasUnsavedChanges(true);
+      toast({
+        title: "Template Generated",
+        description: "Master recipe created from your glass settings. Click 'Save Template' to confirm.",
+      });
+    }
+  };
+
+  const handleSettingsChange = () => {
+    setHasUnsavedChanges(true);
+  };
+
+  const handleSaveTemplate = async () => {
     if (!user || !curveId) {
       toast({
         title: "Error",
@@ -63,7 +86,21 @@ const TemplateCurveEditor = ({
     setIsSavingTemplate(true);
 
     try {
-      // Get the template version (version 0) or create it if it doesn't exist
+      // Get current glass settings and phases
+      const currentSettings = curveState.getTemplateSettings();
+      const currentPhases = curveState.phases;
+
+      if (!currentPhases || currentPhases.length === 0) {
+        toast({
+          title: "Error",
+          description: "Please generate template phases before saving.",
+          variant: "destructive"
+        });
+        setIsSavingTemplate(false);
+        return;
+      }
+
+      // Get or create the template version (version 0)
       let { data: templateVersion, error: fetchError } = await supabase
         .from('curve_versions')
         .select('*')
@@ -78,14 +115,12 @@ const TemplateCurveEditor = ({
           description: "Failed to fetch project template",
           variant: "destructive"
         });
+        setIsSavingTemplate(false);
         return;
       }
 
-      // Get current glass settings from the curve editor
-      const currentSettings = templateCurveData?.settings || {};
-
       if (!templateVersion) {
-        // Create template version
+        // Create new template version
         const { data: newTemplateVersion, error: createError } = await supabase
           .from('curve_versions')
           .insert({
@@ -94,12 +129,12 @@ const TemplateCurveEditor = ({
             name: 'Template',
             is_current: false,
             selected_glass: currentSettings.selectedGlass,
-            room_temp: currentSettings.roomTemp || 20,
-            glass_layers: currentSettings.glassLayers || "1",
-            glass_radius: currentSettings.glassRadius || "10",
-            firing_type: currentSettings.firingType || "f",
-            top_temp_minutes: currentSettings.topTempMinutes || "10",
-            oven_type: currentSettings.ovenType || "t",
+            room_temp: currentSettings.roomTemp,
+            glass_layers: currentSettings.glassLayers,
+            glass_radius: currentSettings.glassRadius,
+            firing_type: currentSettings.firingType,
+            top_temp_minutes: currentSettings.topTempMinutes,
+            oven_type: currentSettings.ovenType,
           })
           .select()
           .single();
@@ -111,6 +146,7 @@ const TemplateCurveEditor = ({
             description: "Failed to create project template",
             variant: "destructive"
           });
+          setIsSavingTemplate(false);
           return;
         }
 
@@ -121,12 +157,12 @@ const TemplateCurveEditor = ({
           .from('curve_versions')
           .update({
             selected_glass: currentSettings.selectedGlass,
-            room_temp: currentSettings.roomTemp || 20,
-            glass_layers: currentSettings.glassLayers || "1",
-            glass_radius: currentSettings.glassRadius || "10",
-            firing_type: currentSettings.firingType || "f",
-            top_temp_minutes: currentSettings.topTempMinutes || "10",
-            oven_type: currentSettings.ovenType || "t",
+            room_temp: currentSettings.roomTemp,
+            glass_layers: currentSettings.glassLayers,
+            glass_radius: currentSettings.glassRadius,
+            firing_type: currentSettings.firingType,
+            top_temp_minutes: currentSettings.topTempMinutes,
+            oven_type: currentSettings.ovenType,
           })
           .eq('id', templateVersion.id);
 
@@ -137,18 +173,18 @@ const TemplateCurveEditor = ({
             description: "Failed to update project template",
             variant: "destructive"
           });
+          setIsSavingTemplate(false);
           return;
         }
       }
 
-      // Delete existing template phases
+      // Delete existing template phases and save new ones
       await supabase
         .from('curve_phases')
         .delete()
         .eq('version_id', templateVersion.id);
 
-      // Save new template phases
-      const phasesToInsert = phases.map((phase: Phase, index: number) => ({
+      const phasesToInsert = currentPhases.map((phase: Phase, index: number) => ({
         version_id: templateVersion.id,
         phase_order: index,
         target_temp: phase.targetTemp,
@@ -164,35 +200,29 @@ const TemplateCurveEditor = ({
         console.error('Error saving template phases:', phasesError);
         toast({
           title: "Error",
-          description: "Failed to save project template",
+          description: "Failed to save template phases",
           variant: "destructive"
         });
+        setIsSavingTemplate(false);
         return;
       }
 
-      // Update the template data with the new information
+      // Update the template data state
       const updatedTemplateData = {
-        phases: phases,
-        settings: {
-          selectedGlass: currentSettings.selectedGlass,
-          roomTemp: currentSettings.roomTemp || 20,
-          glassLayers: currentSettings.glassLayers || "1",
-          glassRadius: currentSettings.glassRadius || "10",
-          firingType: currentSettings.firingType || "f",
-          topTempMinutes: currentSettings.topTempMinutes || "10",
-          ovenType: currentSettings.ovenType || "t",
-        }
+        phases: currentPhases,
+        settings: currentSettings
       };
 
       setTemplateCurveData(updatedTemplateData);
+      setHasUnsavedChanges(false);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
       }
       
       toast({
-        title: "Template saved!",
-        description: "Project template has been saved successfully.",
+        title: "Master Recipe Saved!",
+        description: "Your project template has been saved successfully.",
       });
 
     } catch (error) {
@@ -207,17 +237,12 @@ const TemplateCurveEditor = ({
     }
   };
 
-  const handleApplyGlassTemplate = () => {
-    // This will trigger when the user applies glass settings
-    console.log('Glass template applied');
-  };
-
-  // If no template exists and user hasn't chosen to create one, show the add button
+  // If no template exists and user hasn't chosen to create one
   if (!templateCurveData?.phases && !showTemplateEditor) {
     return (
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+          <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             No Template
           </span>
@@ -225,7 +250,7 @@ const TemplateCurveEditor = ({
         
         <div className="text-center py-8">
           <div className="text-gray-600 mb-6">
-            No project template has been created yet. Create a template to set the default firing curve and glass settings for this project.
+            No master recipe has been created yet. Create a template to define the base firing curve for this project.
           </div>
           
           <Button 
@@ -239,26 +264,86 @@ const TemplateCurveEditor = ({
     );
   }
 
-  // Show the template editor
+  // Show the template configuration interface
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+        <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
         <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
           Project Template
         </span>
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        Configure your base firing curve template and glass settings. This will serve as the default for all versions in this project.
+        Configure your glass parameters and master firing curve. This serves as the foundation for all experiments (versions).
       </div>
       
-      <CurveEditor
-        initialPhases={templateCurveData?.phases || defaultPhases}
-        onSave={handleSaveTemplate}
-        isTemplateMode={true}
-        onApplyGlassTemplate={handleApplyGlassTemplate}
-      />
+      <div className="space-y-6">
+        {/* Glass Settings Configuration */}
+        <GlassSettings 
+          glassData={curveState.glassData}
+          selectedGlass={curveState.selectedGlass}
+          setSelectedGlass={(value) => {
+            curveState.setSelectedGlass(value);
+            handleSettingsChange();
+          }}
+          roomTemp={curveState.roomTemp}
+          setRoomTemp={(value) => {
+            curveState.setRoomTemp(value);
+            handleSettingsChange();
+          }}
+          glassLayers={curveState.glassLayers}
+          setGlassLayers={(value) => {
+            curveState.setGlassLayers(value);
+            handleSettingsChange();
+          }}
+          glassRadius={curveState.glassRadius}
+          setGlassRadius={(value) => {
+            curveState.setGlassRadius(value);
+            handleSettingsChange();
+          }}
+          firingType={curveState.firingType}
+          setFiringType={(value) => {
+            curveState.setFiringType(value);
+            handleSettingsChange();
+          }}
+          topTempMinutes={curveState.topTempMinutes}
+          setTopTempMinutes={(value) => {
+            curveState.setTopTempMinutes(value);
+            handleSettingsChange();
+          }}
+          applyGlassTemplate={handleGenerateFromSettings}
+          ovenType={curveState.ovenType}
+          setOvenType={(value) => {
+            curveState.setOvenType(value);
+            handleSettingsChange();
+          }}
+        />
+        
+        {/* Template Curve Display */}
+        {curveState.phases.length > 0 && (
+          <div className="mt-6">
+            <h4 className="text-lg font-medium mb-4">Template Curve Preview</h4>
+            <CurveChart 
+              phases={curveState.phases}
+              roomTemp={curveState.roomTemp}
+            />
+          </div>
+        )}
+        
+        {/* Save Button */}
+        {hasUnsavedChanges && (
+          <div className="flex justify-center pt-4">
+            <Button 
+              onClick={handleSaveTemplate}
+              disabled={isSavingTemplate || curveState.phases.length === 0}
+              className="bg-green-600 hover:bg-green-700 text-white px-8 py-2"
+            >
+              {isSavingTemplate ? "Saving..." : "Save Template"}
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

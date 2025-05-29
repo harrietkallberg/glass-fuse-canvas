@@ -6,13 +6,15 @@ import glassData from '@/tables.json';
 
 interface UseCurveStateProps {
   initialPhases: Phase[];
+  templatePhases?: Phase[];
+  isTemplateMode?: boolean;
 }
 
-export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
+export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMode = false }: UseCurveStateProps) => {
   // Phase management
   const [phases, setPhases] = useState<Phase[]>(initialPhases);
   
-  // Glass settings state
+  // Glass settings state - these represent the template configuration
   const [selectedGlass, setSelectedGlass] = useState<string>("Bullseye Opaleszent");
   const [roomTemp, setRoomTemp] = useState<number>(20);
   const [glassLayers, setGlassLayers] = useState<string>("1");
@@ -62,8 +64,8 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
     setPhases(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Glass template application
-  const applyGlassTemplate = () => {
+  // Template generation - creates the master recipe from glass parameters
+  const generateTemplateFromSettings = () => {
     try {
       const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
       if (!selectedGlassInfo) {
@@ -82,8 +84,23 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
       );
 
       setPhases(templatePhases);
+      return templatePhases;
     } catch (error) {
-      console.error('Error applying glass template:', error);
+      console.error('Error generating template:', error);
+      return null;
+    }
+  };
+
+  // Load template settings into the state (for editing template)
+  const loadTemplateSettings = (templateSettings: any) => {
+    if (templateSettings) {
+      setSelectedGlass(templateSettings.selectedGlass || "Bullseye Opaleszent");
+      setRoomTemp(templateSettings.roomTemp || 20);
+      setGlassLayers(templateSettings.glassLayers || "1");
+      setGlassRadius(templateSettings.glassRadius || "10");
+      setFiringType(templateSettings.firingType || "f");
+      setTopTempMinutes(templateSettings.topTempMinutes || "10");
+      setOvenType(templateSettings.ovenType || "t");
     }
   };
 
@@ -111,7 +128,7 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
     addPhaseWithData,
     removePhaseByIndex,
     
-    // Glass settings
+    // Glass settings (template configuration)
     glassData,
     selectedGlass,
     setSelectedGlass,
@@ -129,7 +146,8 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
     setOvenType,
     
     // Template operations
-    applyGlassTemplate,
+    generateTemplateFromSettings,
+    loadTemplateSettings,
     getTemplateSettings,
   };
 };

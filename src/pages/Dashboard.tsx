@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -69,7 +68,7 @@ const Dashboard = () => {
 
       console.log('Found projects with templates:', curvesWithTemplates);
 
-      // Transform the data for display
+      // Transform the data for display - use REAL template data, not mock data
       const transformedCurves = curvesWithTemplates.map(curve => {
         const templateVersion = curve.curve_versions[0];
         
@@ -90,14 +89,11 @@ const Dashboard = () => {
           const roomTemp = templateVersion.room_temp || 20;
           curveData = generateChartData(sortedPhases, roomTemp);
         } else {
-          // Fallback to simple mock data if no phases
+          // Fallback to simple data points if no template phases exist
+          // This represents a "no template" state - minimal curve
           curveData = [
             { time: 0, temperature: 20 },
-            { time: 60, temperature: 540 },
-            { time: 90, temperature: 800 },
-            { time: 150, temperature: 520 },
-            { time: 210, temperature: 460 },
-            { time: 270, temperature: 20 }
+            { time: 300, temperature: 20 } // Flat line indicating no template
           ];
         }
 
@@ -108,15 +104,16 @@ const Dashboard = () => {
           created_at: curve.created_at,
           updated_at: curve.updated_at,
           is_private: curve.is_private,
-          glass_type: templateVersion?.selected_glass || 'Standard',
+          glass_type: templateVersion?.selected_glass || 'No Template',
           oven_type: templateVersion?.oven_type === 't' ? 'Top Heated' : 
-                    templateVersion?.oven_type === 's' ? 'Side Heated' : 'Electric',
-          thickness: templateVersion?.glass_layers ? `${templateVersion.glass_layers} layers` : '6mm',
+                    templateVersion?.oven_type === 's' ? 'Side Heated' : 
+                    templateVersion?.oven_type === 'e' ? 'Electric' : 'No Template',
+          thickness: templateVersion?.glass_layers ? `${templateVersion.glass_layers} layers` : 'No Template',
           project_type: templateVersion?.firing_type === 'f' ? 'Full Fuse' : 
                        templateVersion?.firing_type === 't' ? 'Tack Fuse' : 
-                       templateVersion?.firing_type === 's' ? 'Slumping' : 'Full Fuse',
+                       templateVersion?.firing_type === 's' ? 'Slumping' : 'No Template',
           curveData,
-          colorClass: 'enhanced-glass-card'
+          colorClass: templateVersion?.curve_phases?.length > 0 ? 'enhanced-glass-card' : 'glass-card'
         };
       });
 
