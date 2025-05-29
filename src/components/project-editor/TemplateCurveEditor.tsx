@@ -42,43 +42,61 @@ const TemplateCurveEditor = ({
   const [showConfirmButton, setShowConfirmButton] = useState(false);
   const [hasExistingTemplate, setHasExistingTemplate] = useState(false);
   const [templateConfirmedInSession, setTemplateConfirmedInSession] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { user } = useAuth();
   const temperatureUnit = "celsius";
 
-  // Set original phases when templateCurveData changes
+  // Initialize component state when templateCurveData changes
   useEffect(() => {
     console.log('TemplateCurveEditor: templateCurveData changed:', templateCurveData);
     
     if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
       // Existing template with phases
+      console.log('Loading existing template with phases:', templateCurveData.phases);
+      
+      const curveData = {
+        phases: templateCurveData.phases,
+        temperatureUnit,
+        settings: templateCurveData.settings || {}
+      };
+      
       setOriginalPhases([...templateCurveData.phases]);
-      setLocalCurveData(templateCurveData);
+      setLocalCurveData(curveData);
       setHasTemplateChanges(false);
       setHasExistingTemplate(true);
       setShowConfirmButton(false);
       
-      // Check if template has settings (indicating it's been properly configured)
-      if (templateCurveData.settings && Object.keys(templateCurveData.settings).length > 0) {
+      // Check if template has proper settings (indicating it's been confirmed)
+      const hasSettings = templateCurveData.settings && 
+        (templateCurveData.settings.selectedGlass || 
+         templateCurveData.settings.firingType || 
+         templateCurveData.settings.ovenType);
+      
+      if (hasSettings) {
+        console.log('Template has been confirmed with settings:', templateCurveData.settings);
         setTemplateConfirmedInSession(true);
       } else {
+        console.log('Template exists but not fully configured');
         setTemplateConfirmedInSession(false);
       }
-    } else {
+    } else if (templateCurveData === null && !isInitialized) {
       // No existing template, set up default
       console.log('No existing template, setting up default');
       const defaultCurveData = {
         phases: defaultPhases,
         temperatureUnit,
+        settings: {}
       };
       setLocalCurveData(defaultCurveData);
-      setTemplateCurveData(defaultCurveData);
       setOriginalPhases([]);
       setHasTemplateChanges(true);
       setHasExistingTemplate(false);
       setTemplateConfirmedInSession(false);
       setShowConfirmButton(false);
     }
-  }, [templateCurveData, setTemplateCurveData]);
+    
+    setIsInitialized(true);
+  }, [templateCurveData, isInitialized]);
 
   // Compare phases to detect changes
   const phasesHaveChanged = (newPhases: Phase[], originalPhases: Phase[]) => {
@@ -256,7 +274,8 @@ const TemplateCurveEditor = ({
       // Update parent state with confirmed template data
       setTemplateCurveData(updatedTemplateData);
       
-      // Update original phases to reflect the new saved state
+      // Update local state to reflect the confirmed template
+      setLocalCurveData(updatedTemplateData);
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
       setTemplateConfirmedInSession(true);
@@ -267,7 +286,7 @@ const TemplateCurveEditor = ({
         onTemplateConfirmed();
       }
       
-      // Show appropriate success message based on whether it was new or updated
+      // Show appropriate success message
       const successMessage = hasExistingTemplate && templateConfirmedInSession
         ? "Template has been updated!"
         : "Template confirmed!";
@@ -298,8 +317,14 @@ const TemplateCurveEditor = ({
     templateConfirmedInSession,
     showConfirmButton,
     hasTemplateChanges,
-    localCurveData: localCurveData?.phases?.length
+    localCurveData: localCurveData?.phases?.length,
+    localSettings: localCurveData?.settings
   });
+
+  // Don't render until initialized
+  if (!isInitialized) {
+    return <div>Loading template...</div>;
+  }
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
