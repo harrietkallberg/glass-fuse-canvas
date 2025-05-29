@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -96,6 +97,11 @@ const CurveEditor = ({
     updatePhase(id, { [field]: value });
   };
 
+  // Helper function to match PhasesTable expected signature
+  const handleUpdatePhaseTable = (id: string, field: keyof Phase, value: number) => {
+    updatePhase(id, { [field]: value });
+  };
+
   const handleAddPhase = () => {
     const newPhase: Phase = {
       id: String(Date.now()),
@@ -164,7 +170,7 @@ const CurveEditor = ({
                 <CurveChart phases={phases} />
               </div>
               <div className="w-full">
-                <PhasesTable phases={phases} updatePhase={updatePhase} deletePhase={deletePhase} />
+                <PhasesTable phases={phases} updatePhase={handleUpdatePhaseTable} deletePhase={deletePhase} />
                 <PhaseControls 
                   phases={phases}
                   onUpdatePhase={handleUpdatePhase}
@@ -206,3 +212,4 @@ const CurveEditor = ({
 };
 
 export default CurveEditor;
+
