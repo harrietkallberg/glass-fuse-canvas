@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { CurveVersionChartProps } from "./types";
@@ -15,20 +15,20 @@ const GridVersionChart = ({
 }: CurveVersionChartProps) => {
   // Grid configuration
   const GRID_SIZE = 120;
-  const NODE_WIDTH = 140;
-  const NODE_HEIGHT = 80;
-  const GRID_PADDING = 60;
+  const NODE_WIDTH = 160;
+  const NODE_HEIGHT = 90;
+  const GRID_PADDING = 80;
 
   // Calculate grid positions for versions
   const getGridPosition = (version: any) => {
-    // Template is always at (1,1), versions start at (1, next row)
-    if (version.version_number === "Template") {
+    // Template is always at (1,1)
+    if (version.version_number === 0 || version.version_number === "Template") {
       return { column: 1, row: 1 };
     }
     
-    // For now, just place versions in column 1, incrementing rows
-    // Later this will be user-configurable
-    const versionIndex = versions.filter(v => v.version_number !== "Template").indexOf(version);
+    // For now, versions start at column 1, incrementing rows
+    // Later this will be user-configurable for horizontal movement
+    const versionIndex = versions.filter(v => v.version_number !== 0 && v.version_number !== "Template").indexOf(version);
     return { column: 1, row: versionIndex + 2 };
   };
 
@@ -38,14 +38,27 @@ const GridVersionChart = ({
     y: GRID_PADDING + (row - 1) * (NODE_HEIGHT + GRID_SIZE)
   });
 
+  // Check if we have a template version
+  const templateVersion = versions.find(v => v.version_number === 0 || v.version_number === "Template");
+  const hasTemplate = !!templateVersion;
+
+  // If no versions at all, show create template state
   if (versions.length === 0) {
     return (
-      <div className="text-center text-gray-500 py-8 bg-white rounded-2xl border border-gray-200">
-        <p className="text-lg mb-4">No versions available</p>
-        <Button onClick={onNewVersion} className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create New Version
-        </Button>
+      <div className="w-full">
+        <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
+          <div className="text-center text-gray-500 py-12">
+            <div className="mb-4">
+              <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                <Plus className="h-8 w-8 text-gray-400" />
+              </div>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Template Created</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Create your project template first in the Project Information section.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }
@@ -53,32 +66,39 @@ const GridVersionChart = ({
   // Calculate canvas dimensions
   const maxColumn = Math.max(...versions.map(v => getGridPosition(v).column));
   const maxRow = Math.max(...versions.map(v => getGridPosition(v).row));
-  const canvasWidth = GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE);
-  const canvasHeight = GRID_PADDING * 2 + maxRow * (NODE_HEIGHT + GRID_SIZE);
+  const canvasWidth = Math.max(GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE), 1000);
+  const canvasHeight = Math.max(GRID_PADDING * 2 + maxRow * (NODE_HEIGHT + GRID_SIZE), 600);
 
   return (
     <div className="w-full">
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-800">Version Flow</h3>
-          <Button 
-            onClick={onNewVersion}
-            className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            <Plus className="h-4 w-4" />
-            Create New Version
-          </Button>
+          <div>
+            <h3 className="text-xl font-semibold text-gray-800">Version Flow</h3>
+            <p className="text-sm text-gray-500 mt-1">
+              Track your project versions and progression
+            </p>
+          </div>
+          {hasTemplate && (
+            <Button 
+              onClick={onNewVersion}
+              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+            >
+              <Plus className="h-4 w-4" />
+              Create New Version
+            </Button>
+          )}
         </div>
 
         {/* Grid Canvas */}
-        <div className="overflow-auto border border-gray-100 rounded-lg bg-gray-50/30">
+        <div className="overflow-auto border border-gray-100 rounded-xl bg-gradient-to-br from-gray-50/50 to-blue-50/30 shadow-inner">
           <svg
-            width={Math.max(canvasWidth, 800)}
-            height={Math.max(canvasHeight, 400)}
+            width={canvasWidth}
+            height={canvasHeight}
             className="min-w-full"
           >
-            {/* Grid Pattern */}
+            {/* Enhanced Grid Pattern */}
             <defs>
               <pattern
                 id="grid"
@@ -89,12 +109,31 @@ const GridVersionChart = ({
                 <path
                   d={`M ${GRID_SIZE} 0 L 0 0 0 ${GRID_SIZE}`}
                   fill="none"
-                  stroke="#e5e7eb"
+                  stroke="#d1d5db"
                   strokeWidth="1"
-                  strokeDasharray="2,2"
-                  opacity="0.5"
+                  strokeDasharray="3,3"
+                  opacity="0.4"
                 />
               </pattern>
+              
+              {/* Arrow marker for connections */}
+              <defs>
+                <marker
+                  id="arrowhead"
+                  markerWidth="10"
+                  markerHeight="7"
+                  refX="9"
+                  refY="3.5"
+                  orient="auto"
+                >
+                  <polygon
+                    points="0 0, 10 3.5, 0 7"
+                    fill="#6b7280"
+                    stroke="#6b7280"
+                    strokeWidth="1"
+                  />
+                </marker>
+              </defs>
             </defs>
             
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -127,6 +166,15 @@ const GridVersionChart = ({
               );
             })}
           </svg>
+        </div>
+
+        {/* Footer info */}
+        <div className="mt-4 text-xs text-gray-500 text-center">
+          {hasTemplate ? (
+            <span>Click nodes to select • Create new versions to track progress</span>
+          ) : (
+            <span>Complete your project template to start creating versions</span>
+          )}
         </div>
       </div>
     </div>

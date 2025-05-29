@@ -1,12 +1,11 @@
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import React, { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurveVersionChart from "@/components/CurveVersionChart";
-import VersionInfoDisplay from "@/components/curve-editor/VersionInfoDisplay";
-import CurveEditorTabs from "@/components/curve-editor/CurveEditorTabs";
+import CurveEditor from "@/components/curve-editor/CurveEditor";
+import { useCurves } from "@/hooks/useCurves";
 import { useVersionManager } from "@/components/curve-editor/VersionManager";
-import { useCurveState } from "@/hooks/useCurveState";
+import { Phase } from "@/utils/curveUtils";
 
 interface CurveEditorSectionProps {
   curveId: string;
@@ -31,37 +30,82 @@ const CurveEditorSection = ({
   templateCurveData,
   numberToSemantic
 }: CurveEditorSectionProps) => {
-  const [activeTab, setActiveTab] = useState("curve");
-  const [selectedVersionColor, setSelectedVersionColor] = useState("#F97316");
-  const [notes, setNotes] = useState(currentVersionData?.version?.notes || "");
-  const [materials, setMaterials] = useState(currentVersionData?.version?.materials || "");
-  const [tags, setTags] = useState(currentVersionData?.version?.tags || "");
+  const [activeTab, setActiveTab] = useState<"chart" | "editor">("chart");
+  const [notes, setNotes] = useState("");
+  const [materials, setMaterials] = useState("");
+  const [tags, setTags] = useState("");
+  
+  const { getCurveVersions, loadCurveVersion } = useCurves();
 
-  // Initialize curve state with current version phases or template phases
-  const initialPhases = currentVersionData?.phases || templateCurveData?.phases || [];
-  const curveState = useCurveState({ initialPhases });
+  // Real-time version fetching
+  useEffect(() => {
+    const fetchVersions = async () => {
+      if (curveId) {
+        try {
+          const latestVersions = await getCurveVersions(curveId);
+          setVersions(latestVersions);
+        } catch (error) {
+          console.error('Error fetching versions:', error);
+        }
+      }
+    };
 
-  // Update curve state when version data changes
-  React.useEffect(() => {
-    if (currentVersionData) {
-      curveState.setPhases(currentVersionData.phases);
+    // Initial fetch
+    fetchVersions();
+
+    // Set up polling for real-time updates
+    const interval = setInterval(fetchVersions, 3000); // Every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [curveId, getCurveVersions, setVersions]);
+
+  // Update form fields when current version data changes
+  useEffect(() => {
+    if (currentVersionData?.version) {
       setNotes(currentVersionData.version.notes || "");
       setMaterials(currentVersionData.version.materials || "");
       setTags(currentVersionData.version.tags || "");
-      
-      // Update other curve settings from version data
-      if (currentVersionData.version.selected_glass) curveState.setSelectedGlass(currentVersionData.version.selected_glass);
-      if (currentVersionData.version.room_temp) curveState.setRoomTemp(currentVersionData.version.room_temp);
-      if (currentVersionData.version.glass_layers) curveState.setGlassLayers(currentVersionData.version.glass_layers);
-      if (currentVersionData.version.glass_radius) curveState.setGlassRadius(currentVersionData.version.glass_radius);
-      if (currentVersionData.version.firing_type) curveState.setFiringType(currentVersionData.version.firing_type);
-      if (currentVersionData.version.top_temp_minutes) curveState.setTopTempMinutes(currentVersionData.version.top_temp_minutes);
-      if (currentVersionData.version.oven_type) curveState.setOvenType(currentVersionData.version.oven_type);
-    } else if (templateCurveData) {
-      // If no current version, initialize with template
-      curveState.setPhases(templateCurveData.phases || []);
     }
-  }, [currentVersionData, templateCurveData]);
+  }, [currentVersionData]);
+
+  // Create default curve state based on template or empty state
+  const getDefaultCurveState = () => {
+    if (templateCurveData?.phases) {
+      return {
+        selectedGlass: templateCurveData.settings?.selectedGlass || "Bullseye Opaleszent",
+        roomTemp: templateCurveData.settings?.roomTemp || 20,
+        glassLayers: templateCurveData.settings?.glassLayers || "1",
+        glassRadius: templateCurveData.settings?.glassRadius || "10",
+        firingType: templateCurveData.settings?.firingType || "f",
+        topTempMinutes: templateCurveData.settings?.topTempMinutes || "10",
+        ovenType: templateCurveData.settings?.ovenType || "t",
+        phases: templateCurveData.phases
+      };
+    }
+    
+    // Default empty state
+    return {
+      selectedGlass: "Bullseye Opaleszent",
+      roomTemp: 20,
+      glassLayers: "1",
+      glassRadius: "10",
+      firingType: "f",
+      topTempMinutes: "10",
+      ovenType: "t",
+      phases: []
+    };
+  };
+
+  const curveState = currentVersionData ? {
+    selectedGlass: currentVersionData.version?.selected_glass || "Bullseye Opaleszent",
+    roomTemp: currentVersionData.version?.room_temp || 20,
+    glassLayers: currentVersionData.version?.glass_layers || "1",
+    glassRadius: currentVersionData.version?.glass_radius || "10",
+    firingType: currentVersionData.version?.firing_type || "f",
+    topTempMinutes: currentVersionData.version?.top_temp_minutes || "10",
+    ovenType: currentVersionData.version?.oven_type || "t",
+    phases: currentVersionData.phases || []
+  } : getDefaultCurveState();
 
   const versionManager = useVersionManager({
     curveId,
@@ -78,66 +122,65 @@ const CurveEditorSection = ({
   });
 
   const handleVersionSelect = async (versionId: string) => {
-    await versionManager.handleVersionSelect(versionId);
+    if (!versionId || versionId === currentVersionId) return;
     
-    // Generate new color for selected version
-    const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
-    const versionIndex = versions.findIndex(v => v.id === versionId);
-    setSelectedVersionColor(colors[versionIndex % colors.length]);
+    try {
+      const curveData = await loadCurveVersion(versionId);
+      if (curveData) {
+        setCurrentVersionId(versionId);
+        setCurrentVersionData(curveData);
+      }
+    } catch (error) {
+      console.error('Error loading version:', error);
+    }
   };
 
-  const currentVersionName = currentVersionId 
-    ? numberToSemantic(versions.find(v => v.id === currentVersionId)?.version_number || 10000)
-    : "1.0";
+  const handleSetMainVersion = async (versionId: string) => {
+    // Implementation for setting main version
+    console.log('Setting main version:', versionId);
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Version Chart */}
-      <CurveVersionChart 
-        versions={versions.map(v => ({
-          ...v,
-          version_number: numberToSemantic(v.version_number)
-        }))}
-        currentVersionId={currentVersionId}
-        onVersionSelect={handleVersionSelect}
-        onNewVersion={versionManager.handleNewMainVersion}
-        selectedVersionColor={selectedVersionColor}
-      />
-      
-      {/* Current Version Info */}
-      <VersionInfoDisplay 
-        currentVersionName={currentVersionName}
-        selectedVersionColor={selectedVersionColor}
-      />
-
-      {/* Main Editor */}
-      <CurveEditorTabs 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        phases={curveState.phases}
-        templatePhases={templateCurveData?.phases || []}
-        roomTemp={curveState.roomTemp}
-        currentVersionName={currentVersionName}
-        onUpdatePhase={curveState.updatePhase}
-        onAddPhase={curveState.addPhase}
-        onRemovePhase={curveState.removePhase}
-        notes={notes}
-        setNotes={setNotes}
-        materials={materials}
-        setMaterials={setMaterials}
-        tags={tags}
-        setTags={setTags}
-      />
-
-      {/* Single Save Button at Bottom */}
-      <div className="flex justify-center">
-        <Button 
-          onClick={versionManager.handleSave}
-          className="px-8 py-3 bg-[#F97316] hover:bg-[#F97316]/90 text-white text-lg"
-        >
-          Save Changes
-        </Button>
-      </div>
+    <div className="space-y-6">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "chart" | "editor")}>
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="chart">Version Flow</TabsTrigger>
+          <TabsTrigger value="editor">Curve Editor</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="chart" className="space-y-4">
+          <CurveVersionChart
+            versions={versions}
+            currentVersionId={currentVersionId}
+            onVersionSelect={handleVersionSelect}
+            onNewVersion={versionManager.handleNewMainVersion}
+            onSetMainVersion={handleSetMainVersion}
+          />
+        </TabsContent>
+        
+        <TabsContent value="editor" className="space-y-4">
+          <CurveEditor
+            curveId={curveId}
+            currentVersionId={currentVersionId}
+            initialPhases={curveState.phases}
+            templatePhases={templateCurveData?.phases || []}
+            onSave={versionManager.handleSave}
+            notes={notes}
+            setNotes={setNotes}
+            materials={materials}
+            setMaterials={setMaterials}
+            tags={tags}
+            setTags={setTags}
+            selectedGlass={curveState.selectedGlass}
+            roomTemp={curveState.roomTemp}
+            glassLayers={curveState.glassLayers}
+            glassRadius={curveState.glassRadius}
+            firingType={curveState.firingType}
+            topTempMinutes={curveState.topTempMinutes}
+            ovenType={curveState.ovenType}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
