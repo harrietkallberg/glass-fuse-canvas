@@ -46,101 +46,121 @@ const ProjectInformationSection = ({
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
+  const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const { user } = useAuth();
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
-  const handleSaveTemplate = async (phases: Phase[]) => {
+  const handleCurveChange = (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
+    
+    // Mark that there are unsaved template changes
+    if (!isNewCurve) {
+      setHasTemplateChanges(true);
+    }
+  };
 
-    // If we're editing an existing project, update the project template in the database
-    if (!isNewCurve && curveId && user) {
-      try {
-        // Get the template version (version 0.0) or create it if it doesn't exist
-        let { data: templateVersion, error: fetchError } = await supabase
+  const handleConfirmTemplate = async () => {
+    if (!localCurveData?.phases || (!isNewCurve && !curveId) || !user) {
+      return;
+    }
+
+    setIsSavingTemplate(true);
+
+    try {
+      // Get the template version (version 0.0) or create it if it doesn't exist
+      let { data: templateVersion, error: fetchError } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .eq('version_number', 0) // Template version is 0.0
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching template version:', fetchError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch project template",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (!templateVersion) {
+        // Create template version
+        const { data: newTemplateVersion, error: createError } = await supabase
           .from('curve_versions')
-          .select('*')
-          .eq('curve_id', curveId)
-          .eq('version_number', 0) // Template version is 0.0
-          .maybeSingle();
+          .insert({
+            curve_id: curveId,
+            version_number: 0, // 0.0 in numeric format
+            name: 'Template',
+            is_current: false,
+          })
+          .select()
+          .single();
 
-        if (fetchError && fetchError.code !== 'PGRST116') {
-          console.error('Error fetching template version:', fetchError);
-          return;
-        }
-
-        if (!templateVersion) {
-          // Create template version
-          const { data: newTemplateVersion, error: createError } = await supabase
-            .from('curve_versions')
-            .insert({
-              curve_id: curveId,
-              version_number: 0, // 0.0 in numeric format
-              name: 'Template',
-              is_current: false,
-            })
-            .select()
-            .single();
-
-          if (createError) {
-            console.error('Error creating template version:', createError);
-            toast({
-              title: "Error",
-              description: "Failed to create project template",
-              variant: "destructive"
-            });
-            return;
-          }
-
-          templateVersion = newTemplateVersion;
-        }
-
-        // Delete existing template phases
-        await supabase
-          .from('curve_phases')
-          .delete()
-          .eq('version_id', templateVersion.id);
-
-        // Save new template phases
-        const phasesToInsert = phases.map((phase, index) => ({
-          version_id: templateVersion.id,
-          phase_order: index,
-          target_temp: phase.targetTemp,
-          duration: phase.duration,
-          hold_time: phase.holdTime,
-        }));
-
-        const { error: phasesError } = await supabase
-          .from('curve_phases')
-          .insert(phasesToInsert);
-
-        if (phasesError) {
-          console.error('Error saving template phases:', phasesError);
+        if (createError) {
+          console.error('Error creating template version:', createError);
           toast({
             title: "Error",
-            description: "Failed to save project template",
+            description: "Failed to create project template",
             variant: "destructive"
           });
           return;
         }
 
-        toast({
-          title: "Template updated!",
-          description: "Project template has been updated and will be available across all project sections.",
-        });
+        templateVersion = newTemplateVersion;
+      }
 
-      } catch (error) {
-        console.error('Error updating project template:', error);
+      // Delete existing template phases
+      await supabase
+        .from('curve_phases')
+        .delete()
+        .eq('version_id', templateVersion.id);
+
+      // Save new template phases
+      const phasesToInsert = localCurveData.phases.map((phase: Phase, index: number) => ({
+        version_id: templateVersion.id,
+        phase_order: index,
+        target_temp: phase.targetTemp,
+        duration: phase.duration,
+        hold_time: phase.holdTime,
+      }));
+
+      const { error: phasesError } = await supabase
+        .from('curve_phases')
+        .insert(phasesToInsert);
+
+      if (phasesError) {
+        console.error('Error saving template phases:', phasesError);
         toast({
           title: "Error",
-          description: "Failed to update project template",
+          description: "Failed to save project template",
           variant: "destructive"
         });
+        return;
       }
+
+      setHasTemplateChanges(false);
+      toast({
+        title: "Template confirmed!",
+        description: "Project template has been saved and will be available across all project sections.",
+      });
+
+    } catch (error) {
+      console.error('Error confirming project template:', error);
+      toast({
+        title: "Error",
+        description: "Failed to confirm project template",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingTemplate(false);
     }
   };
 
@@ -224,15 +244,28 @@ const ProjectInformationSection = ({
         <div className="text-sm text-gray-600 mb-6">
           {isNewCurve 
             ? "Configure your base firing curve template. This will serve as the starting point for all versions."
-            : "This is your project's base template curve. Changes here will be saved to the project and available across all project sections."
+            : "This is your project's base template curve. Make changes and click 'Confirm Template for Project' to save them across all project sections."
           }
         </div>
         
         <CurveEditor
           initialPhases={templateCurveData?.phases || defaultPhases}
-          onSave={handleSaveTemplate}
+          onSave={handleCurveChange}
           isTemplateMode={true}
         />
+
+        {/* Template Confirmation Button - only show for existing projects */}
+        {!isNewCurve && (
+          <div className="mt-6 flex justify-center">
+            <Button 
+              onClick={handleConfirmTemplate}
+              disabled={!hasTemplateChanges || isSavingTemplate}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+            >
+              {isSavingTemplate ? "Saving..." : "Confirm Template for Project"}
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Action Buttons */}
