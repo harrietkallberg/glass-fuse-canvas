@@ -89,9 +89,9 @@ export const createGlassTemplatePhases = (
   );
 
   const inledandeSmaltpunkt = glassData["Inledande_smaltpunkt"];
-  // Exact Python logic: int() conversions
-  const oAstemp = Math.floor(selectedGlassInfo.o_astemp);
-  const nAstemp = Math.floor(selectedGlassInfo.n_astemp);
+  // Exact Python logic: int() conversions (Python int() truncates towards zero)
+  const oAstemp = selectedGlassInfo.o_astemp;
+  const nAstemp = selectedGlassInfo.n_astemp;
   const topTempHoldTime = parseInt(topTempMinutes) || 10;
 
   // Calculate velocities exactly like Python
