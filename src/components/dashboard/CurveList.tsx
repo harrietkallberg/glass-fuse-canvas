@@ -14,13 +14,13 @@ interface Curve {
   id: string;
   title: string;
   description: string;
-  lastUpdated: string;
-  isPrivate: boolean;
-  glassType?: string;
-  ovenType?: string;
+  created_at: string;
+  updated_at: string;
+  is_private: boolean;
+  glass_type?: string;
+  oven_type?: string;
   thickness?: string;
-  projectType?: string;
-  isModified?: boolean;
+  project_type?: string;
   curveData?: CurveData[];
   colorClass?: string;
 }
@@ -78,13 +78,13 @@ const CurveList = ({ curves, onDeleteCurve }: CurveListProps) => {
             id={curve.id}
             title={curve.title}
             description={curve.description}
-            lastUpdated={curve.lastUpdated}
-            isPrivate={curve.isPrivate}
-            glassType={curve.glassType || "Standard"}
-            ovenType={curve.ovenType || "Electric"}
+            lastUpdated={curve.updated_at}
+            isPrivate={curve.is_private}
+            glassType={curve.glass_type || "Standard"}
+            ovenType={curve.oven_type || "Electric"}
             thickness={curve.thickness || "6mm"}
-            projectType={curve.projectType || "Full Fuse"}
-            isModified={curve.isModified}
+            projectType={curve.project_type || "Full Fuse"}
+            isModified={false}
             curveData={curve.curveData}
             colorClass={`enhanced-glass-card ${curve.colorClass || ''}`}
             onDelete={onDeleteCurve}

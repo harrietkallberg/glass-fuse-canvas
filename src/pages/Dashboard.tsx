@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -21,7 +22,7 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  // Filter curves based on search query
+  // Filter curves based on search query - only use real curves from database
   useEffect(() => {
     if (!searchQuery.trim()) {
       setFilteredCurves(curves);
