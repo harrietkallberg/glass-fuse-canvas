@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,29 @@ const CurveEditPage = () => {
       navigate("/login");
     }
   }, [user, authLoading, navigate]);
+
+  // Create project immediately for new curves
+  useEffect(() => {
+    const createProjectForNewCurve = async () => {
+      if (isNewCurve && user && !currentCurveId) {
+        try {
+          const newCurve = await createCurve("New Project", "");
+          if (newCurve) {
+            setCurrentCurveId(newCurve.id);
+            setProjectTitle("New Project");
+            setProjectDescription("");
+            
+            // Update the URL without triggering a page reload
+            window.history.replaceState({}, '', `/edit/${newCurve.id}`);
+          }
+        } catch (error) {
+          console.error('Error creating project:', error);
+        }
+      }
+    };
+
+    createProjectForNewCurve();
+  }, [isNewCurve, user, currentCurveId, createCurve]);
 
   // Load template data for existing project
   const loadTemplateData = async (curveId: string) => {
@@ -133,41 +157,6 @@ const CurveEditPage = () => {
     loadCurve();
   }, [id, isNewCurve, user]);
 
-  const handleCreateProject = async (title: string, description: string, curveData: any) => {
-    if (!user) return;
-
-    try {
-      const newCurve = await createCurve(title, description);
-      if (!newCurve) {
-        toast({
-          title: "Error",
-          description: "Failed to create project",
-          variant: "destructive"
-        });
-        return;
-      }
-      
-      setCurrentCurveId(newCurve.id);
-      setProjectTitle(title);
-      setProjectDescription(description);
-      setTemplateCurveData(curveData);
-      
-      toast({
-        title: "Project created!",
-        description: "Your project has been created successfully.",
-      });
-
-      navigate(`/edit/${newCurve.id}`);
-    } catch (error) {
-      console.error('Error creating project:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create project",
-        variant: "destructive"
-      });
-    }
-  };
-
   const handleUpdateProject = async (title: string, description: string) => {
     if (!currentCurveId || !user) return;
 
@@ -235,9 +224,9 @@ const CurveEditPage = () => {
         <div className="glass-card p-8 bg-white/40 backdrop-blur-sm rounded-3xl border border-white/30 shadow-xl mb-8">
           <div className="text-center space-y-4">
             <h1 className="text-4xl font-bold text-gray-800">
-              {isNewCurve ? "Create New Project" : projectTitle}
+              {projectTitle || "New Project"}
             </h1>
-            {!isNewCurve && (
+            {projectDescription && (
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">{projectDescription}</p>
             )}
           </div>
@@ -245,8 +234,8 @@ const CurveEditPage = () => {
         
         {/* Main Content with Sidebar */}
         <div className="flex gap-8">
-          {/* Sidebar Navigation */}
-          {!isNewCurve && (
+          {/* Sidebar Navigation - Always show when we have a curve ID */}
+          {currentCurveId && (
             <div className="w-64 space-y-2">
               <Button
                 variant={activeSection === "project" ? "default" : "ghost"}
@@ -269,7 +258,7 @@ const CurveEditPage = () => {
           
           {/* Main Content Area */}
           <div className="flex-1">
-            {(isNewCurve || activeSection === "project") && (
+            {(!currentCurveId || activeSection === "project") && (
               <ProjectInformationSection
                 isNewCurve={isNewCurve}
                 projectTitle={projectTitle}
@@ -278,15 +267,14 @@ const CurveEditPage = () => {
                 setProjectDescription={setProjectDescription}
                 templateCurveData={templateCurveData}
                 setTemplateCurveData={setTemplateCurveData}
-                onCreateProject={handleCreateProject}
                 onUpdateProject={handleUpdateProject}
                 curveId={currentCurveId || undefined}
               />
             )}
             
-            {!isNewCurve && activeSection === "editor" && (
+            {currentCurveId && activeSection === "editor" && (
               <CurveEditorSection
-                curveId={currentCurveId!}
+                curveId={currentCurveId}
                 versions={versions}
                 setVersions={setVersions}
                 currentVersionId={currentVersionId}
