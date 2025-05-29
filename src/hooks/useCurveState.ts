@@ -26,18 +26,39 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
     setPhases(initialPhases);
   }, [initialPhases]);
 
-  // Phase operations
-  const updatePhase = (index: number, updatedPhase: Partial<Phase>) => {
+  // Phase operations that match PhaseControls expected signatures
+  const updatePhase = (id: string, field: keyof Phase, value: number) => {
+    setPhases(prev => prev.map(phase => 
+      phase.id === id ? { ...phase, [field]: value } : phase
+    ));
+  };
+
+  const addPhase = () => {
+    const newPhase: Phase = {
+      id: Date.now().toString(),
+      targetTemp: 20,
+      duration: 60,
+      holdTime: 0
+    };
+    setPhases(prev => [...prev, newPhase]);
+  };
+
+  const removePhase = (id: string) => {
+    setPhases(prev => prev.filter(phase => phase.id !== id));
+  };
+
+  // Legacy functions for backward compatibility with other components
+  const updatePhaseByIndex = (index: number, updatedPhase: Partial<Phase>) => {
     setPhases(prev => prev.map((phase, i) => 
       i === index ? { ...phase, ...updatedPhase } : phase
     ));
   };
 
-  const addPhase = (newPhase: Phase) => {
+  const addPhaseWithData = (newPhase: Phase) => {
     setPhases(prev => [...prev, newPhase]);
   };
 
-  const removePhase = (index: number) => {
+  const removePhaseByIndex = (index: number) => {
     setPhases(prev => prev.filter((_, i) => i !== index));
   };
 
@@ -78,12 +99,17 @@ export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
   });
 
   return {
-    // Phase state and operations
+    // Phase state and operations (new signatures)
     phases,
     setPhases,
     updatePhase,
     addPhase,
     removePhase,
+    
+    // Legacy phase operations (for backward compatibility)
+    updatePhaseByIndex,
+    addPhaseWithData,
+    removePhaseByIndex,
     
     // Glass settings
     glassData,
