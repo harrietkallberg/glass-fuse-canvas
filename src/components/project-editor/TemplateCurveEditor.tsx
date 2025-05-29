@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -12,7 +13,7 @@ interface TemplateCurveEditorProps {
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
   curveId?: string;
-  onTemplateConfirmed?: (newProjectData?: { title: string; description: string; curveData: any }) => void;
+  onTemplateConfirmed?: () => void;
   projectTitle?: string;
   projectDescription?: string;
 }
@@ -48,8 +49,8 @@ const TemplateCurveEditor = ({
       setOriginalPhases([...templateCurveData.phases]);
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
-    } else if (isNewCurve) {
-      // For new projects, set default phases and mark as changed
+    } else {
+      // Set default phases and mark as changed for template setup
       const defaultCurveData = {
         phases: defaultPhases,
         temperatureUnit,
@@ -59,7 +60,7 @@ const TemplateCurveEditor = ({
       setOriginalPhases([]);
       setHasTemplateChanges(true);
     }
-  }, [templateCurveData, isNewCurve, setTemplateCurveData]);
+  }, [templateCurveData, setTemplateCurveData]);
 
   // Compare phases to detect changes
   const phasesHaveChanged = (newPhases: Phase[], originalPhases: Phase[]) => {
@@ -85,43 +86,16 @@ const TemplateCurveEditor = ({
     
     // Check if phases have actually changed from original
     const hasChanges = phasesHaveChanged(phases, originalPhases);
-    setHasTemplateChanges(hasChanges || isNewCurve);
+    setHasTemplateChanges(hasChanges || originalPhases.length === 0);
   };
 
   const handleConfirmTemplate = async () => {
-    if (!localCurveData?.phases || !user) {
-      return;
-    }
-
-    // For new projects, create the project with the template
-    if (isNewCurve) {
-      if (!projectTitle.trim()) {
-        toast({
-          title: "Project title required",
-          description: "Please enter a project title before confirming the template.",
-          variant: "destructive"
-        });
-        return;
-      }
-
-      setHasTemplateChanges(false);
-      setOriginalPhases([...localCurveData.phases]);
-      
-      if (onTemplateConfirmed) {
-        onTemplateConfirmed({
-          title: projectTitle,
-          description: projectDescription,
-          curveData: { 
-            ...localCurveData, 
-            temperatureUnit
-          }
-        });
-      }
-      return;
-    }
-
-    // For existing projects, save template to database
-    if (!curveId) {
+    if (!localCurveData?.phases || !user || !curveId) {
+      toast({
+        title: "Error",
+        description: "Missing required data to save template.",
+        variant: "destructive"
+      });
       return;
     }
 
@@ -226,25 +200,20 @@ const TemplateCurveEditor = ({
     }
   };
 
-  // Show button when there are template changes OR for new projects that need template confirmation
-  const showConfirmButton = hasTemplateChanges || (isNewCurve && localCurveData?.phases);
+  // Show button when there are template changes
+  const showConfirmButton = hasTemplateChanges;
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
-        {!isNewCurve && (
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-            Project Template
-          </span>
-        )}
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+          Project Template
+        </span>
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        {isNewCurve 
-          ? "Configure your base firing curve template. This will serve as the starting point for all versions and create your project."
-          : "This is your project's base template curve. Make changes and click 'Confirm Template for Project' to save them across all project sections."
-        }
+        Configure your base firing curve template. This will serve as the starting point for all versions across the project.
       </div>
       
       <CurveEditor
@@ -258,12 +227,10 @@ const TemplateCurveEditor = ({
         <div className="mt-6 flex justify-center">
           <Button 
             onClick={handleConfirmTemplate}
-            disabled={isSavingTemplate || (isNewCurve && !projectTitle.trim())}
+            disabled={isSavingTemplate}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
           >
-            {isSavingTemplate ? "Saving..." : 
-             isNewCurve ? "Confirm Template & Create Project" : 
-             "Confirm Template for Project"}
+            {isSavingTemplate ? "Saving..." : "Confirm Template for Project"}
           </Button>
           {hasTemplateChanges && (
             <div className="ml-3 flex items-center text-sm text-orange-600">

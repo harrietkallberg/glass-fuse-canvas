@@ -13,7 +13,7 @@ interface ProjectInformationSectionProps {
   setProjectDescription: (description: string) => void;
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
-  onCreateProject: (title: string, description: string, curveData: any) => void;
+  onCreateProject?: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
   curveId?: string;
 }
@@ -26,7 +26,6 @@ const ProjectInformationSection = ({
   setProjectDescription,
   templateCurveData,
   setTemplateCurveData,
-  onCreateProject,
   onUpdateProject,
   curveId
 }: ProjectInformationSectionProps) => {
@@ -50,13 +49,6 @@ const ProjectInformationSection = ({
     if (!isNewCurve) setHasChanges(true);
   };
 
-  const handleTemplateConfirmed = (newProjectData?: { title: string; description: string; curveData: any }) => {
-    if (isNewCurve && newProjectData) {
-      // For new projects, create the project when template is confirmed
-      onCreateProject(newProjectData.title, newProjectData.description, newProjectData.curveData);
-    }
-  };
-
   return (
     <div className="space-y-8">
       <ProjectDetailsForm
@@ -74,7 +66,6 @@ const ProjectInformationSection = ({
         templateCurveData={templateCurveData}
         setTemplateCurveData={setTemplateCurveData}
         curveId={curveId}
-        onTemplateConfirmed={handleTemplateConfirmed}
         projectTitle={projectTitle}
         projectDescription={projectDescription}
       />
