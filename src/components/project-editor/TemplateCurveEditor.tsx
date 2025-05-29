@@ -102,7 +102,8 @@ const TemplateCurveEditor = ({
     setHasChanges(false);
   };
 
-  const selectedGlassInfo = curveState.getSelectedGlassInfo();
+  // Use selectedGlassInfo property instead of getSelectedGlassInfo method
+  const selectedGlassInfo = curveState.selectedGlassInfo;
 
   return (
     <div className="space-y-6">
@@ -304,18 +305,19 @@ const TemplateCurveEditor = ({
         ) : (
           <PhasesTable 
             phases={curveState.phases}
-            onUpdatePhase={(id, field, value) => {
+            updatePhase={(id, field, value) => {
               curveState.updatePhase(id, field, value);
               handlePhaseChange();
             }}
-            onAddPhase={() => {
+            addPhase={() => {
               curveState.addPhase();
               handlePhaseChange();
             }}
-            onRemovePhase={(id) => {
+            removePhase={(id) => {
               curveState.removePhase(id);
               handlePhaseChange();
             }}
+            handleSave={handleSave}
             showHeaders={true}
             isTemplateMode={true}
           />
