@@ -1,97 +1,92 @@
 
 import { useState, useEffect } from 'react';
-import { Phase, generateChartData } from '@/utils/curveUtils';
+import { Phase } from '@/utils/curveUtils';
 import { createGlassTemplatePhases } from '@/utils/glassTemplateUtils';
-import glassData from '../tables.json';
-
-export interface CurveState {
-  phases: Phase[];
-  activeTab: string;
-  selectedGlass: string;
-  roomTemp: number;
-  glassLayers: string;
-  glassRadius: string;
-  firingType: string;
-  topTempMinutes: string;
-  ovenType: string;
-  chartData: any[];
-}
+import glassData from '@/tables.json';
 
 interface UseCurveStateProps {
-  initialPhases?: Phase[];
+  initialPhases: Phase[];
 }
 
-export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
-  const [phases, setPhases] = useState<Phase[]>(
-    initialPhases.length > 0 
-      ? initialPhases 
-      : [{ id: '1', targetTemp: 700, duration: 30, holdTime: 10 }]
-  );
+export const useCurveState = ({ initialPhases }: UseCurveStateProps) => {
+  // Phase management
+  const [phases, setPhases] = useState<Phase[]>(initialPhases);
   
-  const [activeTab, setActiveTab] = useState('chart');
-  const [selectedGlass, setSelectedGlass] = useState<string>(glassData.Glassorter[0].namn);
+  // Glass settings state
+  const [selectedGlass, setSelectedGlass] = useState<string>("Bullseye Opaleszent");
   const [roomTemp, setRoomTemp] = useState<number>(20);
   const [glassLayers, setGlassLayers] = useState<string>("1");
   const [glassRadius, setGlassRadius] = useState<string>("10");
   const [firingType, setFiringType] = useState<string>("f");
   const [topTempMinutes, setTopTempMinutes] = useState<string>("10");
   const [ovenType, setOvenType] = useState<string>("t");
-  const [chartData, setChartData] = useState<any[]>([]);
 
-  // Find selected glass info
-  const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
-
+  // Update phases when initialPhases change
   useEffect(() => {
-    const data = generateChartData(phases, roomTemp);
-    setChartData(data);
-  }, [phases, roomTemp]);
+    setPhases(initialPhases);
+  }, [initialPhases]);
 
-  const addPhase = () => {
-    const lastPhase = phases[phases.length - 1];
-    const newPhase = {
-      id: Date.now().toString(),
-      targetTemp: lastPhase?.targetTemp || 700,
-      duration: 30,
-      holdTime: 10,
-    };
-    setPhases([...phases, newPhase]);
+  // Phase operations
+  const updatePhase = (index: number, updatedPhase: Partial<Phase>) => {
+    setPhases(prev => prev.map((phase, i) => 
+      i === index ? { ...phase, ...updatedPhase } : phase
+    ));
   };
 
-  const removePhase = (id: string) => {
-    if (phases.length <= 1) return;
-    setPhases(phases.filter(phase => phase.id !== id));
+  const addPhase = (newPhase: Phase) => {
+    setPhases(prev => [...prev, newPhase]);
   };
 
-  const updatePhase = (id: string, field: keyof Phase, value: number) => {
-    setPhases(
-      phases.map(phase => 
-        phase.id === id ? { ...phase, [field]: value } : phase
-      )
-    );
+  const removePhase = (index: number) => {
+    setPhases(prev => prev.filter((_, i) => i !== index));
   };
 
+  // Glass template application
   const applyGlassTemplate = () => {
-    if (!selectedGlassInfo) return;
-    
-    const newPhases = createGlassTemplatePhases(
-      selectedGlassInfo,
-      glassData,
-      firingType,
-      ovenType,
-      glassRadius,
-      glassLayers,
-      topTempMinutes,
-      roomTemp
-    );
-    
-    setPhases(newPhases);
+    try {
+      const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
+      if (!selectedGlassInfo) {
+        throw new Error("Selected glass not found");
+      }
+
+      const templatePhases = createGlassTemplatePhases(
+        selectedGlassInfo,
+        glassData,
+        firingType,
+        ovenType,
+        glassRadius,
+        glassLayers,
+        topTempMinutes,
+        roomTemp
+      );
+
+      setPhases(templatePhases);
+    } catch (error) {
+      console.error('Error applying glass template:', error);
+    }
   };
+
+  // Get current template settings
+  const getTemplateSettings = () => ({
+    selectedGlass,
+    roomTemp,
+    glassLayers,
+    glassRadius,
+    firingType,
+    topTempMinutes,
+    ovenType
+  });
 
   return {
+    // Phase state and operations
     phases,
     setPhases,
-    activeTab,
-    setActiveTab,
+    updatePhase,
+    addPhase,
+    removePhase,
+    
+    // Glass settings
+    glassData,
     selectedGlass,
     setSelectedGlass,
     roomTemp,
@@ -106,12 +101,9 @@ export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
     setTopTempMinutes,
     ovenType,
     setOvenType,
-    chartData,
-    selectedGlassInfo,
-    addPhase,
-    removePhase,
-    updatePhase,
+    
+    // Template operations
     applyGlassTemplate,
-    glassData
+    getTemplateSettings,
   };
 };

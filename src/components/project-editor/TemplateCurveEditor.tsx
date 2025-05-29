@@ -1,6 +1,6 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,110 +35,23 @@ const TemplateCurveEditor = ({
   projectTitle = "",
   projectDescription = ""
 }: TemplateCurveEditorProps) => {
-  const [localCurveData, setLocalCurveData] = useState(templateCurveData);
-  const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
-  const [originalPhases, setOriginalPhases] = useState<Phase[]>([]);
-  const [showConfirmButton, setShowConfirmButton] = useState(false);
-  const [hasExistingTemplate, setHasExistingTemplate] = useState(false);
-  const [templateConfirmedInSession, setTemplateConfirmedInSession] = useState(false);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
   const { user } = useAuth();
-  const temperatureUnit = "celsius";
 
-  // Initialize component state when templateCurveData changes
+  // Show template editor if template exists or user wants to create one
   useEffect(() => {
-    console.log('TemplateCurveEditor: templateCurveData changed:', templateCurveData);
-    
     if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
-      // Existing template with phases
-      console.log('Loading existing template with phases:', templateCurveData.phases);
-      
-      const curveData = {
-        phases: templateCurveData.phases,
-        temperatureUnit,
-        settings: templateCurveData.settings || {}
-      };
-      
-      setOriginalPhases([...templateCurveData.phases]);
-      setLocalCurveData(curveData);
-      setHasTemplateChanges(false);
-      setHasExistingTemplate(true);
-      setShowConfirmButton(false);
-      
-      // Check if template has proper settings (indicating it's been confirmed)
-      const hasSettings = templateCurveData.settings && 
-        (templateCurveData.settings.selectedGlass || 
-         templateCurveData.settings.firingType || 
-         templateCurveData.settings.ovenType);
-      
-      if (hasSettings) {
-        console.log('Template has been confirmed with settings:', templateCurveData.settings);
-        setTemplateConfirmedInSession(true);
-      } else {
-        console.log('Template exists but not fully configured');
-        setTemplateConfirmedInSession(false);
-      }
-    } else if (templateCurveData === null && !isInitialized) {
-      // No existing template, set up default
-      console.log('No existing template, setting up default');
-      const defaultCurveData = {
-        phases: defaultPhases,
-        temperatureUnit,
-        settings: {}
-      };
-      setLocalCurveData(defaultCurveData);
-      setOriginalPhases([]);
-      setHasTemplateChanges(true);
-      setHasExistingTemplate(false);
-      setTemplateConfirmedInSession(false);
-      setShowConfirmButton(false);
+      setShowTemplateEditor(true);
     }
-    
-    setIsInitialized(true);
-  }, [templateCurveData, isInitialized]);
+  }, [templateCurveData]);
 
-  // Compare phases to detect changes
-  const phasesHaveChanged = (newPhases: Phase[], originalPhases: Phase[]) => {
-    if (newPhases.length !== originalPhases.length) return true;
-    
-    return newPhases.some((phase, index) => {
-      const original = originalPhases[index];
-      return !original || 
-        phase.targetTemp !== original.targetTemp ||
-        phase.duration !== original.duration ||
-        phase.holdTime !== original.holdTime;
-    });
+  const handleCreateTemplate = () => {
+    setShowTemplateEditor(true);
   };
 
-  const handleCurveChange = (phases: Phase[]) => {
-    console.log('Curve changed, phases:', phases);
-    const curveData = {
-      ...localCurveData,
-      phases,
-      temperatureUnit,
-    };
-    
-    setLocalCurveData(curveData);
-    
-    // Check if phases have actually changed from original
-    const hasChanges = phasesHaveChanged(phases, originalPhases);
-    setHasTemplateChanges(hasChanges || originalPhases.length === 0);
-    
-    // Show confirm button if there are changes to an existing template
-    if (hasExistingTemplate && hasChanges) {
-      setShowConfirmButton(true);
-    }
-  };
-
-  const handleApplyGlassTemplate = () => {
-    console.log('Glass template applied');
-    // Show the confirm button when glass template is applied
-    setShowConfirmButton(true);
-  };
-
-  const handleConfirmTemplate = async () => {
-    if (!localCurveData?.phases || !user || !curveId) {
+  const handleSaveTemplate = async (phases: Phase[]) => {
+    if (!user || !curveId) {
       toast({
         title: "Error",
         description: "Missing required data to save template.",
@@ -147,11 +60,10 @@ const TemplateCurveEditor = ({
       return;
     }
 
-    console.log('Confirming template with data:', localCurveData);
     setIsSavingTemplate(true);
 
     try {
-      // Get the template version (version 0.0) or create it if it doesn't exist
+      // Get the template version (version 0) or create it if it doesn't exist
       let { data: templateVersion, error: fetchError } = await supabase
         .from('curve_versions')
         .select('*')
@@ -169,6 +81,9 @@ const TemplateCurveEditor = ({
         return;
       }
 
+      // Get current glass settings from the curve editor
+      const currentSettings = templateCurveData?.settings || {};
+
       if (!templateVersion) {
         // Create template version
         const { data: newTemplateVersion, error: createError } = await supabase
@@ -178,13 +93,13 @@ const TemplateCurveEditor = ({
             version_number: 0,
             name: 'Template',
             is_current: false,
-            selected_glass: localCurveData.settings?.selectedGlass,
-            room_temp: localCurveData.settings?.roomTemp || 20,
-            glass_layers: localCurveData.settings?.glassLayers || "1",
-            glass_radius: localCurveData.settings?.glassRadius || "10",
-            firing_type: localCurveData.settings?.firingType || "f",
-            top_temp_minutes: localCurveData.settings?.topTempMinutes || "10",
-            oven_type: localCurveData.settings?.ovenType || "t",
+            selected_glass: currentSettings.selectedGlass,
+            room_temp: currentSettings.roomTemp || 20,
+            glass_layers: currentSettings.glassLayers || "1",
+            glass_radius: currentSettings.glassRadius || "10",
+            firing_type: currentSettings.firingType || "f",
+            top_temp_minutes: currentSettings.topTempMinutes || "10",
+            oven_type: currentSettings.ovenType || "t",
           })
           .select()
           .single();
@@ -201,17 +116,17 @@ const TemplateCurveEditor = ({
 
         templateVersion = newTemplateVersion;
       } else {
-        // Update existing template version with current settings
+        // Update existing template version
         const { error: updateError } = await supabase
           .from('curve_versions')
           .update({
-            selected_glass: localCurveData.settings?.selectedGlass,
-            room_temp: localCurveData.settings?.roomTemp || 20,
-            glass_layers: localCurveData.settings?.glassLayers || "1",
-            glass_radius: localCurveData.settings?.glassRadius || "10",
-            firing_type: localCurveData.settings?.firingType || "f",
-            top_temp_minutes: localCurveData.settings?.topTempMinutes || "10",
-            oven_type: localCurveData.settings?.ovenType || "t",
+            selected_glass: currentSettings.selectedGlass,
+            room_temp: currentSettings.roomTemp || 20,
+            glass_layers: currentSettings.glassLayers || "1",
+            glass_radius: currentSettings.glassRadius || "10",
+            firing_type: currentSettings.firingType || "f",
+            top_temp_minutes: currentSettings.topTempMinutes || "10",
+            oven_type: currentSettings.ovenType || "t",
           })
           .eq('id', templateVersion.id);
 
@@ -233,7 +148,7 @@ const TemplateCurveEditor = ({
         .eq('version_id', templateVersion.id);
 
       // Save new template phases
-      const phasesToInsert = localCurveData.phases.map((phase: Phase, index: number) => ({
+      const phasesToInsert = phases.map((phase: Phase, index: number) => ({
         version_id: templateVersion.id,
         phase_order: index,
         target_temp: phase.targetTemp,
@@ -255,56 +170,36 @@ const TemplateCurveEditor = ({
         return;
       }
 
-      // Create the updated template data with settings
+      // Update the template data with the new information
       const updatedTemplateData = {
-        phases: localCurveData.phases,
+        phases: phases,
         settings: {
-          selectedGlass: localCurveData.settings?.selectedGlass,
-          roomTemp: localCurveData.settings?.roomTemp || 20,
-          glassLayers: localCurveData.settings?.glassLayers || "1",
-          glassRadius: localCurveData.settings?.glassRadius || "10",
-          firingType: localCurveData.settings?.firingType || "f",
-          topTempMinutes: localCurveData.settings?.topTempMinutes || "10",
-          ovenType: localCurveData.settings?.ovenType || "t",
+          selectedGlass: currentSettings.selectedGlass,
+          roomTemp: currentSettings.roomTemp || 20,
+          glassLayers: currentSettings.glassLayers || "1",
+          glassRadius: currentSettings.glassRadius || "10",
+          firingType: currentSettings.firingType || "f",
+          topTempMinutes: currentSettings.topTempMinutes || "10",
+          ovenType: currentSettings.ovenType || "t",
         }
       };
 
-      console.log('Template saved successfully, updating state with:', updatedTemplateData);
-      
-      // Update parent state with confirmed template data
       setTemplateCurveData(updatedTemplateData);
-      
-      // Update local state to reflect the confirmed template
-      setLocalCurveData(updatedTemplateData);
-      setOriginalPhases([...localCurveData.phases]);
-      setHasTemplateChanges(false);
-      setTemplateConfirmedInSession(true);
-      setHasExistingTemplate(true);
-      setShowConfirmButton(false);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
       }
       
-      // Show appropriate success message
-      const successMessage = hasExistingTemplate && templateConfirmedInSession
-        ? "Template has been updated!"
-        : "Template confirmed!";
-      
-      const successDescription = hasExistingTemplate && templateConfirmedInSession
-        ? "Project template has been updated and will be used for dashboard display."
-        : "Project template has been saved and will be used for dashboard display.";
-      
       toast({
-        title: successMessage,
-        description: successDescription,
+        title: "Template saved!",
+        description: "Project template has been saved successfully.",
       });
 
     } catch (error) {
-      console.error('Error confirming project template:', error);
+      console.error('Error saving project template:', error);
       toast({
         title: "Error",
-        description: "Failed to confirm project template",
+        description: "Failed to save project template",
         variant: "destructive"
       });
     } finally {
@@ -312,20 +207,39 @@ const TemplateCurveEditor = ({
     }
   };
 
-  console.log('Rendering TemplateCurveEditor with:', {
-    hasExistingTemplate,
-    templateConfirmedInSession,
-    showConfirmButton,
-    hasTemplateChanges,
-    localCurveData: localCurveData?.phases?.length,
-    localSettings: localCurveData?.settings
-  });
+  const handleApplyGlassTemplate = () => {
+    // This will trigger when the user applies glass settings
+    console.log('Glass template applied');
+  };
 
-  // Don't render until initialized
-  if (!isInitialized) {
-    return <div>Loading template...</div>;
+  // If no template exists and user hasn't chosen to create one, show the add button
+  if (!templateCurveData?.phases && !showTemplateEditor) {
+    return (
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            No Template
+          </span>
+        </div>
+        
+        <div className="text-center py-8">
+          <div className="text-gray-600 mb-6">
+            No project template has been created yet. Create a template to set the default firing curve and glass settings for this project.
+          </div>
+          
+          <Button 
+            onClick={handleCreateTemplate}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+          >
+            Add New Template
+          </Button>
+        </div>
+      </div>
+    );
   }
 
+  // Show the template editor
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
       <div className="flex justify-between items-center mb-4">
@@ -336,45 +250,15 @@ const TemplateCurveEditor = ({
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        {hasExistingTemplate && templateConfirmedInSession
-          ? "Modify your project template. Changes will update the template used for all versions across the project."
-          : "Configure your base firing curve template. This will serve as the starting point for all versions across the project."
-        }
+        Configure your base firing curve template and glass settings. This will serve as the default for all versions in this project.
       </div>
       
       <CurveEditor
-        initialPhases={localCurveData?.phases || defaultPhases}
-        onSave={handleCurveChange}
+        initialPhases={templateCurveData?.phases || defaultPhases}
+        onSave={handleSaveTemplate}
         isTemplateMode={true}
         onApplyGlassTemplate={handleApplyGlassTemplate}
       />
-
-      {/* Template Confirmation Button - Shows after applying glass template or making changes to existing template */}
-      {showConfirmButton && (
-        <div className="mt-6 flex justify-center">
-          <Button 
-            onClick={handleConfirmTemplate}
-            disabled={isSavingTemplate}
-            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
-          >
-            {isSavingTemplate 
-              ? "Saving..." 
-              : (hasExistingTemplate && templateConfirmedInSession)
-                ? "Update Template" 
-                : "Confirm Template"
-            }
-          </Button>
-        </div>
-      )}
-
-      {/* Show unsaved changes indicator */}
-      {hasTemplateChanges && !showConfirmButton && !hasExistingTemplate && (
-        <div className="mt-6 flex justify-center">
-          <div className="text-sm text-orange-600">
-            • Template needs to be configured
-          </div>
-        </div>
-      )}
     </div>
   );
 };

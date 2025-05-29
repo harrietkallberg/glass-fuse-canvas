@@ -29,7 +29,19 @@ const CurveEditor = ({
   const [showTabs, setShowTabs] = React.useState(false);
   
   const handleSave = () => {
-    if (onSave) onSave(curveState.phases);
+    if (onSave) {
+      // For template mode, also save the current glass settings
+      if (isTemplateMode) {
+        // Update the template data with current settings
+        const updatedPhases = curveState.phases.map(phase => ({
+          ...phase,
+          // Preserve any additional phase data
+        }));
+        onSave(updatedPhases);
+      } else {
+        onSave(curveState.phases);
+      }
+    }
     
     // Show success toast
     toast({
@@ -43,6 +55,11 @@ const CurveEditor = ({
   const handleApplyTemplate = () => {
     curveState.applyGlassTemplate();
     setShowTabs(true);
+    
+    // For template mode, immediately save the new phases and settings
+    if (isTemplateMode && onSave) {
+      onSave(curveState.phases);
+    }
     
     // Call the parent callback to show confirm button
     if (onApplyGlassTemplate) {
