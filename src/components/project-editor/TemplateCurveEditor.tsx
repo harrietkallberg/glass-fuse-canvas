@@ -1,342 +1,461 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { useCurveState } from '@/hooks/useCurveState';
-import CurveChart from '@/components/curve-editor/CurveChart';
-import PhasesTable from '@/components/curve-editor/PhasesTable';
-import { Phase, calculateTotalTime } from '@/utils/curveUtils';
-import { TemplateSettings } from '@/hooks/useTemplateState';
-import { BarChart3, Table } from 'lucide-react';
-import glassData from '../../tables.json';
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import { useCurveState } from "@/hooks/useCurveState";
+import GlassSettings from "@/components/curve-editor/GlassSettings";
+import CurveChart from "@/components/curve-editor/CurveChart";
+import PhasesTable from "@/components/curve-editor/PhasesTable";
+import { Phase } from "@/utils/curveUtils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TemplateCurveEditorProps {
-  initialPhases: Phase[];
-  initialSettings: TemplateSettings;
-  onSave: (phases: Phase[], settings: TemplateSettings) => void;
-  onChange?: () => void;
-  isLoading?: boolean;
+  isNewCurve: boolean;
+  templateCurveData: any;
+  setTemplateCurveData: (data: any) => void;
+  curveId?: string;
+  onTemplateConfirmed?: () => void;
+  projectTitle?: string;
+  projectDescription?: string;
 }
 
 const TemplateCurveEditor = ({
-  initialPhases,
-  initialSettings,
-  onSave,
-  onChange,
-  isLoading = false
+  isNewCurve,
+  templateCurveData,
+  setTemplateCurveData,
+  curveId,
+  onTemplateConfirmed,
+  projectTitle = "",
+  projectDescription = ""
 }: TemplateCurveEditorProps) => {
+  const [isSavingTemplate, setIsSavingTemplate] = useState(false);
+  const [showTemplateEditor, setShowTemplateEditor] = useState(false);
+  const [savedTemplatePhases, setSavedTemplatePhases] = useState<Phase[]>([]);
+  const [previewPhases, setPreviewPhases] = useState<Phase[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
-  const [hasChanges, setHasChanges] = useState(false);
-  
-  // Initialize curve state with the provided data
-  const curveState = useCurveState({ initialPhases });
+  const { user } = useAuth();
 
-  // Local state for template settings
-  const [settings, setSettings] = useState<TemplateSettings>(initialSettings);
+  // Initialize curve state - if template exists, use it, otherwise use empty
+  const curveState = useCurveState({ 
+    initialPhases: templateCurveData?.phases || [],
+    isTemplateMode: true 
+  });
 
-  // Update curve state when initialPhases change
+  // Load existing template settings when component mounts
   useEffect(() => {
-    if (initialPhases.length > 0) {
-      curveState.setPhases(initialPhases);
+    if (templateCurveData?.settings) {
+      curveState.loadTemplateSettings(templateCurveData.settings);
     }
-  }, [initialPhases]);
+  }, [templateCurveData]);
 
-  // Update settings when initialSettings change
+  // Show template editor if template exists
   useEffect(() => {
-    setSettings(initialSettings);
-    curveState.setSelectedGlass(initialSettings.selectedGlass);
-    curveState.setRoomTemp(initialSettings.roomTemp);
-    curveState.setGlassLayers(initialSettings.glassLayers);
-    curveState.setGlassRadius(initialSettings.glassRadius);
-    curveState.setFiringType(initialSettings.firingType);
-    curveState.setTopTempMinutes(initialSettings.topTempMinutes);
-    curveState.setOvenType(initialSettings.ovenType);
-  }, [initialSettings]);
+    if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
+      setShowTemplateEditor(true);
+      setSavedTemplatePhases(templateCurveData.phases);
+    }
+  }, [templateCurveData]);
 
-  const handleSettingChange = (key: keyof TemplateSettings, value: string | number) => {
-    const newSettings = { ...settings, [key]: value };
-    setSettings(newSettings);
-    setHasChanges(true);
-    onChange?.();
+  // Fetch template data from Supabase
+  const fetchTemplateFromDatabase = async () => {
+    if (!curveId) return;
 
-    // Update curve state accordingly
-    switch (key) {
-      case 'selectedGlass':
-        curveState.setSelectedGlass(value as string);
-        break;
-      case 'roomTemp':
-        curveState.setRoomTemp(value as number);
-        break;
-      case 'glassLayers':
-        curveState.setGlassLayers(value as string);
-        break;
-      case 'glassRadius':
-        curveState.setGlassRadius(value as string);
-        break;
-      case 'firingType':
-        curveState.setFiringType(value as string);
-        break;
-      case 'topTempMinutes':
-        curveState.setTopTempMinutes(value as string);
-        break;
-      case 'ovenType':
-        curveState.setOvenType(value as string);
-        break;
+    try {
+      const { data: templateVersion, error } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .eq('version_number', 0)
+        .maybeSingle();
+
+      if (error || !templateVersion) {
+        console.log('No template found in database');
+        setSavedTemplatePhases([]);
+        return;
+      }
+
+      // Fetch template phases
+      const { data: phasesData, error: phasesError } = await supabase
+        .from('curve_phases')
+        .select('*')
+        .eq('version_id', templateVersion.id)
+        .order('phase_order');
+
+      if (phasesError) {
+        console.error('Error fetching template phases:', phasesError);
+        return;
+      }
+
+      const phases: Phase[] = phasesData.map((phase, index) => ({
+        id: (index + 1).toString(),
+        targetTemp: phase.target_temp,
+        duration: phase.duration,
+        holdTime: phase.hold_time,
+      }));
+
+      const templateData = {
+        phases,
+        settings: {
+          selectedGlass: templateVersion.selected_glass,
+          roomTemp: templateVersion.room_temp,
+          glassLayers: templateVersion.glass_layers,
+          glassRadius: templateVersion.glass_radius,
+          firingType: templateVersion.firing_type,
+          topTempMinutes: templateVersion.top_temp_minutes,
+          ovenType: templateVersion.oven_type,
+        }
+      };
+
+      setSavedTemplatePhases(phases);
+      setTemplateCurveData(templateData);
+      
+      // Also load settings into the curve state
+      curveState.loadTemplateSettings(templateData.settings);
+
+    } catch (error) {
+      console.error('Error fetching template:', error);
     }
   };
 
-  const handlePhaseChange = () => {
-    setHasChanges(true);
-    onChange?.();
+  // Fetch template on component mount
+  useEffect(() => {
+    fetchTemplateFromDatabase();
+  }, [curveId]);
+
+  const handleCreateTemplate = () => {
+    setShowTemplateEditor(true);
   };
 
-  const handleApplyTemplate = () => {
-    curveState.applyGlassTemplate();
-    setHasChanges(true);
-    onChange?.();
+  const handleViewGlassTemplate = () => {
+    const generatedPhases = curveState.generateTemplateFromSettings();
+    if (generatedPhases) {
+      setPreviewPhases(generatedPhases);
+      setShowPreview(true);
+      toast({
+        title: "Template Generated",
+        description: "Preview your glass template below. Click 'Confirm as Project Template' to save it.",
+      });
+    }
   };
 
-  const handleSave = () => {
-    onSave(curveState.phases, settings);
-    setHasChanges(false);
+  const handleConfirmTemplate = async () => {
+    if (!user || !curveId || previewPhases.length === 0) {
+      toast({
+        title: "Error",
+        description: "Missing required data to save template.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsSavingTemplate(true);
+
+    try {
+      // Get current glass settings
+      const currentSettings = curveState.getTemplateSettings();
+
+      // Get or create the template version (version 0)
+      let { data: templateVersion, error: fetchError } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .eq('version_number', 0)
+        .maybeSingle();
+
+      if (fetchError && fetchError.code !== 'PGRST116') {
+        console.error('Error fetching template version:', fetchError);
+        toast({
+          title: "Error",
+          description: "Failed to fetch project template",
+          variant: "destructive"
+        });
+        setIsSavingTemplate(false);
+        return;
+      }
+
+      if (!templateVersion) {
+        // Create new template version
+        const { data: newTemplateVersion, error: createError } = await supabase
+          .from('curve_versions')
+          .insert({
+            curve_id: curveId,
+            version_number: 0,
+            name: 'Template',
+            is_current: false,
+            selected_glass: currentSettings.selectedGlass,
+            room_temp: currentSettings.roomTemp,
+            glass_layers: currentSettings.glassLayers,
+            glass_radius: currentSettings.glassRadius,
+            firing_type: currentSettings.firingType,
+            top_temp_minutes: currentSettings.topTempMinutes,
+            oven_type: currentSettings.ovenType,
+          })
+          .select()
+          .single();
+
+        if (createError) {
+          console.error('Error creating template version:', createError);
+          toast({
+            title: "Error",
+            description: "Failed to create project template",
+            variant: "destructive"
+          });
+          setIsSavingTemplate(false);
+          return;
+        }
+
+        templateVersion = newTemplateVersion;
+      } else {
+        // Update existing template version
+        const { error: updateError } = await supabase
+          .from('curve_versions')
+          .update({
+            selected_glass: currentSettings.selectedGlass,
+            room_temp: currentSettings.roomTemp,
+            glass_layers: currentSettings.glassLayers,
+            glass_radius: currentSettings.glassRadius,
+            firing_type: currentSettings.firingType,
+            top_temp_minutes: currentSettings.topTempMinutes,
+            oven_type: currentSettings.ovenType,
+          })
+          .eq('id', templateVersion.id);
+
+        if (updateError) {
+          console.error('Error updating template version:', updateError);
+          toast({
+            title: "Error",
+            description: "Failed to update project template",
+            variant: "destructive"
+          });
+          setIsSavingTemplate(false);
+          return;
+        }
+      }
+
+      // Delete existing template phases and save new ones
+      await supabase
+        .from('curve_phases')
+        .delete()
+        .eq('version_id', templateVersion.id);
+
+      const phasesToInsert = previewPhases.map((phase: Phase, index: number) => ({
+        version_id: templateVersion.id,
+        phase_order: index,
+        target_temp: phase.targetTemp,
+        duration: phase.duration,
+        hold_time: phase.holdTime,
+      }));
+
+      const { error: phasesError } = await supabase
+        .from('curve_phases')
+        .insert(phasesToInsert);
+
+      if (phasesError) {
+        console.error('Error saving template phases:', phasesError);
+        toast({
+          title: "Error",
+          description: "Failed to save template phases",
+          variant: "destructive"
+        });
+        setIsSavingTemplate(false);
+        return;
+      }
+
+      // Update the template data state and saved phases
+      const updatedTemplateData = {
+        phases: previewPhases,
+        settings: currentSettings
+      };
+
+      setTemplateCurveData(updatedTemplateData);
+      setSavedTemplatePhases(previewPhases);
+      setShowPreview(false);
+      setPreviewPhases([]);
+      
+      // Re-fetch the template data to ensure consistency
+      await fetchTemplateFromDatabase();
+      
+      if (onTemplateConfirmed) {
+        onTemplateConfirmed();
+      }
+      
+      toast({
+        title: "Master Recipe Saved!",
+        description: "Your project template has been saved successfully.",
+      });
+
+    } catch (error) {
+      console.error('Error saving project template:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save project template",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSavingTemplate(false);
+    }
   };
 
-  // Use selectedGlassInfo property instead of getSelectedGlassInfo method
-  const selectedGlassInfo = curveState.selectedGlassInfo;
-
-  return (
-    <div className="space-y-6">
-      {/* Glass Settings Section */}
-      <div className="bg-white/60 p-4 rounded-xl border border-white/50">
-        <h4 className="font-medium mb-4 text-gray-800">Glass & Firing Parameters</h4>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Glass Type */}
-          <div>
-            <Label htmlFor="glassType">Glass Type</Label>
-            <Select
-              value={settings.selectedGlass}
-              onValueChange={(value) => handleSettingChange('selectedGlass', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue placeholder="Select glass type" />
-              </SelectTrigger>
-              <SelectContent>
-                {glassData.Glassorter.map((glass) => (
-                  <SelectItem key={glass.namn} value={glass.namn}>
-                    {glass.namn}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Room Temperature */}
-          <div>
-            <Label htmlFor="roomTemp">Room Temperature (°C)</Label>
-            <Input
-              id="roomTemp"
-              type="number"
-              value={settings.roomTemp}
-              onChange={(e) => handleSettingChange('roomTemp', parseInt(e.target.value) || 20)}
-              className="mt-1"
-            />
-          </div>
-
-          {/* Glass Layers */}
-          <div>
-            <Label htmlFor="glassLayers">Glass Layers</Label>
-            <Select
-              value={settings.glassLayers}
-              onValueChange={(value) => handleSettingChange('glassLayers', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1 Layer</SelectItem>
-                <SelectItem value="2">2 Layers</SelectItem>
-                <SelectItem value="3">3 Layers</SelectItem>
-                <SelectItem value="4">4 Layers</SelectItem>
-                <SelectItem value="5">5 Layers</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Glass Radius */}
-          <div>
-            <Label htmlFor="glassRadius">Glass Radius (cm)</Label>
-            <Input
-              id="glassRadius"
-              type="number"
-              value={settings.glassRadius}
-              onChange={(e) => handleSettingChange('glassRadius', e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
-          {/* Firing Type */}
-          <div>
-            <Label htmlFor="firingType">Firing Type</Label>
-            <Select
-              value={settings.firingType}
-              onValueChange={(value) => handleSettingChange('firingType', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="f">Full Fuse</SelectItem>
-                <SelectItem value="s">Slump</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Top Temperature Minutes */}
-          <div>
-            <Label htmlFor="topTempMinutes">Top Temperature Hold (min)</Label>
-            <Input
-              id="topTempMinutes"
-              type="number"
-              value={settings.topTempMinutes}
-              onChange={(e) => handleSettingChange('topTempMinutes', e.target.value)}
-              className="mt-1"
-            />
-          </div>
-
-          {/* Oven Type */}
-          <div>
-            <Label htmlFor="ovenType">Oven Type</Label>
-            <Select
-              value={settings.ovenType}
-              onValueChange={(value) => handleSettingChange('ovenType', value)}
-            >
-              <SelectTrigger className="mt-1">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="t">Top Heated</SelectItem>
-                <SelectItem value="s">Side Heated</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-
-        {/* Apply Template Button */}
-        <div className="mt-4 flex justify-end">
-          <Button
-            onClick={handleApplyTemplate}
-            variant="outline"
-            className="gap-2"
-          >
-            Generate Template
-          </Button>
-        </div>
-
-        {/* Glass Info Display */}
-        {selectedGlassInfo && (
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <h5 className="font-medium text-blue-800 mb-2">Glass Information</h5>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
-                <span className="text-blue-600">Category:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.kategori}</span>
-              </div>
-              <div>
-                <span className="text-blue-600">Upper Annealing:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.o_astemp}°C</span>
-              </div>
-              <div>
-                <span className="text-blue-600">Lower Annealing:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.n_astemp}°C</span>
-              </div>
-              <div>
-                <span className="text-blue-600">Name:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.namn}</span>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Curve Display Section */}
-      <div className="bg-white/60 p-4 rounded-xl border border-white/50">
+  // If no template exists and user hasn't chosen to create one
+  if (!templateCurveData?.phases && !showTemplateEditor) {
+    return (
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h4 className="font-medium text-gray-800">Template Firing Curve</h4>
-          <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-600">
-              Total time: {calculateTotalTime(curveState.phases)} min
-            </div>
-            
-            {/* Enhanced View Mode Toggle */}
-            <div className="flex items-center bg-gray-100 rounded-lg p-1 border">
-              <button
-                onClick={() => setViewMode('chart')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  viewMode === 'chart' 
-                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <BarChart3 className="w-4 h-4" />
-                Visual
-              </button>
-              <button
-                onClick={() => setViewMode('table')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                  viewMode === 'table' 
-                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                <Table className="w-4 h-4" />
-                Tabular
-              </button>
-            </div>
-          </div>
+          <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            No Template
+          </span>
         </div>
-
-        {/* Chart or Table View */}
-        {viewMode === 'chart' ? (
-          <CurveChart 
-            phases={curveState.phases}
-            roomTemp={curveState.roomTemp}
-          />
-        ) : (
-          <PhasesTable 
-            phases={curveState.phases}
-            updatePhase={(id, field, value) => {
-              curveState.updatePhase(id, field, value);
-              handlePhaseChange();
-            }}
-            addPhase={() => {
-              curveState.addPhase();
-              handlePhaseChange();
-            }}
-            removePhase={(id) => {
-              curveState.removePhase(id);
-              handlePhaseChange();
-            }}
-            handleSave={handleSave}
-            selectedGlassInfo={selectedGlassInfo}
-          />
-        )}
-      </div>
-
-      {/* Save Button - only show if there are changes and not in new curve mode */}
-      {hasChanges && (
-        <div className="flex justify-end">
+        
+        <div className="text-center py-8">
+          <div className="text-gray-600 mb-6">
+            No master recipe has been created yet. Create a template to define the base firing curve for this project.
+          </div>
+          
           <Button 
-            onClick={handleSave}
-            className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2"
-            disabled={isLoading}
+            onClick={handleCreateTemplate}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
           >
-            {isLoading ? "Saving..." : "Save Template Changes"}
+            Add New Template
           </Button>
         </div>
-      )}
+      </div>
+    );
+  }
+
+  // Show the template configuration interface
+  return (
+    <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
+        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+          Project Template
+        </span>
+      </div>
+      
+      <div className="text-sm text-gray-600 mb-6">
+        Configure your glass parameters and master firing curve. This serves as the foundation for all experiments (versions).
+      </div>
+      
+      <div className="space-y-6">
+        {/* Glass Settings Configuration */}
+        <GlassSettings 
+          glassData={curveState.glassData}
+          selectedGlass={curveState.selectedGlass}
+          setSelectedGlass={curveState.setSelectedGlass}
+          roomTemp={curveState.roomTemp}
+          setRoomTemp={curveState.setRoomTemp}
+          glassLayers={curveState.glassLayers}
+          setGlassLayers={curveState.setGlassLayers}
+          glassRadius={curveState.glassRadius}
+          setGlassRadius={curveState.setGlassRadius}
+          firingType={curveState.firingType}
+          setFiringType={curveState.setFiringType}
+          topTempMinutes={curveState.topTempMinutes}
+          setTopTempMinutes={curveState.setTopTempMinutes}
+          viewGlassTemplate={handleViewGlassTemplate}
+          ovenType={curveState.ovenType}
+          setOvenType={curveState.setOvenType}
+        />
+        
+        {/* Template Preview - Show when user clicks "View Glass Template" */}
+        {showPreview && previewPhases.length > 0 && (
+          <div className="space-y-6">
+            <div className="border-t pt-6">
+              <h4 className="text-lg font-medium mb-4">Glass Template Preview</h4>
+              
+              {/* Visual Chart or Table View */}
+              <div className="bg-white/60 p-4 rounded-xl mb-6">
+                {viewMode === 'table' ? (
+                  <PhasesTable 
+                    phases={previewPhases}
+                    updatePhase={() => {}} // Read-only preview
+                    addPhase={() => {}} // Read-only preview
+                    removePhase={() => {}} // Read-only preview
+                    handleSave={() => {}} // Read-only preview
+                    selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                    showSlideSelector={true}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                  />
+                ) : (
+                  <>
+                    <PhasesTable 
+                      phases={[]} // Empty to just show the selector
+                      updatePhase={() => {}}
+                      addPhase={() => {}}
+                      removePhase={() => {}}
+                      handleSave={() => {}}
+                      showSlideSelector={true}
+                      viewMode={viewMode}
+                      onViewModeChange={setViewMode}
+                    />
+                    <CurveChart 
+                      phases={previewPhases}
+                      roomTemp={curveState.roomTemp}
+                    />
+                  </>
+                )}
+              </div>
+              
+              {/* Confirm Button */}
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleConfirmTemplate}
+                  disabled={isSavingTemplate}
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+                >
+                  {isSavingTemplate ? "Saving..." : "Confirm as Project Template"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Saved Template Display - Show saved template if it exists */}
+        {savedTemplatePhases.length > 0 && !showPreview && (
+          <div className="space-y-4">
+            <h4 className="text-lg font-medium">Saved Template Curve</h4>
+            
+            <div className="bg-white/60 p-4 rounded-xl">
+              {viewMode === 'table' ? (
+                <PhasesTable 
+                  phases={savedTemplatePhases}
+                  updatePhase={() => {}} // Read-only for saved template
+                  addPhase={() => {}} // Read-only for saved template
+                  removePhase={() => {}} // Read-only for saved template
+                  handleSave={() => {}} // Read-only for saved template
+                  selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                  showSlideSelector={true}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
+                />
+              ) : (
+                <>
+                  <PhasesTable 
+                    phases={[]} // Empty to just show the selector
+                    updatePhase={() => {}}
+                    addPhase={() => {}}
+                    removePhase={() => {}}
+                    handleSave={() => {}}
+                    showSlideSelector={true}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                  />
+                  <CurveChart 
+                    phases={savedTemplatePhases}
+                    roomTemp={curveState.roomTemp}
+                  />
+                </>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
