@@ -357,7 +357,7 @@ const TemplateCurveEditor = ({
           setFiringType={curveState.setFiringType}
           topTempMinutes={curveState.topTempMinutes}
           setTopTempMinutes={curveState.setTopTempMinutes}
-          applyGlassTemplate={handleViewGlassTemplate}
+          viewGlassTemplate={handleViewGlassTemplate}
           ovenType={curveState.ovenType}
           setOvenType={curveState.setOvenType}
         />
@@ -386,9 +386,10 @@ const TemplateCurveEditor = ({
                 {showTableView ? (
                   <PhasesTable 
                     phases={previewPhases}
-                    onUpdatePhase={() => {}} // Read-only preview
-                    onRemovePhase={() => {}} // Read-only preview
-                    isReadOnly={true}
+                    updatePhase={() => {}} // Read-only preview
+                    addPhase={() => {}} // Read-only preview
+                    removePhase={() => {}} // Read-only preview
+                    handleSave={() => {}} // Read-only preview
                   />
                 ) : (
                   <CurveChart 
@@ -434,9 +435,10 @@ const TemplateCurveEditor = ({
               {showTableView ? (
                 <PhasesTable 
                   phases={savedTemplatePhases}
-                  onUpdatePhase={() => {}} // Read-only for saved template
-                  onRemovePhase={() => {}} // Read-only for saved template
-                  isReadOnly={true}
+                  updatePhase={() => {}} // Read-only for saved template
+                  addPhase={() => {}} // Read-only for saved template
+                  removePhase={() => {}} // Read-only for saved template
+                  handleSave={() => {}} // Read-only for saved template
                 />
               ) : (
                 <CurveChart 
