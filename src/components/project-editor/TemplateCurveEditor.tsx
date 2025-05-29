@@ -9,6 +9,7 @@ import CurveChart from '@/components/curve-editor/CurveChart';
 import PhasesTable from '@/components/curve-editor/PhasesTable';
 import { Phase, calculateTotalTime } from '@/utils/curveUtils';
 import { TemplateSettings } from '@/hooks/useTemplateState';
+import { BarChart3, Table } from 'lucide-react';
 import glassData from '../../tables.json';
 
 interface TemplateCurveEditorProps {
@@ -230,7 +231,7 @@ const TemplateCurveEditor = ({
             variant="outline"
             className="gap-2"
           >
-            Generate Scientific Template
+            Generate Template
           </Button>
         </div>
 
@@ -269,27 +270,28 @@ const TemplateCurveEditor = ({
               Total time: {calculateTotalTime(curveState.phases)} min
             </div>
             
-            {/* View Mode Slider */}
-            <div className="relative flex bg-gray-200 rounded-full p-1">
-              <div
-                className={`absolute top-1 bottom-1 w-20 bg-white rounded-full shadow-sm transition-transform duration-200 ${
-                  viewMode === 'table' ? 'translate-x-20' : 'translate-x-0'
-                }`}
-              />
+            {/* Enhanced View Mode Toggle */}
+            <div className="flex items-center bg-gray-100 rounded-lg p-1 border">
               <button
                 onClick={() => setViewMode('chart')}
-                className={`relative z-10 px-4 py-1 text-sm font-medium rounded-full transition-colors duration-200 ${
-                  viewMode === 'chart' ? 'text-gray-900' : 'text-gray-500'
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'chart' 
+                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
+                <BarChart3 className="w-4 h-4" />
                 Visual
               </button>
               <button
                 onClick={() => setViewMode('table')}
-                className={`relative z-10 px-4 py-1 text-sm font-medium rounded-full transition-colors duration-200 ${
-                  viewMode === 'table' ? 'text-gray-900' : 'text-gray-500'
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
+                  viewMode === 'table' 
+                    ? 'bg-white text-gray-900 shadow-sm border border-gray-200' 
+                    : 'text-gray-600 hover:text-gray-800'
                 }`}
               >
+                <Table className="w-4 h-4" />
                 Tabular
               </button>
             </div>

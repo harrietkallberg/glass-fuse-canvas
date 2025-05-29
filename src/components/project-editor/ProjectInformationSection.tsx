@@ -198,18 +198,6 @@ const ProjectInformationSection = ({
           )}
         </div>
         
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
-          <div className="flex">
-            <div className="ml-3">
-              <p className="text-sm text-blue-700">
-                <strong>Template vs Versions:</strong> The template is your project's "master recipe" - the original 
-                scientific curve that defines what this project IS. Versions are experimental modifications where you 
-                test "what if I change this?" The template rarely changes; versions change frequently.
-              </p>
-            </div>
-          </div>
-        </div>
-        
         <TemplateCurveEditor
           initialPhases={templateState.templatePhases}
           initialSettings={templateState.templateSettings}
