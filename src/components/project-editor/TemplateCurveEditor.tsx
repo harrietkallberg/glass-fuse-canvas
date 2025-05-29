@@ -13,6 +13,7 @@ interface TemplateCurveEditorProps {
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
   curveId?: string;
+  onTemplateConfirmed?: () => void;
 }
 
 // Default template phases
@@ -28,7 +29,8 @@ const TemplateCurveEditor = ({
   isNewCurve,
   templateCurveData,
   setTemplateCurveData,
-  curveId
+  curveId,
+  onTemplateConfirmed
 }: TemplateCurveEditorProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
@@ -43,8 +45,18 @@ const TemplateCurveEditor = ({
       setOriginalPhases([...templateCurveData.phases]);
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
+    } else if (isNewCurve) {
+      // For new projects, set default phases and mark as changed
+      const defaultCurveData = {
+        phases: defaultPhases,
+        temperatureUnit,
+      };
+      setLocalCurveData(defaultCurveData);
+      setTemplateCurveData(defaultCurveData);
+      setOriginalPhases([]);
+      setHasTemplateChanges(true);
     }
-  }, [templateCurveData]);
+  }, [templateCurveData, isNewCurve, setTemplateCurveData]);
 
   // Compare phases to detect changes
   const phasesHaveChanged = (newPhases: Phase[], originalPhases: Phase[]) => {
@@ -70,11 +82,30 @@ const TemplateCurveEditor = ({
     
     // Check if phases have actually changed from original
     const hasChanges = phasesHaveChanged(phases, originalPhases);
-    setHasTemplateChanges(hasChanges && !isNewCurve);
+    setHasTemplateChanges(hasChanges || isNewCurve);
   };
 
   const handleConfirmTemplate = async () => {
-    if (!localCurveData?.phases || (!isNewCurve && !curveId) || !user) {
+    if (!localCurveData?.phases || !user) {
+      return;
+    }
+
+    // For new projects, we don't save to database yet - that happens when project is created
+    if (isNewCurve) {
+      setHasTemplateChanges(false);
+      setOriginalPhases([...localCurveData.phases]);
+      if (onTemplateConfirmed) {
+        onTemplateConfirmed();
+      }
+      toast({
+        title: "Template confirmed!",
+        description: "Template is ready. Click 'Create Project' to save your project.",
+      });
+      return;
+    }
+
+    // For existing projects, save to database
+    if (!curveId) {
       return;
     }
 
@@ -158,6 +189,10 @@ const TemplateCurveEditor = ({
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
       
+      if (onTemplateConfirmed) {
+        onTemplateConfirmed();
+      }
+      
       toast({
         title: "Template confirmed!",
         description: "Project template has been saved and will be available across all project sections.",
@@ -174,6 +209,9 @@ const TemplateCurveEditor = ({
       setIsSavingTemplate(false);
     }
   };
+
+  // Show button for both new and existing projects when there are template changes
+  const showConfirmButton = hasTemplateChanges;
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
@@ -199,21 +237,19 @@ const TemplateCurveEditor = ({
         isTemplateMode={true}
       />
 
-      {/* Template Confirmation Button - only show for existing projects */}
-      {!isNewCurve && (
+      {/* Template Confirmation Button */}
+      {showConfirmButton && (
         <div className="mt-6 flex justify-center">
           <Button 
             onClick={handleConfirmTemplate}
-            disabled={!hasTemplateChanges || isSavingTemplate}
+            disabled={isSavingTemplate}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
           >
             {isSavingTemplate ? "Saving..." : "Confirm Template for Project"}
           </Button>
-          {hasTemplateChanges && (
-            <div className="ml-3 flex items-center text-sm text-orange-600">
-              <span>• Unsaved template changes</span>
-            </div>
-          )}
+          <div className="ml-3 flex items-center text-sm text-orange-600">
+            <span>• Unsaved template changes</span>
+          </div>
         </div>
       )}
     </div>

@@ -6,6 +6,7 @@ interface ProjectActionsProps {
   isNewCurve: boolean;
   hasChanges: boolean;
   projectTitle: string;
+  templateConfirmed: boolean;
   onCreateProject: () => void;
   onUpdateProject: () => void;
 }
@@ -14,6 +15,7 @@ const ProjectActions = ({
   isNewCurve,
   hasChanges,
   projectTitle,
+  templateConfirmed,
   onCreateProject,
   onUpdateProject
 }: ProjectActionsProps) => {
@@ -23,7 +25,7 @@ const ProjectActions = ({
         <Button 
           onClick={onCreateProject}
           className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-3 text-lg"
-          disabled={!projectTitle.trim()}
+          disabled={!projectTitle.trim() || !templateConfirmed}
         >
           Create Project
         </Button>
