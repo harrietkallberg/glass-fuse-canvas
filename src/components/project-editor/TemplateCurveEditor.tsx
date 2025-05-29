@@ -31,6 +31,7 @@ const TemplateCurveEditor = ({
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [savedTemplatePhases, setSavedTemplatePhases] = useState<Phase[]>([]);
   const { user } = useAuth();
 
   // Initialize curve state - if template exists, use it, otherwise use empty
@@ -50,8 +51,75 @@ const TemplateCurveEditor = ({
   useEffect(() => {
     if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
       setShowTemplateEditor(true);
+      setSavedTemplatePhases(templateCurveData.phases);
     }
   }, [templateCurveData]);
+
+  // Fetch template data from Supabase
+  const fetchTemplateFromDatabase = async () => {
+    if (!curveId) return;
+
+    try {
+      const { data: templateVersion, error } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .eq('version_number', 0)
+        .maybeSingle();
+
+      if (error || !templateVersion) {
+        console.log('No template found in database');
+        setSavedTemplatePhases([]);
+        return;
+      }
+
+      // Fetch template phases
+      const { data: phasesData, error: phasesError } = await supabase
+        .from('curve_phases')
+        .select('*')
+        .eq('version_id', templateVersion.id)
+        .order('phase_order');
+
+      if (phasesError) {
+        console.error('Error fetching template phases:', phasesError);
+        return;
+      }
+
+      const phases: Phase[] = phasesData.map((phase, index) => ({
+        id: (index + 1).toString(),
+        targetTemp: phase.target_temp,
+        duration: phase.duration,
+        holdTime: phase.hold_time,
+      }));
+
+      const templateData = {
+        phases,
+        settings: {
+          selectedGlass: templateVersion.selected_glass,
+          roomTemp: templateVersion.room_temp,
+          glassLayers: templateVersion.glass_layers,
+          glassRadius: templateVersion.glass_radius,
+          firingType: templateVersion.firing_type,
+          topTempMinutes: templateVersion.top_temp_minutes,
+          ovenType: templateVersion.oven_type,
+        }
+      };
+
+      setSavedTemplatePhases(phases);
+      setTemplateCurveData(templateData);
+      
+      // Also load settings into the curve state
+      curveState.loadTemplateSettings(templateData.settings);
+
+    } catch (error) {
+      console.error('Error fetching template:', error);
+    }
+  };
+
+  // Fetch template on component mount
+  useEffect(() => {
+    fetchTemplateFromDatabase();
+  }, [curveId]);
 
   const handleCreateTemplate = () => {
     setShowTemplateEditor(true);
@@ -207,13 +275,14 @@ const TemplateCurveEditor = ({
         return;
       }
 
-      // Update the template data state
+      // Update the template data state and saved phases
       const updatedTemplateData = {
         phases: currentPhases,
         settings: currentSettings
       };
 
       setTemplateCurveData(updatedTemplateData);
+      setSavedTemplatePhases(currentPhases);
       setHasUnsavedChanges(false);
       
       if (onTemplateConfirmed) {
@@ -320,13 +389,17 @@ const TemplateCurveEditor = ({
           }}
         />
         
-        {/* Template Curve Display - Always show if phases exist */}
-        {curveState.phases.length > 0 && (
+        {/* Template Curve Display - Show saved template or current working template */}
+        {(savedTemplatePhases.length > 0 || curveState.phases.length > 0) && (
           <div className="space-y-4">
-            <h4 className="text-lg font-medium">Template Curve Preview</h4>
+            <h4 className="text-lg font-medium">
+              {savedTemplatePhases.length > 0 && !hasUnsavedChanges ? 
+                'Saved Template Curve' : 
+                'Template Curve Preview'}
+            </h4>
             <div className="bg-white/60 p-4 rounded-xl">
               <CurveChart 
-                phases={curveState.phases}
+                phases={hasUnsavedChanges && curveState.phases.length > 0 ? curveState.phases : savedTemplatePhases}
                 roomTemp={curveState.roomTemp}
               />
             </div>
