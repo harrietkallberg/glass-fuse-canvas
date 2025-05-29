@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
@@ -41,18 +42,24 @@ export const useCurves = () => {
   const [curves, setCurves] = useState<CurveData[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Fetch user's curves
+  // Fetch user's curves - only real data from database
   const fetchCurves = async () => {
-    if (!user) return;
+    if (!user) {
+      setCurves([]);
+      setLoading(false);
+      return;
+    }
     
     setLoading(true);
     const { data, error } = await supabase
       .from('curves')
       .select('*')
+      .eq('user_id', user.id) // Only fetch curves for the current user
       .order('updated_at', { ascending: false });
 
     if (error) {
       console.error('Error fetching curves:', error);
+      setCurves([]);
     } else {
       setCurves(data || []);
     }
