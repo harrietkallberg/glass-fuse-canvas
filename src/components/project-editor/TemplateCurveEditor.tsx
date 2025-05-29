@@ -41,6 +41,7 @@ const TemplateCurveEditor = ({
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalPhases, setOriginalPhases] = useState<Phase[]>([]);
   const [showConfirmButton, setShowConfirmButton] = useState(false);
+  const [isExistingTemplate, setIsExistingTemplate] = useState(false);
   const { user } = useAuth();
   const temperatureUnit = "celsius";
 
@@ -50,6 +51,9 @@ const TemplateCurveEditor = ({
       setOriginalPhases([...templateCurveData.phases]);
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
+      setIsExistingTemplate(true);
+      // Show confirm button immediately if template exists
+      setShowConfirmButton(true);
     } else {
       // Set default phases and mark as changed for template setup
       const defaultCurveData = {
@@ -60,6 +64,7 @@ const TemplateCurveEditor = ({
       setTemplateCurveData(defaultCurveData);
       setOriginalPhases([]);
       setHasTemplateChanges(true);
+      setIsExistingTemplate(false);
     }
   }, [templateCurveData, setTemplateCurveData]);
 
@@ -215,16 +220,27 @@ const TemplateCurveEditor = ({
       // Update original phases to reflect the new saved state
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
-      setShowConfirmButton(false);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
       }
       
+      // Show appropriate success message based on whether it was new or updated
+      const successMessage = isExistingTemplate 
+        ? "Template has been updated!"
+        : "Template confirmed!";
+      
+      const successDescription = isExistingTemplate
+        ? "Project template has been updated and will be used for dashboard display."
+        : "Project template has been saved and will be used for dashboard display.";
+      
       toast({
-        title: "Template confirmed!",
-        description: "Project template has been saved and will be used for dashboard display.",
+        title: successMessage,
+        description: successDescription,
       });
+
+      // Update the existing template flag
+      setIsExistingTemplate(true);
 
     } catch (error) {
       console.error('Error confirming project template:', error);
@@ -248,7 +264,10 @@ const TemplateCurveEditor = ({
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        Configure your base firing curve template. This will serve as the starting point for all versions across the project.
+        {isExistingTemplate 
+          ? "Modify your project template. Changes will update the template used for all versions across the project."
+          : "Configure your base firing curve template. This will serve as the starting point for all versions across the project."
+        }
       </div>
       
       <CurveEditor
@@ -258,7 +277,7 @@ const TemplateCurveEditor = ({
         onApplyGlassTemplate={handleApplyGlassTemplate}
       />
 
-      {/* Template Confirmation Button - Shows after applying glass template */}
+      {/* Template Confirmation Button - Shows after applying glass template or if template exists */}
       {showConfirmButton && (
         <div className="mt-6 flex justify-center">
           <Button 
@@ -266,7 +285,12 @@ const TemplateCurveEditor = ({
             disabled={isSavingTemplate}
             className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
           >
-            {isSavingTemplate ? "Saving..." : "Confirm Template"}
+            {isSavingTemplate 
+              ? "Saving..." 
+              : isExistingTemplate 
+                ? "Update Template" 
+                : "Confirm Template"
+            }
           </Button>
         </div>
       )}
