@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useCurveState } from "@/hooks/useCurveState";
 import GlassSettings from "@/components/curve-editor/GlassSettings";
 import CurveChart from "@/components/curve-editor/CurveChart";
+import PhasesTable from "@/components/curve-editor/PhasesTable";
 import { Phase } from "@/utils/curveUtils";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
@@ -30,8 +31,9 @@ const TemplateCurveEditor = ({
 }: TemplateCurveEditorProps) => {
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [showTemplateEditor, setShowTemplateEditor] = useState(false);
-  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
   const [savedTemplatePhases, setSavedTemplatePhases] = useState<Phase[]>([]);
+  const [previewPhases, setPreviewPhases] = useState<Phase[]>([]);
+  const [showPreview, setShowPreview] = useState(false);
   const { user } = useAuth();
 
   // Initialize curve state - if template exists, use it, otherwise use empty
@@ -123,26 +125,22 @@ const TemplateCurveEditor = ({
 
   const handleCreateTemplate = () => {
     setShowTemplateEditor(true);
-    setHasUnsavedChanges(false);
   };
 
-  const handleGenerateFromSettings = () => {
+  const handleViewGlassTemplate = () => {
     const generatedPhases = curveState.generateTemplateFromSettings();
     if (generatedPhases) {
-      setHasUnsavedChanges(true);
+      setPreviewPhases(generatedPhases);
+      setShowPreview(true);
       toast({
         title: "Template Generated",
-        description: "Master recipe created from your glass settings. Click 'Save Template' to confirm.",
+        description: "Preview your glass template below. Click 'Confirm as Project Template' to save it.",
       });
     }
   };
 
-  const handleSettingsChange = () => {
-    setHasUnsavedChanges(true);
-  };
-
-  const handleSaveTemplate = async () => {
-    if (!user || !curveId) {
+  const handleConfirmTemplate = async () => {
+    if (!user || !curveId || previewPhases.length === 0) {
       toast({
         title: "Error",
         description: "Missing required data to save template.",
@@ -154,19 +152,8 @@ const TemplateCurveEditor = ({
     setIsSavingTemplate(true);
 
     try {
-      // Get current glass settings and phases
+      // Get current glass settings
       const currentSettings = curveState.getTemplateSettings();
-      const currentPhases = curveState.phases;
-
-      if (!currentPhases || currentPhases.length === 0) {
-        toast({
-          title: "Error",
-          description: "Please generate template phases before saving.",
-          variant: "destructive"
-        });
-        setIsSavingTemplate(false);
-        return;
-      }
 
       // Get or create the template version (version 0)
       let { data: templateVersion, error: fetchError } = await supabase
@@ -252,7 +239,7 @@ const TemplateCurveEditor = ({
         .delete()
         .eq('version_id', templateVersion.id);
 
-      const phasesToInsert = currentPhases.map((phase: Phase, index: number) => ({
+      const phasesToInsert = previewPhases.map((phase: Phase, index: number) => ({
         version_id: templateVersion.id,
         phase_order: index,
         target_temp: phase.targetTemp,
@@ -277,13 +264,14 @@ const TemplateCurveEditor = ({
 
       // Update the template data state and saved phases
       const updatedTemplateData = {
-        phases: currentPhases,
+        phases: previewPhases,
         settings: currentSettings
       };
 
       setTemplateCurveData(updatedTemplateData);
-      setSavedTemplatePhases(currentPhases);
-      setHasUnsavedChanges(false);
+      setSavedTemplatePhases(previewPhases);
+      setShowPreview(false);
+      setPreviewPhases([]);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
@@ -352,70 +340,72 @@ const TemplateCurveEditor = ({
         <GlassSettings 
           glassData={curveState.glassData}
           selectedGlass={curveState.selectedGlass}
-          setSelectedGlass={(value) => {
-            curveState.setSelectedGlass(value);
-            handleSettingsChange();
-          }}
+          setSelectedGlass={curveState.setSelectedGlass}
           roomTemp={curveState.roomTemp}
-          setRoomTemp={(value) => {
-            curveState.setRoomTemp(value);
-            handleSettingsChange();
-          }}
+          setRoomTemp={curveState.setRoomTemp}
           glassLayers={curveState.glassLayers}
-          setGlassLayers={(value) => {
-            curveState.setGlassLayers(value);
-            handleSettingsChange();
-          }}
+          setGlassLayers={curveState.setGlassLayers}
           glassRadius={curveState.glassRadius}
-          setGlassRadius={(value) => {
-            curveState.setGlassRadius(value);
-            handleSettingsChange();
-          }}
+          setGlassRadius={curveState.setGlassRadius}
           firingType={curveState.firingType}
-          setFiringType={(value) => {
-            curveState.setFiringType(value);
-            handleSettingsChange();
-          }}
+          setFiringType={curveState.setFiringType}
           topTempMinutes={curveState.topTempMinutes}
-          setTopTempMinutes={(value) => {
-            curveState.setTopTempMinutes(value);
-            handleSettingsChange();
-          }}
-          applyGlassTemplate={handleGenerateFromSettings}
+          setTopTempMinutes={curveState.setTopTempMinutes}
+          applyGlassTemplate={handleViewGlassTemplate}
           ovenType={curveState.ovenType}
-          setOvenType={(value) => {
-            curveState.setOvenType(value);
-            handleSettingsChange();
-          }}
+          setOvenType={curveState.setOvenType}
         />
         
-        {/* Template Curve Display - Show saved template or current working template */}
-        {(savedTemplatePhases.length > 0 || curveState.phases.length > 0) && (
-          <div className="space-y-4">
-            <h4 className="text-lg font-medium">
-              {savedTemplatePhases.length > 0 && !hasUnsavedChanges ? 
-                'Saved Template Curve' : 
-                'Template Curve Preview'}
-            </h4>
-            <div className="bg-white/60 p-4 rounded-xl">
-              <CurveChart 
-                phases={hasUnsavedChanges && curveState.phases.length > 0 ? curveState.phases : savedTemplatePhases}
-                roomTemp={curveState.roomTemp}
-              />
+        {/* Template Preview - Show when user clicks "View Glass Template" */}
+        {showPreview && previewPhases.length > 0 && (
+          <div className="space-y-6">
+            <div className="border-t pt-6">
+              <h4 className="text-lg font-medium mb-4">Glass Template Preview</h4>
+              
+              {/* Visual Chart */}
+              <div className="bg-white/60 p-4 rounded-xl mb-6">
+                <CurveChart 
+                  phases={previewPhases}
+                  roomTemp={curveState.roomTemp}
+                />
+              </div>
+              
+              {/* Table View */}
+              <div className="bg-white/60 p-4 rounded-xl mb-6">
+                <h5 className="text-md font-medium mb-3">Phase Details</h5>
+                <PhasesTable 
+                  phases={previewPhases}
+                  roomTemp={curveState.roomTemp}
+                  onUpdatePhase={() => {}} // Read-only preview
+                  onRemovePhase={() => {}} // Read-only preview
+                  isReadOnly={true}
+                />
+              </div>
+              
+              {/* Confirm Button */}
+              <div className="flex justify-center">
+                <Button 
+                  onClick={handleConfirmTemplate}
+                  disabled={isSavingTemplate}
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg"
+                >
+                  {isSavingTemplate ? "Saving..." : "Confirm as Project Template"}
+                </Button>
+              </div>
             </div>
           </div>
         )}
         
-        {/* Save Button */}
-        {hasUnsavedChanges && curveState.phases.length > 0 && (
-          <div className="flex justify-center pt-4">
-            <Button 
-              onClick={handleSaveTemplate}
-              disabled={isSavingTemplate}
-              className="bg-green-600 hover:bg-green-700 text-white px-8 py-2"
-            >
-              {isSavingTemplate ? "Saving..." : "Save Template"}
-            </Button>
+        {/* Saved Template Display - Show saved template if it exists */}
+        {savedTemplatePhases.length > 0 && !showPreview && (
+          <div className="space-y-4">
+            <h4 className="text-lg font-medium">Saved Template Curve</h4>
+            <div className="bg-white/60 p-4 rounded-xl">
+              <CurveChart 
+                phases={savedTemplatePhases}
+                roomTemp={curveState.roomTemp}
+              />
+            </div>
           </div>
         )}
       </div>

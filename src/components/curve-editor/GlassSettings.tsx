@@ -156,7 +156,7 @@ const GlassSettings = ({
         
         <div className="md:col-span-2 flex justify-end">
           <Button onClick={applyGlassTemplate}>
-            Apply Glass Template
+            View Glass Template
           </Button>
         </div>
       </div>
