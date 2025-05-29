@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -48,17 +47,25 @@ const TemplateCurveEditor = ({
 
   // Set original phases when templateCurveData changes
   useEffect(() => {
-    if (templateCurveData?.phases) {
+    console.log('TemplateCurveEditor: templateCurveData changed:', templateCurveData);
+    
+    if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
+      // Existing template with phases
       setOriginalPhases([...templateCurveData.phases]);
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
       setHasExistingTemplate(true);
-      // Check if template has been confirmed by looking at settings
-      if (templateCurveData.settings) {
+      setShowConfirmButton(false);
+      
+      // Check if template has settings (indicating it's been properly configured)
+      if (templateCurveData.settings && Object.keys(templateCurveData.settings).length > 0) {
         setTemplateConfirmedInSession(true);
+      } else {
+        setTemplateConfirmedInSession(false);
       }
     } else {
-      // Set default phases and mark as changed for template setup
+      // No existing template, set up default
+      console.log('No existing template, setting up default');
       const defaultCurveData = {
         phases: defaultPhases,
         temperatureUnit,
@@ -68,6 +75,8 @@ const TemplateCurveEditor = ({
       setOriginalPhases([]);
       setHasTemplateChanges(true);
       setHasExistingTemplate(false);
+      setTemplateConfirmedInSession(false);
+      setShowConfirmButton(false);
     }
   }, [templateCurveData, setTemplateCurveData]);
 
@@ -85,6 +94,7 @@ const TemplateCurveEditor = ({
   };
 
   const handleCurveChange = (phases: Phase[]) => {
+    console.log('Curve changed, phases:', phases);
     const curveData = {
       ...localCurveData,
       phases,
@@ -104,6 +114,7 @@ const TemplateCurveEditor = ({
   };
 
   const handleApplyGlassTemplate = () => {
+    console.log('Glass template applied');
     // Show the confirm button when glass template is applied
     setShowConfirmButton(true);
   };
@@ -118,6 +129,7 @@ const TemplateCurveEditor = ({
       return;
     }
 
+    console.log('Confirming template with data:', localCurveData);
     setIsSavingTemplate(true);
 
     try {
@@ -239,6 +251,8 @@ const TemplateCurveEditor = ({
         }
       };
 
+      console.log('Template saved successfully, updating state with:', updatedTemplateData);
+      
       // Update parent state with confirmed template data
       setTemplateCurveData(updatedTemplateData);
       
@@ -278,6 +292,14 @@ const TemplateCurveEditor = ({
       setIsSavingTemplate(false);
     }
   };
+
+  console.log('Rendering TemplateCurveEditor with:', {
+    hasExistingTemplate,
+    templateConfirmedInSession,
+    showConfirmButton,
+    hasTemplateChanges,
+    localCurveData: localCurveData?.phases?.length
+  });
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
@@ -321,10 +343,10 @@ const TemplateCurveEditor = ({
       )}
 
       {/* Show unsaved changes indicator */}
-      {hasTemplateChanges && !showConfirmButton && (
+      {hasTemplateChanges && !showConfirmButton && !hasExistingTemplate && (
         <div className="mt-6 flex justify-center">
           <div className="text-sm text-orange-600">
-            • Unsaved template changes
+            • Template needs to be configured
           </div>
         </div>
       )}

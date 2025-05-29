@@ -70,19 +70,30 @@ export const useProjectLoader = ({
   // Load template data for existing project
   const loadTemplateData = async (curveId: string) => {
     try {
+      console.log('Loading template data for curve:', curveId);
+      
       // Try to get the template version (version 0.0)
-      const { data: templateVersion } = await supabase
+      const { data: templateVersion, error } = await supabase
         .from('curve_versions')
         .select('*')
         .eq('curve_id', curveId)
         .eq('version_number', 0)
         .maybeSingle();
 
+      if (error) {
+        console.error('Error fetching template version:', error);
+        setTemplateCurveData(null);
+        return;
+      }
+
       if (templateVersion) {
+        console.log('Found template version:', templateVersion);
+        
+        // Load the complete template data including phases
         const templateData = await loadCurveVersion(templateVersion.id);
         if (templateData) {
           const completeTemplateData = {
-            phases: templateData.phases,
+            phases: templateData.phases || [],
             settings: {
               selectedGlass: templateData.version.selected_glass,
               roomTemp: templateData.version.room_temp,
@@ -93,10 +104,14 @@ export const useProjectLoader = ({
               ovenType: templateData.version.oven_type,
             }
           };
-          console.log('Loaded template data:', completeTemplateData);
+          console.log('Loaded complete template data:', completeTemplateData);
           setTemplateCurveData(completeTemplateData);
+        } else {
+          console.log('No template data found for version');
+          setTemplateCurveData(null);
         }
       } else {
+        console.log('No template version found');
         // No template exists, set to null to show default state
         setTemplateCurveData(null);
       }
@@ -110,37 +125,49 @@ export const useProjectLoader = ({
   useEffect(() => {
     const loadCurve = async () => {
       if (!isNewCurve && id && user) {
+        console.log('Loading existing curve:', id);
         setLoading(true);
         
-        // First get the curve info to get the project title and description
-        const { data: curveInfo } = await supabase
-          .from('curves')
-          .select('title, description')
-          .eq('id', id)
-          .single();
+        try {
+          // First get the curve info to get the project title and description
+          const { data: curveInfo, error: curveError } = await supabase
+            .from('curves')
+            .select('title, description')
+            .eq('id', id)
+            .single();
 
-        if (curveInfo) {
-          setProjectTitle(curveInfo.title);
-          setProjectDescription(curveInfo.description || '');
-        }
-
-        // Load template data
-        await loadTemplateData(id);
-        
-        const versionsList = await getCurveVersions(id);
-        const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
-        
-        if (currentVersion) {
-          const curveData = await loadCurveVersion(currentVersion.id);
-          if (curveData) {
-            setCurrentCurveId(id);
-            setCurrentVersionId(currentVersion.id);
-            setVersions(versionsList);
-            setCurrentVersionData(curveData);
+          if (curveError) {
+            console.error('Error fetching curve info:', curveError);
+            setLoading(false);
+            return;
           }
+
+          if (curveInfo) {
+            setProjectTitle(curveInfo.title);
+            setProjectDescription(curveInfo.description || '');
+            setCurrentCurveId(id);
+          }
+
+          // Load template data first
+          await loadTemplateData(id);
+          
+          // Then load versions and current version data
+          const versionsList = await getCurveVersions(id);
+          const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
+          
+          if (currentVersion) {
+            const curveData = await loadCurveVersion(currentVersion.id);
+            if (curveData) {
+              setCurrentVersionId(currentVersion.id);
+              setVersions(versionsList);
+              setCurrentVersionData(curveData);
+            }
+          }
+        } catch (error) {
+          console.error('Error loading curve:', error);
+        } finally {
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     };
 
