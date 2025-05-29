@@ -6,6 +6,7 @@ interface Phase {
   targetTemp: number;
   duration: number;
   holdTime: number;
+  velocity?: number;
 }
 
 interface PhasesTableProps {
@@ -24,6 +25,7 @@ interface PhasesTableProps {
   showSlideSelector?: boolean;
   viewMode?: 'chart' | 'table';
   onViewModeChange?: (mode: 'chart' | 'table') => void;
+  roomTemp?: number;
 }
 
 const PhasesTable = ({
@@ -31,11 +33,25 @@ const PhasesTable = ({
   selectedGlassInfo,
   showSlideSelector = false,
   viewMode = 'chart',
-  onViewModeChange
+  onViewModeChange,
+  roomTemp = 20
 }: PhasesTableProps) => {
   // Extract annealing temperatures from the glass info
   const upperAnnealingTemp = selectedGlassInfo?.o_astemp;
   const lowerAnnealingTemp = selectedGlassInfo?.n_astemp;
+  
+  // Calculate velocity for display - use stored velocity if available, otherwise calculate
+  const getDisplayVelocity = (phase: Phase, index: number): number => {
+    // If velocity is stored in the phase (from glass template), use it as-is (including negative values)
+    if (phase.velocity !== undefined) {
+      return Math.abs(phase.velocity); // Display absolute value for readability
+    }
+    
+    // Fallback: calculate from temperature difference and duration (for manually created phases)
+    const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
+    const tempDifference = phase.targetTemp - startTemp;
+    return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
+  };
   
   // Check if a phase contains an annealing temperature
   const isAnnealingPhase = (phase: Phase) => {
@@ -95,45 +111,54 @@ const PhasesTable = ({
         </div>
       )}
 
-      {/* Simple list layout */}
-      <div className="space-y-2">
-        {/* Header */}
-        <div className="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
-          <div>Phase</div>
-          <div>Target Temp (°C)</div>
-          <div>Rise Time (min)</div>
-          <div>Hold Time (min)</div>
+      {/* Only show the table when in table view mode or when no view mode selector */}
+      {(viewMode === 'table' || !showSlideSelector) && (
+        <div className="space-y-2">
+          {/* Header */}
+          <div className="grid grid-cols-5 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
+            <div>Phase</div>
+            <div>Target Temp (°C)</div>
+            <div>Rise Time (min)</div>
+            <div>Hold Time (min)</div>
+            <div>Velocity (°C/h)</div>
+          </div>
+          
+          {/* Phase rows */}
+          {phases.map((phase, index) => {
+            const highlightClass = getHighlightColor(phase);
+            const velocity = getDisplayVelocity(phase, index);
+            
+            return (
+              <div 
+                key={phase.id} 
+                className={`grid grid-cols-5 gap-4 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${highlightClass} ${
+                  isAnnealingPhase(phase) ? 'border-amber-300 border-2' : ''
+                }`}
+              >
+                <div className="text-sm font-medium text-gray-900">
+                  Phase {index + 1}
+                </div>
+                
+                <div className="text-sm text-gray-700">
+                  {phase.targetTemp}°C
+                </div>
+                
+                <div className="text-sm text-gray-700">
+                  {phase.duration} min
+                </div>
+                
+                <div className="text-sm text-gray-700">
+                  {phase.holdTime} min
+                </div>
+                
+                <div className="text-sm text-gray-700">
+                  {velocity}°C/h
+                </div>
+              </div>
+            );
+          })}
         </div>
-        
-        {/* Phase rows */}
-        {phases.map((phase, index) => {
-          const highlightClass = getHighlightColor(phase);
-          return (
-            <div 
-              key={phase.id} 
-              className={`grid grid-cols-4 gap-4 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${highlightClass} ${
-                isAnnealingPhase(phase) ? 'border-amber-300 border-2' : ''
-              }`}
-            >
-              <div className="text-sm font-medium text-gray-900">
-                Phase {index + 1}
-              </div>
-              
-              <div className="text-sm text-gray-700">
-                {phase.targetTemp}°C
-              </div>
-              
-              <div className="text-sm text-gray-700">
-                {phase.duration} min
-              </div>
-              
-              <div className="text-sm text-gray-700">
-                {phase.holdTime} min
-              </div>
-            </div>
-          );
-        })}
-      </div>
+      )}
     </div>
   );
 };

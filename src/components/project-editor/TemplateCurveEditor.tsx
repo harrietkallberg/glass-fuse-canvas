@@ -284,8 +284,8 @@ const TemplateCurveEditor = ({
       }
       
       toast({
-        title: "Master Recipe Saved!",
-        description: "Your project template has been saved successfully.",
+        title: "Project Template Saved!",
+        description: "Your project template has been saved and will be used as the baseline for all versions.",
       });
 
     } catch (error) {
@@ -305,7 +305,7 @@ const TemplateCurveEditor = ({
     return (
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
+          <h3 className="text-xl font-semibold">Project Template</h3>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
             No Template
           </span>
@@ -313,14 +313,14 @@ const TemplateCurveEditor = ({
         
         <div className="text-center py-8">
           <div className="text-gray-600 mb-6">
-            No master recipe has been created yet. Create a template to define the base firing curve for this project.
+            No project template has been created yet. Create a template to define the base firing curve for this project.
           </div>
           
           <Button 
             onClick={handleCreateTemplate}
             className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
           >
-            Add New Template
+            Create Template
           </Button>
         </div>
       </div>
@@ -331,14 +331,14 @@ const TemplateCurveEditor = ({
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-xl font-semibold">Master Recipe (Template)</h3>
+        <h3 className="text-xl font-semibold">Project Template</h3>
         <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-          Project Template
+          Baseline Curve
         </span>
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        Configure your glass parameters and master firing curve. This serves as the foundation for all experiments (versions).
+        Configure your glass parameters and firing curve template. This serves as the foundation for all experiments.
       </div>
       
       <div className="space-y-6">
@@ -362,11 +362,11 @@ const TemplateCurveEditor = ({
           setOvenType={curveState.setOvenType}
         />
         
-        {/* Template Preview - Show when user clicks "View Glass Template" */}
+        {/* Template Preview - Show when user clicks "Generate Template" */}
         {showPreview && previewPhases.length > 0 && (
           <div className="space-y-6">
             <div className="border-t pt-6">
-              <h4 className="text-lg font-medium mb-4">Glass Template Preview</h4>
+              <h4 className="text-lg font-medium mb-4">Template Preview</h4>
               
               {/* Visual Chart or Table View */}
               <div className="bg-white/60 p-4 rounded-xl mb-6">
@@ -377,10 +377,11 @@ const TemplateCurveEditor = ({
                     addPhase={() => {}} // Read-only preview
                     removePhase={() => {}} // Read-only preview
                     handleSave={() => {}} // Read-only preview
-                    selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                    selectedGlassInfo={curveState.selectedGlassInfo}
                     showSlideSelector={true}
                     viewMode={viewMode}
                     onViewModeChange={setViewMode}
+                    roomTemp={curveState.roomTemp}
                   />
                 ) : (
                   <>
@@ -429,10 +430,11 @@ const TemplateCurveEditor = ({
                   addPhase={() => {}} // Read-only for saved template
                   removePhase={() => {}} // Read-only for saved template
                   handleSave={() => {}} // Read-only for saved template
-                  selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                  selectedGlassInfo={curveState.selectedGlassInfo}
                   showSlideSelector={true}
                   viewMode={viewMode}
                   onViewModeChange={setViewMode}
+                  roomTemp={curveState.roomTemp}
                 />
               ) : (
                 <>

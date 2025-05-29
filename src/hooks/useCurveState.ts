@@ -150,6 +150,9 @@ export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMo
     ovenType,
     setOvenType,
     
+    // Glass info property
+    selectedGlassInfo: getSelectedGlassInfo(),
+    
     // Template operations
     generateTemplateFromSettings,
     getSelectedGlassInfo,
