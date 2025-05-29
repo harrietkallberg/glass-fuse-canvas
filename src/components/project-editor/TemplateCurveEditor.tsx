@@ -27,6 +27,17 @@ const defaultPhases: Phase[] = [
   { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
 ];
 
+// Default template settings
+const defaultSettings = {
+  selectedGlass: '',
+  roomTemp: 20,
+  glassLayers: '1',
+  glassRadius: '10',
+  firingType: 'f',
+  topTempMinutes: '10',
+  ovenType: 't',
+};
+
 const TemplateCurveEditor = ({
   isNewCurve,
   templateCurveData,
@@ -52,7 +63,20 @@ const TemplateCurveEditor = ({
   useEffect(() => {
     const loadTemplateData = async () => {
       if (!curveId || !user) {
+        // If no curve ID, set up default state for new template
+        const defaultCurveData = {
+          phases: defaultPhases,
+          temperatureUnit,
+          settings: defaultSettings
+        };
+        setLocalCurveData(defaultCurveData);
+        setOriginalPhases([]);
+        setHasTemplateChanges(false); // Start with no changes for new template
+        setHasExistingTemplate(false);
+        setTemplateConfirmedInSession(false);
+        setShowConfirmButton(true); // Show button to create initial template
         setIsLoading(false);
+        setIsInitialized(true);
         return;
       }
 
@@ -126,27 +150,19 @@ const TemplateCurveEditor = ({
           setHasTemplateChanges(false);
           setShowConfirmButton(false);
         } else {
-          console.log('No template version found, setting up default');
-          // No template exists, set up default
+          console.log('No template version found, setting up default for existing project');
+          // No template exists for this existing project, set up default
           const defaultCurveData = {
             phases: defaultPhases,
             temperatureUnit,
-            settings: {
-              selectedGlass: '',
-              roomTemp: 20,
-              glassLayers: '1',
-              glassRadius: '10',
-              firingType: 'f',
-              topTempMinutes: '10',
-              ovenType: 't',
-            }
+            settings: defaultSettings
           };
           setLocalCurveData(defaultCurveData);
           setOriginalPhases([]);
-          setHasTemplateChanges(true);
+          setHasTemplateChanges(false); // Start with no changes
           setHasExistingTemplate(false);
           setTemplateConfirmedInSession(false);
-          setShowConfirmButton(false);
+          setShowConfirmButton(true); // Show button to create template
         }
       } catch (error) {
         console.error('Error loading template data:', error);
@@ -203,19 +219,23 @@ const TemplateCurveEditor = ({
     
     setLocalCurveData(curveData);
     
-    // Check if phases have actually changed from original
-    const hasChanges = phasesHaveChanged(phases, originalPhases);
-    setHasTemplateChanges(hasChanges || originalPhases.length === 0);
-    
-    // Show confirm button if there are changes to an existing template
-    if (hasExistingTemplate && hasChanges) {
+    // For new templates or existing templates, mark as having changes
+    if (!hasExistingTemplate || originalPhases.length === 0) {
+      // For new templates, any change should be saved
+      setHasTemplateChanges(true);
       setShowConfirmButton(true);
+    } else {
+      // For existing templates, check if phases have actually changed from original
+      const hasChanges = phasesHaveChanged(phases, originalPhases);
+      setHasTemplateChanges(hasChanges);
+      setShowConfirmButton(hasChanges);
     }
   };
 
   const handleApplyGlassTemplate = () => {
     console.log('Glass template applied');
-    // Show the confirm button when glass template is applied
+    // Mark as having changes and show confirm button
+    setHasTemplateChanges(true);
     setShowConfirmButton(true);
   };
 
@@ -357,7 +377,7 @@ const TemplateCurveEditor = ({
       setTemplateCurveData(updatedTemplateData);
       
       // Update local state to reflect the confirmed template
-      setLocalCurveData(updatedTemplateData);
+      setLocalCurveData({ ...updatedTemplateData, temperatureUnit });
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
       setTemplateConfirmedInSession(true);
@@ -371,11 +391,11 @@ const TemplateCurveEditor = ({
       // Show appropriate success message
       const successMessage = hasExistingTemplate && templateConfirmedInSession
         ? "Template has been updated!"
-        : "Template confirmed!";
+        : "Template created successfully!";
       
       const successDescription = hasExistingTemplate && templateConfirmedInSession
         ? "Project template has been updated and will be used for dashboard display."
-        : "Project template has been saved and will be used for dashboard display.";
+        : "Project template has been created and will be used for dashboard display.";
       
       toast({
         title: successMessage,
@@ -450,7 +470,7 @@ const TemplateCurveEditor = ({
         savedSettings={localCurveData.settings}
       />
 
-      {/* Template Confirmation Button - Shows after applying glass template or making changes to existing template */}
+      {/* Template Confirmation Button */}
       {showConfirmButton && (
         <div className="mt-6 flex justify-center">
           <Button 
@@ -460,19 +480,27 @@ const TemplateCurveEditor = ({
           >
             {isSavingTemplate 
               ? "Saving..." 
-              : (hasExistingTemplate && templateConfirmedInSession)
+              : hasExistingTemplate
                 ? "Update Template" 
-                : "Confirm Template"
+                : "Create Template"
             }
           </Button>
         </div>
       )}
 
-      {/* Show unsaved changes indicator */}
-      {hasTemplateChanges && !showConfirmButton && !hasExistingTemplate && (
+      {/* Status indicators */}
+      {!hasExistingTemplate && !showConfirmButton && (
         <div className="mt-6 flex justify-center">
-          <div className="text-sm text-orange-600">
-            • Template needs to be configured
+          <div className="text-sm text-blue-600">
+            • Ready to create template - make changes above and save
+          </div>
+        </div>
+      )}
+
+      {hasExistingTemplate && templateConfirmedInSession && !showConfirmButton && (
+        <div className="mt-6 flex justify-center">
+          <div className="text-sm text-green-600">
+            ✓ Template is configured and saved
           </div>
         </div>
       )}
