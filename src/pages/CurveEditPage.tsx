@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -44,6 +43,39 @@ const CurveEditPage = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Load template data for existing project
+  const loadTemplateData = async (curveId: string) => {
+    try {
+      // Try to get the template version (version 0.0)
+      const { data: templateVersion } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('curve_id', curveId)
+        .eq('version_number', 0)
+        .maybeSingle();
+
+      if (templateVersion) {
+        const templateData = await loadCurveVersion(templateVersion.id);
+        if (templateData) {
+          setTemplateCurveData({
+            phases: templateData.phases,
+            settings: {
+              selectedGlass: templateData.version.selected_glass,
+              roomTemp: templateData.version.room_temp,
+              glassLayers: templateData.version.glass_layers,
+              glassRadius: templateData.version.glass_radius,
+              firingType: templateData.version.firing_type,
+              topTempMinutes: templateData.version.top_temp_minutes,
+              ovenType: templateData.version.oven_type,
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error loading template data:', error);
+    }
+  };
+
   // Load existing curve if editing
   useEffect(() => {
     const loadCurve = async () => {
@@ -61,6 +93,9 @@ const CurveEditPage = () => {
           setProjectTitle(curveInfo.title);
           setProjectDescription(curveInfo.description || '');
         }
+
+        // Load template data
+        await loadTemplateData(id);
         
         const versionsList = await getCurveVersions(id);
         const currentVersion = versionsList.find(v => v.is_current) || versionsList[0];
@@ -68,19 +103,21 @@ const CurveEditPage = () => {
         if (currentVersion) {
           const curveData = await loadCurveVersion(currentVersion.id);
           if (curveData) {
-            // Store template curve data (this would be the original curve configuration)
-            setTemplateCurveData({
-              phases: curveData.phases,
-              settings: {
-                selectedGlass: curveData.version.selected_glass,
-                roomTemp: curveData.version.room_temp,
-                glassLayers: curveData.version.glass_layers,
-                glassRadius: curveData.version.glass_radius,
-                firingType: curveData.version.firing_type,
-                topTempMinutes: curveData.version.top_temp_minutes,
-                ovenType: curveData.version.oven_type,
-              }
-            });
+            // If no template data was loaded, use the current version as fallback
+            if (!templateCurveData) {
+              setTemplateCurveData({
+                phases: curveData.phases,
+                settings: {
+                  selectedGlass: curveData.version.selected_glass,
+                  roomTemp: curveData.version.room_temp,
+                  glassLayers: curveData.version.glass_layers,
+                  glassRadius: curveData.version.glass_radius,
+                  firingType: curveData.version.firing_type,
+                  topTempMinutes: curveData.version.top_temp_minutes,
+                  ovenType: curveData.version.oven_type,
+                }
+              });
+            }
             
             setCurrentCurveId(id);
             setCurrentVersionId(currentVersion.id);
@@ -243,6 +280,7 @@ const CurveEditPage = () => {
                 setTemplateCurveData={setTemplateCurveData}
                 onCreateProject={handleCreateProject}
                 onUpdateProject={handleUpdateProject}
+                curveId={currentCurveId || undefined}
               />
             )}
             

@@ -6,6 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { Phase } from "@/utils/curveUtils";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/components/ui/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 interface ProjectInformationSectionProps {
   isNewCurve: boolean;
@@ -17,6 +20,7 @@ interface ProjectInformationSectionProps {
   setTemplateCurveData: (data: any) => void;
   onCreateProject: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
+  curveId?: string;
 }
 
 // Default template phases
@@ -37,19 +41,107 @@ const ProjectInformationSection = ({
   templateCurveData,
   setTemplateCurveData,
   onCreateProject,
-  onUpdateProject
+  onUpdateProject,
+  curveId
 }: ProjectInformationSectionProps) => {
   const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
+  const { user } = useAuth();
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
-  const handleSaveTemplate = (phases: Phase[]) => {
+  const handleSaveTemplate = async (phases: Phase[]) => {
     const curveData = {
       phases,
       temperatureUnit,
     };
     setLocalCurveData(curveData);
     setTemplateCurveData(curveData);
+
+    // If we're editing an existing project, update the project template in the database
+    if (!isNewCurve && curveId && user) {
+      try {
+        // Get the template version (version 0.0) or create it if it doesn't exist
+        let { data: templateVersion, error: fetchError } = await supabase
+          .from('curve_versions')
+          .select('*')
+          .eq('curve_id', curveId)
+          .eq('version_number', 0) // Template version is 0.0
+          .maybeSingle();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error('Error fetching template version:', fetchError);
+          return;
+        }
+
+        if (!templateVersion) {
+          // Create template version
+          const { data: newTemplateVersion, error: createError } = await supabase
+            .from('curve_versions')
+            .insert({
+              curve_id: curveId,
+              version_number: 0, // 0.0 in numeric format
+              name: 'Template',
+              is_current: false,
+            })
+            .select()
+            .single();
+
+          if (createError) {
+            console.error('Error creating template version:', createError);
+            toast({
+              title: "Error",
+              description: "Failed to create project template",
+              variant: "destructive"
+            });
+            return;
+          }
+
+          templateVersion = newTemplateVersion;
+        }
+
+        // Delete existing template phases
+        await supabase
+          .from('curve_phases')
+          .delete()
+          .eq('version_id', templateVersion.id);
+
+        // Save new template phases
+        const phasesToInsert = phases.map((phase, index) => ({
+          version_id: templateVersion.id,
+          phase_order: index,
+          target_temp: phase.targetTemp,
+          duration: phase.duration,
+          hold_time: phase.holdTime,
+        }));
+
+        const { error: phasesError } = await supabase
+          .from('curve_phases')
+          .insert(phasesToInsert);
+
+        if (phasesError) {
+          console.error('Error saving template phases:', phasesError);
+          toast({
+            title: "Error",
+            description: "Failed to save project template",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        toast({
+          title: "Template updated!",
+          description: "Project template has been updated and will be available across all project sections.",
+        });
+
+      } catch (error) {
+        console.error('Error updating project template:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update project template",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleCreateProject = () => {
@@ -132,13 +224,13 @@ const ProjectInformationSection = ({
         <div className="text-sm text-gray-600 mb-6">
           {isNewCurve 
             ? "Configure your base firing curve template. This will serve as the starting point for all versions."
-            : "This is your project's base template curve. Changes here affect the project identity."
+            : "This is your project's base template curve. Changes here will be saved to the project and available across all project sections."
           }
         </div>
         
         <CurveEditor
           initialPhases={templateCurveData?.phases || defaultPhases}
-          onSave={isNewCurve ? handleSaveTemplate : undefined}
+          onSave={handleSaveTemplate}
           isTemplateMode={true}
         />
       </div>
