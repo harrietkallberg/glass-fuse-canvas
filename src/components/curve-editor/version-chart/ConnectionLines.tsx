@@ -21,13 +21,31 @@ const ConnectionLines = ({ groupedVersions, sortedGenerations }: ConnectionLines
           const parentPos = getNodePosition(generation, draftsInGeneration[draftIndex - 1]);
           const currentPos = getNodePosition(generation, draft);
           
+          // Vertical line connecting drafts
           lines.push(
-            <path
+            <line
               key={`vertical-${generation}-${draft}`}
-              d={`M ${parentPos.x + 30} ${parentPos.y + 30} L ${parentPos.x + 30} ${currentPos.y + 30} L ${currentPos.x + 30} ${currentPos.y + 30}`}
-              stroke="rgba(249, 115, 22, 0.4)"
+              x1={parentPos.x + 60}
+              y1={parentPos.y + 60}
+              x2={parentPos.x + 60}
+              y2={currentPos.y}
+              stroke="rgba(156, 163, 175, 0.6)"
               strokeWidth="2"
-              fill="none"
+              strokeDasharray="5,5"
+            />
+          );
+          
+          // Horizontal connector to current position
+          lines.push(
+            <line
+              key={`horizontal-connector-${generation}-${draft}`}
+              x1={parentPos.x + 60}
+              y1={currentPos.y}
+              x2={currentPos.x + 60}
+              y2={currentPos.y}
+              stroke="rgba(156, 163, 175, 0.6)"
+              strokeWidth="2"
+              strokeDasharray="5,5"
             />
           );
         }
@@ -38,23 +56,29 @@ const ConnectionLines = ({ groupedVersions, sortedGenerations }: ConnectionLines
         const currentMainPos = getNodePosition(generation, 0);
         const nextMainPos = getNodePosition(sortedGenerations[genIndex + 1], 0);
         
+        // Main progression line
         lines.push(
-          <path
-            key={`horizontal-${generation}`}
-            d={`M ${currentMainPos.x + 30} ${currentMainPos.y + 30} L ${nextMainPos.x + 30} ${nextMainPos.y + 30}`}
-            stroke="rgba(51, 195, 240, 0.6)"
+          <line
+            key={`main-progression-${generation}`}
+            x1={currentMainPos.x + 120}
+            y1={currentMainPos.y + 30}
+            x2={nextMainPos.x}
+            y2={nextMainPos.y + 30}
+            stroke="rgba(51, 195, 240, 0.8)"
             strokeWidth="3"
-            fill="none"
           />
         );
         
         // Add arrow marker for progression
+        const midX = (currentMainPos.x + 120 + nextMainPos.x) / 2;
+        const midY = currentMainPos.y + 30;
+        
         lines.push(
           <ArrowRight 
             key={`arrow-${generation}`}
             className="h-4 w-4 text-[#33C3F0]" 
             style={{ 
-              transform: `translate(${(currentMainPos.x + nextMainPos.x) / 2 + 22}px, ${currentMainPos.y + 22}px)`,
+              transform: `translate(${midX - 8}px, ${midY - 8}px)`,
               position: 'absolute'
             }} 
           />

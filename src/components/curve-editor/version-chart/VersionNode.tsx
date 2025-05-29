@@ -1,7 +1,6 @@
 
 import React from "react";
 import { Button } from "@/components/ui/button";
-import { Crown } from "lucide-react";
 import { Version } from './types';
 import { getGenerationColor } from './utils';
 
@@ -30,70 +29,87 @@ const VersionNode = ({
   const isCurrent = version.is_current;
   const nodeColor = getGenerationColor(generation, isSelected, selectedVersionColor);
   const isMainVersion = draft === 0;
+  const isTemplate = version.version_number === "Template";
 
   return (
     <g transform={`translate(${position.x}, ${position.y})`}>
-      {/* Node glow effect */}
-      {(isSelected || isCurrent) && (
-        <circle
-          cx="30"
-          cy="30"
-          r="38"
-          fill={`${nodeColor}20`}
+      {/* Selection glow effect */}
+      {isSelected && (
+        <rect
+          x="-5"
+          y="-5"
+          width="130"
+          height="70"
+          rx="8"
+          fill={`${selectedVersionColor}30`}
           className="animate-pulse"
         />
       )}
       
-      {/* Node shadow */}
-      <circle
-        cx="32"
-        cy="32"
-        r={isMainVersion ? "28" : "20"}
-        fill="rgba(0, 0, 0, 0.15)"
-        className="blur-sm"
-      />
-      
-      {/* Main node circle */}
-      <circle
-        cx="30"
-        cy="30"
-        r={isMainVersion ? "28" : "20"}
-        fill={nodeColor}
-        stroke={isSelected ? selectedVersionColor : nodeColor}
-        strokeWidth={isSelected ? "4" : "2"}
-        className="cursor-pointer transition-all duration-300 hover:stroke-4 filter drop-shadow-lg"
+      {/* Main tile */}
+      <rect
+        x="0"
+        y="0"
+        width="120"
+        height="60"
+        rx="6"
+        fill={isTemplate ? "#9CA3AF" : nodeColor}
+        stroke={isSelected ? selectedVersionColor : (isTemplate ? "#6B7280" : nodeColor)}
+        strokeWidth={isSelected ? "3" : "2"}
+        className="cursor-pointer transition-all duration-300 hover:stroke-3 filter drop-shadow-lg"
         onClick={() => onVersionSelect(version.id)}
       />
       
       {/* Glass highlight */}
-      <circle
-        cx="24"
-        cy="24"
-        r={isMainVersion ? "12" : "8"}
-        fill="rgba(255, 255, 255, 0.4)"
+      <rect
+        x="5"
+        y="5"
+        width="110"
+        height="20"
+        rx="3"
+        fill="rgba(255, 255, 255, 0.3)"
         className="pointer-events-none"
       />
       
       {/* Version number */}
       <text
-        x="30"
-        y="36"
+        x="60"
+        y="35"
         textAnchor="middle"
-        className={`${isMainVersion ? 'text-base' : 'text-xs'} font-bold cursor-pointer transition-colors duration-300 ${
+        className={`text-sm font-bold cursor-pointer transition-colors duration-300 ${
           isSelected || isCurrent ? "fill-white" : "fill-gray-800"
         }`}
         onClick={() => onVersionSelect(version.id)}
       >
-        {version.version_number}
+        {isTemplate ? "Template" : `v${version.version_number}`}
       </text>
       
-      {/* Crown for current version */}
-      {isCurrent && (
-        <Crown className="h-4 w-4 text-yellow-500" style={{ transform: 'translate(45px, 10px)' }} />
+      {/* Current version indicator */}
+      {isCurrent && !isTemplate && (
+        <rect
+          x="85"
+          y="45"
+          width="30"
+          height="12"
+          rx="6"
+          fill="#10B981"
+          className="pointer-events-none"
+        />
+      )}
+      
+      {isCurrent && !isTemplate && (
+        <text
+          x="100"
+          y="53"
+          textAnchor="middle"
+          className="text-xs font-medium fill-white pointer-events-none"
+        >
+          Current
+        </text>
       )}
       
       {/* Version info card */}
-      <foreignObject x="-60" y={isMainVersion ? "80" : "60"} width="180" height="120">
+      <foreignObject x="-30" y="80" width="180" height="120">
         <div className="text-center">
           <Button
             variant="ghost"
@@ -107,9 +123,9 @@ const VersionNode = ({
           >
             <div className="space-y-3">
               <div className="font-semibold text-base">
-                Version {version.version_number}
-                {isCurrent && (
-                  <div className="text-xs bg-[#33C3F0]/25 text-[#33C3F0] px-3 py-1 rounded-full mt-2 backdrop-blur-sm font-medium">
+                {isTemplate ? "Template" : `Version ${version.version_number}`}
+                {isCurrent && !isTemplate && (
+                  <div className="text-xs bg-[#10B981]/25 text-[#10B981] px-3 py-1 rounded-full mt-2 backdrop-blur-sm font-medium">
                     Current
                   </div>
                 )}
@@ -117,7 +133,7 @@ const VersionNode = ({
               <div className="text-xs text-gray-600 font-medium">
                 {new Date(version.created_at).toLocaleDateString()}
               </div>
-              {onSetMainVersion && !isCurrent && (
+              {onSetMainVersion && !isCurrent && !isTemplate && (
                 <Button
                   size="sm"
                   variant="outline"
@@ -127,7 +143,7 @@ const VersionNode = ({
                   }}
                   className="text-xs mt-2"
                 >
-                  Move to Next Level
+                  Set as Current
                 </Button>
               )}
             </div>
