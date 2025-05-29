@@ -41,7 +41,8 @@ const TemplateCurveEditor = ({
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalPhases, setOriginalPhases] = useState<Phase[]>([]);
   const [showConfirmButton, setShowConfirmButton] = useState(false);
-  const [isExistingTemplate, setIsExistingTemplate] = useState(false);
+  const [hasExistingTemplate, setHasExistingTemplate] = useState(false);
+  const [templateConfirmedInSession, setTemplateConfirmedInSession] = useState(false);
   const { user } = useAuth();
   const temperatureUnit = "celsius";
 
@@ -51,9 +52,9 @@ const TemplateCurveEditor = ({
       setOriginalPhases([...templateCurveData.phases]);
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
-      setIsExistingTemplate(true);
-      // Show confirm button immediately if template exists
-      setShowConfirmButton(true);
+      setHasExistingTemplate(true);
+      // Don't show confirm button immediately for existing templates
+      // Only show after glass template is applied or changes are made
     } else {
       // Set default phases and mark as changed for template setup
       const defaultCurveData = {
@@ -64,7 +65,7 @@ const TemplateCurveEditor = ({
       setTemplateCurveData(defaultCurveData);
       setOriginalPhases([]);
       setHasTemplateChanges(true);
-      setIsExistingTemplate(false);
+      setHasExistingTemplate(false);
     }
   }, [templateCurveData, setTemplateCurveData]);
 
@@ -93,6 +94,11 @@ const TemplateCurveEditor = ({
     // Check if phases have actually changed from original
     const hasChanges = phasesHaveChanged(phases, originalPhases);
     setHasTemplateChanges(hasChanges || originalPhases.length === 0);
+    
+    // Show confirm button if there are changes to an existing template
+    if (hasExistingTemplate && hasChanges) {
+      setShowConfirmButton(true);
+    }
   };
 
   const handleApplyGlassTemplate = () => {
@@ -220,17 +226,19 @@ const TemplateCurveEditor = ({
       // Update original phases to reflect the new saved state
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
+      setTemplateConfirmedInSession(true);
+      setHasExistingTemplate(true);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
       }
       
       // Show appropriate success message based on whether it was new or updated
-      const successMessage = isExistingTemplate 
+      const successMessage = hasExistingTemplate && templateConfirmedInSession
         ? "Template has been updated!"
         : "Template confirmed!";
       
-      const successDescription = isExistingTemplate
+      const successDescription = hasExistingTemplate && templateConfirmedInSession
         ? "Project template has been updated and will be used for dashboard display."
         : "Project template has been saved and will be used for dashboard display.";
       
@@ -238,9 +246,6 @@ const TemplateCurveEditor = ({
         title: successMessage,
         description: successDescription,
       });
-
-      // Update the existing template flag
-      setIsExistingTemplate(true);
 
     } catch (error) {
       console.error('Error confirming project template:', error);
@@ -264,7 +269,7 @@ const TemplateCurveEditor = ({
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
-        {isExistingTemplate 
+        {hasExistingTemplate && templateConfirmedInSession
           ? "Modify your project template. Changes will update the template used for all versions across the project."
           : "Configure your base firing curve template. This will serve as the starting point for all versions across the project."
         }
@@ -277,7 +282,7 @@ const TemplateCurveEditor = ({
         onApplyGlassTemplate={handleApplyGlassTemplate}
       />
 
-      {/* Template Confirmation Button - Shows after applying glass template or if template exists */}
+      {/* Template Confirmation Button - Shows after applying glass template or making changes to existing template */}
       {showConfirmButton && (
         <div className="mt-6 flex justify-center">
           <Button 
@@ -287,7 +292,7 @@ const TemplateCurveEditor = ({
           >
             {isSavingTemplate 
               ? "Saving..." 
-              : isExistingTemplate 
+              : (hasExistingTemplate && templateConfirmedInSession)
                 ? "Update Template" 
                 : "Confirm Template"
             }
