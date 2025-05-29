@@ -166,3 +166,6 @@ export const createGlassTemplatePhases = (
     }
   ];
 };
+
+// Add backward compatibility alias
+export const generateGlassCurve = createGlassTemplatePhases;

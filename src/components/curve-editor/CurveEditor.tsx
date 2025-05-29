@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +8,7 @@ import CurveChart from './CurveChart';
 import GlassSettings from './GlassSettings';
 import PhaseControls from './PhaseControls';
 import { Phase } from '@/utils/curveUtils';
-import { generateGlassCurve } from '@/utils/glassTemplateUtils';
+import { createGlassTemplatePhases } from '@/utils/glassTemplateUtils';
 
 interface CurveEditorProps {
   initialPhases?: Phase[];
@@ -90,22 +91,43 @@ const CurveEditor = ({
     setPhases(phases.filter(phase => phase.id !== id));
   };
 
+  // Helper function to match PhaseControls expected signature
+  const handleUpdatePhase = (id: string, field: keyof Phase, value: number) => {
+    updatePhase(id, { [field]: value });
+  };
+
+  const handleAddPhase = () => {
+    const newPhase: Phase = {
+      id: String(Date.now()),
+      targetTemp: 100,
+      duration: 30,
+      holdTime: 0
+    };
+    addPhase(newPhase);
+  };
+
   const applyGlassTemplate = () => {
     if (!glassData || !selectedGlass) {
       console.log('Missing glass data or selected glass');
       return;
     }
 
-    const newPhases = generateGlassCurve({
-      selectedGlass,
-      roomTemp,
-      glassLayers,
-      glassRadius,
+    const selectedGlassInfo = glassData.Glassorter.find((glass: any) => glass.namn === selectedGlass);
+    if (!selectedGlassInfo) {
+      console.log('Selected glass not found in data');
+      return;
+    }
+
+    const newPhases = createGlassTemplatePhases(
+      selectedGlassInfo,
+      glassData,
       firingType,
-      topTempMinutes,
       ovenType,
-      glassData
-    });
+      glassRadius,
+      glassLayers,
+      topTempMinutes,
+      roomTemp
+    );
 
     console.log('Generated glass curve phases:', newPhases);
     setPhases(newPhases);
@@ -143,7 +165,12 @@ const CurveEditor = ({
               </div>
               <div className="w-full">
                 <PhasesTable phases={phases} updatePhase={updatePhase} deletePhase={deletePhase} />
-                <PhaseControls addPhase={addPhase} />
+                <PhaseControls 
+                  phases={phases}
+                  onUpdatePhase={handleUpdatePhase}
+                  onAddPhase={handleAddPhase}
+                  onRemovePhase={deletePhase}
+                />
                 <Button onClick={handleSave} className="mt-4">Save Curve</Button>
               </div>
             </div>
