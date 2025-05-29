@@ -240,20 +240,20 @@ const TemplateCurveEditor = ({
             <h5 className="font-medium text-blue-800 mb-2">Glass Information</h5>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="text-blue-600">COE:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.coe}</span>
+                <span className="text-blue-600">Category:</span>
+                <span className="ml-2 font-medium">{selectedGlassInfo.kategori}</span>
               </div>
               <div>
-                <span className="text-blue-600">Annealing:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.annealing}°C</span>
+                <span className="text-blue-600">Upper Annealing:</span>
+                <span className="ml-2 font-medium">{selectedGlassInfo.o_astemp}°C</span>
               </div>
               <div>
-                <span className="text-blue-600">Strain Point:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.strain}°C</span>
+                <span className="text-blue-600">Lower Annealing:</span>
+                <span className="ml-2 font-medium">{selectedGlassInfo.n_astemp}°C</span>
               </div>
               <div>
-                <span className="text-blue-600">Softening:</span>
-                <span className="ml-2 font-medium">{selectedGlassInfo.softening}°C</span>
+                <span className="text-blue-600">Name:</span>
+                <span className="ml-2 font-medium">{selectedGlassInfo.namn}</span>
               </div>
             </div>
           </div>
@@ -318,8 +318,7 @@ const TemplateCurveEditor = ({
               handlePhaseChange();
             }}
             handleSave={handleSave}
-            showHeaders={true}
-            isTemplateMode={true}
+            selectedGlassInfo={selectedGlassInfo}
           />
         )}
       </div>
