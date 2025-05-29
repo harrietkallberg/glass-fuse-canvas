@@ -170,7 +170,13 @@ const CurveEditor = ({
                 <CurveChart phases={phases} />
               </div>
               <div className="w-full">
-                <PhasesTable phases={phases} updatePhase={handleUpdatePhaseTable} deletePhase={deletePhase} />
+                <PhasesTable 
+                  phases={phases} 
+                  updatePhase={handleUpdatePhaseTable} 
+                  addPhase={handleAddPhase}
+                  removePhase={deletePhase}
+                  handleSave={handleSave}
+                />
                 <PhaseControls 
                   phases={phases}
                   onUpdatePhase={handleUpdatePhase}
