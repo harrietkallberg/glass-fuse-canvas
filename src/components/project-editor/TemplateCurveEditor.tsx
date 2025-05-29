@@ -53,8 +53,10 @@ const TemplateCurveEditor = ({
       setLocalCurveData(templateCurveData);
       setHasTemplateChanges(false);
       setHasExistingTemplate(true);
-      // Don't show confirm button immediately for existing templates
-      // Only show after glass template is applied or changes are made
+      // Check if template has been confirmed by looking at settings
+      if (templateCurveData.settings) {
+        setTemplateConfirmedInSession(true);
+      }
     } else {
       // Set default phases and mark as changed for template setup
       const defaultCurveData = {
@@ -84,12 +86,12 @@ const TemplateCurveEditor = ({
 
   const handleCurveChange = (phases: Phase[]) => {
     const curveData = {
+      ...localCurveData,
       phases,
       temperatureUnit,
     };
     
     setLocalCurveData(curveData);
-    setTemplateCurveData(curveData);
     
     // Check if phases have actually changed from original
     const hasChanges = phasesHaveChanged(phases, originalPhases);
@@ -223,11 +225,29 @@ const TemplateCurveEditor = ({
         return;
       }
 
+      // Create the updated template data with settings
+      const updatedTemplateData = {
+        phases: localCurveData.phases,
+        settings: {
+          selectedGlass: localCurveData.settings?.selectedGlass,
+          roomTemp: localCurveData.settings?.roomTemp || 20,
+          glassLayers: localCurveData.settings?.glassLayers || "1",
+          glassRadius: localCurveData.settings?.glassRadius || "10",
+          firingType: localCurveData.settings?.firingType || "f",
+          topTempMinutes: localCurveData.settings?.topTempMinutes || "10",
+          ovenType: localCurveData.settings?.ovenType || "t",
+        }
+      };
+
+      // Update parent state with confirmed template data
+      setTemplateCurveData(updatedTemplateData);
+      
       // Update original phases to reflect the new saved state
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
       setTemplateConfirmedInSession(true);
       setHasExistingTemplate(true);
+      setShowConfirmButton(false);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();

@@ -81,7 +81,7 @@ export const useProjectLoader = ({
       if (templateVersion) {
         const templateData = await loadCurveVersion(templateVersion.id);
         if (templateData) {
-          setTemplateCurveData({
+          const completeTemplateData = {
             phases: templateData.phases,
             settings: {
               selectedGlass: templateData.version.selected_glass,
@@ -92,11 +92,17 @@ export const useProjectLoader = ({
               topTempMinutes: templateData.version.top_temp_minutes,
               ovenType: templateData.version.oven_type,
             }
-          });
+          };
+          console.log('Loaded template data:', completeTemplateData);
+          setTemplateCurveData(completeTemplateData);
         }
+      } else {
+        // No template exists, set to null to show default state
+        setTemplateCurveData(null);
       }
     } catch (error) {
       console.error('Error loading template data:', error);
+      setTemplateCurveData(null);
     }
   };
 
