@@ -37,15 +37,6 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
     };
   });
 
-  // Calculate regular tick intervals for x-axis
-  const maxTime = Math.max(...Array.from(allTimePoints));
-  const getXAxisTicks = () => {
-    if (maxTime <= 120) return Array.from({length: Math.ceil(maxTime/15) + 1}, (_, i) => i * 15); // Every 15 min for short curves
-    if (maxTime <= 480) return Array.from({length: Math.ceil(maxTime/30) + 1}, (_, i) => i * 30); // Every 30 min for medium curves
-    if (maxTime <= 1440) return Array.from({length: Math.ceil(maxTime/60) + 1}, (_, i) => i * 60); // Every hour for long curves
-    return Array.from({length: Math.ceil(maxTime/120) + 1}, (_, i) => i * 120); // Every 2 hours for very long curves
-  };
-
   return (
     <div className="w-full">
       {/* Time Display */}
@@ -61,20 +52,11 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
       <div className="enhanced-glass-card p-6 h-96 w-full max-w-[800px] mx-auto">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={combinedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-            <CartesianGrid 
-              strokeDasharray="2 2" 
-              stroke="rgba(156, 163, 175, 0.4)" 
-              horizontal={true}
-              vertical={true}
-            />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.3)" />
             <XAxis 
               dataKey="time" 
               label={{ value: 'Time (minutes)', position: 'insideBottom', offset: -10 }}
               stroke="rgba(75, 85, 99, 0.8)"
-              ticks={getXAxisTicks()}
-              type="number"
-              scale="linear"
-              domain={[0, maxTime]}
             />
             <YAxis 
               label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
@@ -98,22 +80,22 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
               <Line 
                 type="linear" 
                 dataKey="templateTemp" 
-                stroke="rgba(156, 163, 175, 0.6)" 
-                strokeWidth={2}
+                stroke="#9CA3AF" 
+                strokeWidth={3}
                 strokeDasharray="8 4"
                 name="Template"
                 connectNulls={false}
-                dot={{ fill: 'rgba(156, 163, 175, 0.6)', strokeWidth: 2, r: 3 }}
+                dot={{ fill: '#9CA3AF', strokeWidth: 2, r: 4 }}
               />
             )}
             <Line 
               type="linear" 
               dataKey="currentTemp" 
-              stroke="rgba(249, 115, 22, 0.7)" 
-              strokeWidth={2.5}
+              stroke="#F97316" 
+              strokeWidth={3}
               name="Current Version"
               connectNulls={false}
-              dot={{ fill: 'rgba(249, 115, 22, 0.7)', strokeWidth: 2, r: 3 }}
+              dot={{ fill: '#F97316', strokeWidth: 2, r: 4 }}
             />
           </LineChart>
         </ResponsiveContainer>

@@ -95,47 +95,45 @@ const PhasesTable = ({
         </div>
       )}
 
-      {/* Only show table content when in table mode */}
-      {viewMode === 'table' && (
-        <div className="space-y-2">
-          {/* Header */}
-          <div className="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
-            <div>Phase</div>
-            <div>Target Temp (°C)</div>
-            <div>Rise Time (min)</div>
-            <div>Hold Time (min)</div>
-          </div>
-          
-          {/* Phase rows */}
-          {phases.map((phase, index) => {
-            const highlightClass = getHighlightColor(phase);
-            return (
-              <div 
-                key={phase.id} 
-                className={`grid grid-cols-4 gap-4 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${highlightClass} ${
-                  isAnnealingPhase(phase) ? 'border-amber-300 border-2' : ''
-                }`}
-              >
-                <div className="text-sm font-medium text-gray-900">
-                  Phase {index + 1}
-                </div>
-                
-                <div className="text-sm text-gray-700">
-                  {phase.targetTemp}°C
-                </div>
-                
-                <div className="text-sm text-gray-700">
-                  {phase.duration} min
-                </div>
-                
-                <div className="text-sm text-gray-700">
-                  {phase.holdTime} min
-                </div>
-              </div>
-            );
-          })}
+      {/* Simple list layout */}
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
+          <div>Phase</div>
+          <div>Target Temp (°C)</div>
+          <div>Rise Time (min)</div>
+          <div>Hold Time (min)</div>
         </div>
-      )}
+        
+        {/* Phase rows */}
+        {phases.map((phase, index) => {
+          const highlightClass = getHighlightColor(phase);
+          return (
+            <div 
+              key={phase.id} 
+              className={`grid grid-cols-4 gap-4 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${highlightClass} ${
+                isAnnealingPhase(phase) ? 'border-amber-300 border-2' : ''
+              }`}
+            >
+              <div className="text-sm font-medium text-gray-900">
+                Phase {index + 1}
+              </div>
+              
+              <div className="text-sm text-gray-700">
+                {phase.targetTemp}°C
+              </div>
+              
+              <div className="text-sm text-gray-700">
+                {phase.duration} min
+              </div>
+              
+              <div className="text-sm text-gray-700">
+                {phase.holdTime} min
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };
