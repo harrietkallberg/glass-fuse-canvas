@@ -71,10 +71,10 @@ const TemplateCurveEditor = ({
         };
         setLocalCurveData(defaultCurveData);
         setOriginalPhases([]);
-        setHasTemplateChanges(false); // Start with no changes for new template
+        setHasTemplateChanges(false);
         setHasExistingTemplate(false);
         setTemplateConfirmedInSession(false);
-        setShowConfirmButton(true); // Show button to create initial template
+        setShowConfirmButton(false); // Don't show button until user makes changes
         setIsLoading(false);
         setIsInitialized(true);
         return;
@@ -159,10 +159,10 @@ const TemplateCurveEditor = ({
           };
           setLocalCurveData(defaultCurveData);
           setOriginalPhases([]);
-          setHasTemplateChanges(false); // Start with no changes
+          setHasTemplateChanges(false);
           setHasExistingTemplate(false);
           setTemplateConfirmedInSession(false);
-          setShowConfirmButton(true); // Show button to create template
+          setShowConfirmButton(false); // Don't show button until user makes changes
         }
       } catch (error) {
         console.error('Error loading template data:', error);
@@ -219,17 +219,9 @@ const TemplateCurveEditor = ({
     
     setLocalCurveData(curveData);
     
-    // For new templates or existing templates, mark as having changes
-    if (!hasExistingTemplate || originalPhases.length === 0) {
-      // For new templates, any change should be saved
-      setHasTemplateChanges(true);
-      setShowConfirmButton(true);
-    } else {
-      // For existing templates, check if phases have actually changed from original
-      const hasChanges = phasesHaveChanged(phases, originalPhases);
-      setHasTemplateChanges(hasChanges);
-      setShowConfirmButton(hasChanges);
-    }
+    // Always mark as having changes when phases change
+    setHasTemplateChanges(true);
+    setShowConfirmButton(true);
   };
 
   const handleApplyGlassTemplate = () => {
@@ -458,7 +450,7 @@ const TemplateCurveEditor = ({
       <div className="text-sm text-gray-600 mb-6">
         {hasExistingTemplate && templateConfirmedInSession
           ? "Modify your project template. Changes will update the template used for all versions across the project."
-          : "Configure your base firing curve template. This will serve as the starting point for all versions across the project."
+          : "Configure your base firing curve template by selecting glass type, oven settings, and adjusting the curve. This will serve as the starting point for all versions across the project."
         }
       </div>
       
@@ -480,7 +472,7 @@ const TemplateCurveEditor = ({
           >
             {isSavingTemplate 
               ? "Saving..." 
-              : hasExistingTemplate
+              : hasExistingTemplate && templateConfirmedInSession
                 ? "Update Template" 
                 : "Create Template"
             }
@@ -491,8 +483,8 @@ const TemplateCurveEditor = ({
       {/* Status indicators */}
       {!hasExistingTemplate && !showConfirmButton && (
         <div className="mt-6 flex justify-center">
-          <div className="text-sm text-blue-600">
-            • Ready to create template - make changes above and save
+          <div className="text-sm text-gray-600">
+            Configure glass settings and curve above, then save your template
           </div>
         </div>
       )}
