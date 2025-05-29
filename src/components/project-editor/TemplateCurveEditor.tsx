@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -35,7 +36,7 @@ const TemplateCurveEditor = ({
   projectTitle = "",
   projectDescription = ""
 }: TemplateCurveEditorProps) => {
-  const [localCurveData, setLocalCurveData] = useState(templateCurveData);
+  const [localCurveData, setLocalCurveData] = useState(null);
   const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalPhases, setOriginalPhases] = useState<Phase[]>([]);
@@ -43,60 +44,141 @@ const TemplateCurveEditor = ({
   const [hasExistingTemplate, setHasExistingTemplate] = useState(false);
   const [templateConfirmedInSession, setTemplateConfirmedInSession] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
   const temperatureUnit = "celsius";
 
-  // Initialize component state when templateCurveData changes
+  // Load template data directly from database when component mounts
   useEffect(() => {
-    console.log('TemplateCurveEditor: templateCurveData changed:', templateCurveData);
-    
-    if (templateCurveData?.phases && templateCurveData.phases.length > 0) {
-      // Existing template with phases
-      console.log('Loading existing template with phases:', templateCurveData.phases);
-      
-      const curveData = {
-        phases: templateCurveData.phases,
-        temperatureUnit,
-        settings: templateCurveData.settings || {}
-      };
-      
-      setOriginalPhases([...templateCurveData.phases]);
-      setLocalCurveData(curveData);
-      setHasTemplateChanges(false);
-      setHasExistingTemplate(true);
-      setShowConfirmButton(false);
-      
-      // Check if template has proper settings (indicating it's been confirmed)
-      const hasSettings = templateCurveData.settings && 
-        (templateCurveData.settings.selectedGlass || 
-         templateCurveData.settings.firingType || 
-         templateCurveData.settings.ovenType);
-      
-      if (hasSettings) {
-        console.log('Template has been confirmed with settings:', templateCurveData.settings);
-        setTemplateConfirmedInSession(true);
-      } else {
-        console.log('Template exists but not fully configured');
-        setTemplateConfirmedInSession(false);
+    const loadTemplateData = async () => {
+      if (!curveId || !user) {
+        setIsLoading(false);
+        return;
       }
-    } else if (templateCurveData === null && !isInitialized) {
-      // No existing template, set up default
-      console.log('No existing template, setting up default');
-      const defaultCurveData = {
-        phases: defaultPhases,
-        temperatureUnit,
-        settings: {}
-      };
-      setLocalCurveData(defaultCurveData);
-      setOriginalPhases([]);
-      setHasTemplateChanges(true);
-      setHasExistingTemplate(false);
-      setTemplateConfirmedInSession(false);
-      setShowConfirmButton(false);
+
+      console.log('Loading template data for curve ID:', curveId);
+      setIsLoading(true);
+
+      try {
+        // Get the template version (version 0)
+        const { data: templateVersion, error: versionError } = await supabase
+          .from('curve_versions')
+          .select('*')
+          .eq('curve_id', curveId)
+          .eq('version_number', 0)
+          .maybeSingle();
+
+        if (versionError && versionError.code !== 'PGRST116') {
+          console.error('Error fetching template version:', versionError);
+          setIsLoading(false);
+          return;
+        }
+
+        if (templateVersion) {
+          console.log('Found template version:', templateVersion);
+          
+          // Get template phases
+          const { data: phases, error: phasesError } = await supabase
+            .from('curve_phases')
+            .select('*')
+            .eq('version_id', templateVersion.id)
+            .order('phase_order');
+
+          if (phasesError) {
+            console.error('Error fetching template phases:', phasesError);
+            setIsLoading(false);
+            return;
+          }
+
+          // Convert database phases to our format
+          const templatePhases = phases?.map(phase => ({
+            id: phase.id,
+            targetTemp: phase.target_temp,
+            duration: phase.duration,
+            holdTime: phase.hold_time
+          })) || [];
+
+          // Create complete template data with settings
+          const completeTemplateData = {
+            phases: templatePhases,
+            settings: {
+              selectedGlass: templateVersion.selected_glass || '',
+              roomTemp: templateVersion.room_temp || 20,
+              glassLayers: templateVersion.glass_layers || '1',
+              glassRadius: templateVersion.glass_radius || '10',
+              firingType: templateVersion.firing_type || 'f',
+              topTempMinutes: templateVersion.top_temp_minutes || '10',
+              ovenType: templateVersion.oven_type || 't',
+            }
+          };
+
+          console.log('Loaded complete template data:', completeTemplateData);
+          
+          // Set the complete template data
+          setTemplateCurveData(completeTemplateData);
+          setLocalCurveData({
+            ...completeTemplateData,
+            temperatureUnit
+          });
+          setOriginalPhases([...templatePhases]);
+          setHasExistingTemplate(true);
+          setTemplateConfirmedInSession(true);
+          setHasTemplateChanges(false);
+          setShowConfirmButton(false);
+        } else {
+          console.log('No template version found, setting up default');
+          // No template exists, set up default
+          const defaultCurveData = {
+            phases: defaultPhases,
+            temperatureUnit,
+            settings: {
+              selectedGlass: '',
+              roomTemp: 20,
+              glassLayers: '1',
+              glassRadius: '10',
+              firingType: 'f',
+              topTempMinutes: '10',
+              ovenType: 't',
+            }
+          };
+          setLocalCurveData(defaultCurveData);
+          setOriginalPhases([]);
+          setHasTemplateChanges(true);
+          setHasExistingTemplate(false);
+          setTemplateConfirmedInSession(false);
+          setShowConfirmButton(false);
+        }
+      } catch (error) {
+        console.error('Error loading template data:', error);
+      } finally {
+        setIsLoading(false);
+        setIsInitialized(true);
+      }
+    };
+
+    loadTemplateData();
+  }, [curveId, user, setTemplateCurveData]);
+
+  // Update local state when templateCurveData changes from parent
+  useEffect(() => {
+    if (isInitialized && templateCurveData && localCurveData) {
+      console.log('Parent templateCurveData updated:', templateCurveData);
+      
+      // Only update if the data is different
+      const currentData = JSON.stringify(localCurveData);
+      const newData = JSON.stringify({
+        ...templateCurveData,
+        temperatureUnit
+      });
+      
+      if (currentData !== newData) {
+        setLocalCurveData({
+          ...templateCurveData,
+          temperatureUnit
+        });
+      }
     }
-    
-    setIsInitialized(true);
-  }, [templateCurveData, isInitialized]);
+  }, [templateCurveData, isInitialized, localCurveData, temperatureUnit]);
 
   // Compare phases to detect changes
   const phasesHaveChanged = (newPhases: Phase[], originalPhases: Phase[]) => {
@@ -318,12 +400,30 @@ const TemplateCurveEditor = ({
     showConfirmButton,
     hasTemplateChanges,
     localCurveData: localCurveData?.phases?.length,
-    localSettings: localCurveData?.settings
+    localSettings: localCurveData?.settings,
+    isLoading
   });
 
-  // Don't render until initialized
-  if (!isInitialized) {
-    return <div>Loading template...</div>;
+  // Show loading state
+  if (isLoading || !isInitialized) {
+    return (
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+        <div className="flex justify-center items-center h-32">
+          <div className="text-lg">Loading template...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // Don't render if we don't have local curve data
+  if (!localCurveData) {
+    return (
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+        <div className="flex justify-center items-center h-32">
+          <div className="text-lg">Initializing template...</div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -343,10 +443,11 @@ const TemplateCurveEditor = ({
       </div>
       
       <CurveEditor
-        initialPhases={localCurveData?.phases || defaultPhases}
+        initialPhases={localCurveData.phases || defaultPhases}
         onSave={handleCurveChange}
         isTemplateMode={true}
         onApplyGlassTemplate={handleApplyGlassTemplate}
+        savedSettings={localCurveData.settings}
       />
 
       {/* Template Confirmation Button - Shows after applying glass template or making changes to existing template */}

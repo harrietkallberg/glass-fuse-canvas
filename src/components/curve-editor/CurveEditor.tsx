@@ -1,141 +1,180 @@
-import React from 'react';
-import { calculateTotalTime } from '@/utils/curveUtils';
-import { useCurveState } from '@/hooks/useCurveState';
-import GlassSettings from './GlassSettings';
+import React, { useState, useEffect } from 'react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PhasesTable from './PhasesTable';
 import CurveChart from './CurveChart';
-import CurveTableView from './CurveTableView';
+import GlassSettings from './GlassSettings';
 import PhaseControls from './PhaseControls';
-import { toast } from '@/components/ui/use-toast';
 import { Phase } from '@/utils/curveUtils';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { generateGlassCurve } from '@/utils/glassTemplateUtils';
 
 interface CurveEditorProps {
   initialPhases?: Phase[];
-  templatePhases?: Phase[];
   onSave?: (phases: Phase[]) => void;
   isTemplateMode?: boolean;
   onApplyGlassTemplate?: () => void;
+  savedSettings?: {
+    selectedGlass?: string;
+    roomTemp?: number;
+    glassLayers?: string;
+    glassRadius?: string;
+    firingType?: string;
+    topTempMinutes?: string;
+    ovenType?: string;
+  };
 }
 
 const CurveEditor = ({ 
   initialPhases = [], 
-  templatePhases = [],
   onSave, 
-  isTemplateMode = false,
-  onApplyGlassTemplate
+  isTemplateMode = false, 
+  onApplyGlassTemplate,
+  savedSettings = {}
 }: CurveEditorProps) => {
-  const curveState = useCurveState({ initialPhases });
-  const [activeTab, setActiveTab] = React.useState("curve");
-  const [showTabs, setShowTabs] = React.useState(false);
+  const [phases, setPhases] = useState<Phase[]>(initialPhases);
   
-  const handleSave = () => {
-    if (onSave) onSave(curveState.phases);
-    
-    // Show success toast
-    toast({
-      title: isTemplateMode ? "Template saved!" : "Curve saved!",
-      description: isTemplateMode 
-        ? "Your project template has been saved successfully."
-        : "Your firing curve has been saved successfully.",
-    });
+  // Glass settings state - initialize with saved settings
+  const [selectedGlass, setSelectedGlass] = useState(savedSettings.selectedGlass || '');
+  const [roomTemp, setRoomTemp] = useState(savedSettings.roomTemp || 20);
+  const [glassLayers, setGlassLayers] = useState(savedSettings.glassLayers || '1');
+  const [glassRadius, setGlassRadius] = useState(savedSettings.glassRadius || '10');
+  const [firingType, setFiringType] = useState(savedSettings.firingType || 'f');
+  const [topTempMinutes, setTopTempMinutes] = useState(savedSettings.topTempMinutes || '10');
+  const [ovenType, setOvenType] = useState(savedSettings.ovenType || 't');
+
+  const [glassData, setGlassData] = useState<any>(null);
+
+  // Update phases when initialPhases change
+  useEffect(() => {
+    if (initialPhases && initialPhases.length > 0) {
+      setPhases(initialPhases);
+    }
+  }, [initialPhases]);
+
+  // Update settings when savedSettings change
+  useEffect(() => {
+    if (savedSettings) {
+      console.log('Updating CurveEditor with saved settings:', savedSettings);
+      setSelectedGlass(savedSettings.selectedGlass || '');
+      setRoomTemp(savedSettings.roomTemp || 20);
+      setGlassLayers(savedSettings.glassLayers || '1');
+      setGlassRadius(savedSettings.glassRadius || '10');
+      setFiringType(savedSettings.firingType || 'f');
+      setTopTempMinutes(savedSettings.topTempMinutes || '10');
+      setOvenType(savedSettings.ovenType || 't');
+    }
+  }, [savedSettings]);
+
+  // Load glass data
+  useEffect(() => {
+    fetch('/tables.json')
+      .then(response => response.json())
+      .then(data => {
+        setGlassData(data);
+      })
+      .catch(error => {
+        console.error('Error loading glass data:', error);
+      });
+  }, []);
+
+  const addPhase = (newPhase: Phase) => {
+    setPhases([...phases, { ...newPhase, id: String(Date.now()) }]);
   };
 
-  const handleApplyTemplate = () => {
-    curveState.applyGlassTemplate();
-    setShowTabs(true);
+  const updatePhase = (id: string, updatedPhase: Partial<Phase>) => {
+    setPhases(phases.map(phase => phase.id === id ? { ...phase, ...updatedPhase } : phase));
+  };
+
+  const deletePhase = (id: string) => {
+    setPhases(phases.filter(phase => phase.id !== id));
+  };
+
+  const applyGlassTemplate = () => {
+    if (!glassData || !selectedGlass) {
+      console.log('Missing glass data or selected glass');
+      return;
+    }
+
+    const newPhases = generateGlassCurve({
+      selectedGlass,
+      roomTemp,
+      glassLayers,
+      glassRadius,
+      firingType,
+      topTempMinutes,
+      ovenType,
+      glassData
+    });
+
+    console.log('Generated glass curve phases:', newPhases);
+    setPhases(newPhases);
     
-    // Call the parent callback to show confirm button
     if (onApplyGlassTemplate) {
       onApplyGlassTemplate();
     }
   };
 
+  const handleSave = () => {
+    if (onSave) {
+      onSave(phases);
+    }
+  };
+
+  if (!glassData) {
+    return <div>Loading glass data...</div>;
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Template Mode: Combined Glass Settings and Curve View */}
-      {isTemplateMode ? (
-        <div className="glass p-6 rounded-2xl">
-          <div className="flex justify-between mb-4">
-            <h3 className="text-lg font-medium">Template Curve Configuration</h3>
-            <div className="text-sm text-muted-foreground">
-              Total time: {calculateTotalTime(curveState.phases)} min
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Curve Editor</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Tabs defaultValue="curve" className="w-full space-y-4">
+          <TabsList>
+            <TabsTrigger value="curve">Curve</TabsTrigger>
+            {isTemplateMode && <TabsTrigger value="glass">Glass Settings</TabsTrigger>}
+          </TabsList>
+          <TabsContent value="curve">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="w-full">
+                <CurveChart phases={phases} />
+              </div>
+              <div className="w-full">
+                <PhasesTable phases={phases} updatePhase={updatePhase} deletePhase={deletePhase} />
+                <PhaseControls addPhase={addPhase} />
+                <Button onClick={handleSave} className="mt-4">Save Curve</Button>
+              </div>
             </div>
-          </div>
-          
-          {/* Glass Settings */}
-          <GlassSettings 
-            glassData={curveState.glassData}
-            selectedGlass={curveState.selectedGlass}
-            setSelectedGlass={curveState.setSelectedGlass}
-            roomTemp={curveState.roomTemp}
-            setRoomTemp={curveState.setRoomTemp}
-            glassLayers={curveState.glassLayers}
-            setGlassLayers={curveState.setGlassLayers}
-            glassRadius={curveState.glassRadius}
-            setGlassRadius={curveState.setGlassRadius}
-            firingType={curveState.firingType}
-            setFiringType={curveState.setFiringType}
-            topTempMinutes={curveState.topTempMinutes}
-            setTopTempMinutes={curveState.setTopTempMinutes}
-            applyGlassTemplate={handleApplyTemplate}
-            ovenType={curveState.ovenType}
-            setOvenType={curveState.setOvenType}
-          />
-          
-          {/* Curve/Table View - Show after template is applied */}
-          {showTabs && (
-            <div className="mt-8">
-              <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                <TabsList className="w-full mb-6 p-2 bg-white/50">
-                  <TabsTrigger value="curve" className="flex-1 text-lg py-3">Curve View</TabsTrigger>
-                  <TabsTrigger value="table" className="flex-1 text-lg py-3">Table View</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="curve" className="mt-6">
-                  <CurveChart 
-                    phases={curveState.phases}
-                    roomTemp={curveState.roomTemp}
-                  />
-                </TabsContent>
-                
-                <TabsContent value="table" className="mt-6">
-                  <CurveTableView 
-                    phases={curveState.phases}
-                    isTemplateMode={true}
-                    roomTemp={curveState.roomTemp}
-                  />
-                </TabsContent>
-              </Tabs>
-            </div>
+          </TabsContent>
+          {isTemplateMode && (
+            <TabsContent value="glass">
+              {glassData && (
+                <GlassSettings
+                  glassData={glassData}
+                  selectedGlass={selectedGlass}
+                  setSelectedGlass={setSelectedGlass}
+                  roomTemp={roomTemp}
+                  setRoomTemp={setRoomTemp}
+                  glassLayers={glassLayers}
+                  setGlassLayers={setGlassLayers}
+                  glassRadius={glassRadius}
+                  setGlassRadius={setGlassRadius}
+                  firingType={firingType}
+                  setFiringType={setFiringType}
+                  topTempMinutes={topTempMinutes}
+                  setTopTempMinutes={setTopTempMinutes}
+                  applyGlassTemplate={applyGlassTemplate}
+                  ovenType={ovenType}
+                  setOvenType={setOvenType}
+                />
+              )}
+            </TabsContent>
           )}
-        </div>
-      ) : (
-        // Non-template mode: Keep existing full functionality
-        <div className="glass p-6 rounded-2xl">
-          <div className="flex justify-between mb-4">
-            <h3 className="text-lg font-medium">Firing Curve</h3>
-            <div className="text-sm text-muted-foreground">
-              Total time: {calculateTotalTime(curveState.phases)} min
-            </div>
-          </div>
-          
-          <div className="space-y-6">
-            <CurveChart 
-              phases={curveState.phases}
-              roomTemp={curveState.roomTemp}
-              templatePhases={templatePhases}
-            />
-            
-            <PhaseControls 
-              phases={curveState.phases}
-              onUpdatePhase={curveState.updatePhase}
-              onAddPhase={curveState.addPhase}
-              onRemovePhase={curveState.removePhase}
-            />
-          </div>
-        </div>
-      )}
-    </div>
+        </Tabs>
+      </CardContent>
+    </Card>
   );
 };
 
