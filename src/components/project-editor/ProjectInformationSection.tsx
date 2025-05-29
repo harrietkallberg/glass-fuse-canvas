@@ -4,8 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import CurveEditor from "@/components/curve-editor/CurveEditor";
+import { toast } from "@/components/ui/use-toast";
+import TemplateCurveEditor from "./TemplateCurveEditor";
 import { Phase } from "@/utils/curveUtils";
+import { useTemplateState, TemplateSettings } from "@/hooks/useTemplateState";
 
 interface ProjectInformationSectionProps {
   isNewCurve: boolean;
@@ -17,9 +19,10 @@ interface ProjectInformationSectionProps {
   setTemplateCurveData: (data: any) => void;
   onCreateProject: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
+  curveId?: string;
 }
 
-// Default template phases
+// Default template phases - these represent the "master recipe"
 const defaultPhases: Phase[] = [
   { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
   { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
@@ -37,27 +40,76 @@ const ProjectInformationSection = ({
   templateCurveData,
   setTemplateCurveData,
   onCreateProject,
-  onUpdateProject
+  onUpdateProject,
+  curveId
 }: ProjectInformationSectionProps) => {
-  const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
+  const [templateUnsavedChanges, setTemplateUnsavedChanges] = useState(false);
+  
   const temperatureUnit = "celsius"; // Fixed to celsius only
 
-  const handleSaveTemplate = (phases: Phase[]) => {
-    const curveData = {
-      phases,
-      temperatureUnit,
-    };
-    setLocalCurveData(curveData);
-    setTemplateCurveData(curveData);
+  // Initialize template state
+  const templateState = useTemplateState({
+    curveId,
+    initialTemplate: templateCurveData ? {
+      phases: templateCurveData.phases || defaultPhases,
+      settings: templateCurveData.settings || {}
+    } : undefined
+  });
+
+  const handleSaveTemplate = async (phases: Phase[], settings: TemplateSettings) => {
+    if (isNewCurve) {
+      // For new curves, just store locally until project is created
+      const curveData = {
+        phases,
+        settings,
+        temperatureUnit,
+      };
+      setTemplateCurveData(curveData);
+      setTemplateUnsavedChanges(false);
+      
+      toast({
+        title: "Template configured!",
+        description: "Your base firing curve template has been set up. Create the project to save it permanently.",
+      });
+    } else {
+      // For existing curves, save to database
+      const success = await templateState.saveTemplate(phases, settings);
+      if (success) {
+        const curveData = {
+          phases,
+          settings,
+          temperatureUnit,
+        };
+        setTemplateCurveData(curveData);
+        setTemplateUnsavedChanges(false);
+        
+        toast({
+          title: "Template saved!",
+          description: "Your project's base template has been updated successfully.",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to save template changes",
+          variant: "destructive"
+        });
+      }
+    }
   };
 
   const handleCreateProject = () => {
     if (!projectTitle.trim()) {
+      toast({
+        title: "Missing title",
+        description: "Please enter a project name",
+        variant: "destructive"
+      });
       return;
     }
     onCreateProject(projectTitle, projectDescription, { 
-      ...localCurveData, 
+      phases: templateState.templatePhases,
+      settings: templateState.templateSettings,
       temperatureUnit
     });
   };
@@ -77,6 +129,10 @@ const ProjectInformationSection = ({
   const handleDescriptionChange = (value: string) => {
     setProjectDescription(value);
     if (!isNewCurve) setHasChanges(true);
+  };
+
+  const handleTemplateChange = () => {
+    setTemplateUnsavedChanges(true);
   };
 
   return (
@@ -121,30 +177,50 @@ const ProjectInformationSection = ({
       {/* Template Curve Configuration */}
       <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+          <div>
+            <h3 className="text-xl font-semibold">Master Template Curve</h3>
+            <p className="text-sm text-gray-600 mt-1">
+              {isNewCurve 
+                ? "Configure your base firing curve template. This will serve as the starting point for all versions."
+                : "This is your project's master template curve. This defines the project's core identity."
+              }
+            </p>
+          </div>
           {!isNewCurve && (
-            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-              Project Template
-            </span>
+            <div className="text-right">
+              <span className="text-sm text-gray-500 bg-blue-100 px-3 py-1 rounded-full">
+                Master Template
+              </span>
+              {templateUnsavedChanges && (
+                <div className="text-xs text-orange-600 mt-1">Unsaved changes</div>
+              )}
+            </div>
           )}
         </div>
         
-        <div className="text-sm text-gray-600 mb-6">
-          {isNewCurve 
-            ? "Configure your base firing curve template. This will serve as the starting point for all versions."
-            : "This is your project's base template curve. Changes here affect the project identity."
-          }
+        <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+          <div className="flex">
+            <div className="ml-3">
+              <p className="text-sm text-blue-700">
+                <strong>Template vs Versions:</strong> The template is your project's "master recipe" - the original 
+                scientific curve that defines what this project IS. Versions are experimental modifications where you 
+                test "what if I change this?" The template rarely changes; versions change frequently.
+              </p>
+            </div>
+          </div>
         </div>
         
-        <CurveEditor
-          initialPhases={templateCurveData?.phases || defaultPhases}
-          onSave={isNewCurve ? handleSaveTemplate : undefined}
-          isTemplateMode={true}
+        <TemplateCurveEditor
+          initialPhases={templateState.templatePhases}
+          initialSettings={templateState.templateSettings}
+          onSave={handleSaveTemplate}
+          onChange={handleTemplateChange}
+          isLoading={templateState.isLoading}
         />
       </div>
 
       {/* Action Buttons */}
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-3">
         {isNewCurve ? (
           <Button 
             onClick={handleCreateProject}
@@ -153,13 +229,27 @@ const ProjectInformationSection = ({
           >
             Create Project
           </Button>
-        ) : hasChanges && (
-          <Button 
-            onClick={handleUpdateProject}
-            className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2"
-          >
-            Update Project Info
-          </Button>
+        ) : (
+          <>
+            {hasChanges && (
+              <Button 
+                onClick={handleUpdateProject}
+                variant="outline"
+                className="px-6 py-2"
+              >
+                Update Project Info
+              </Button>
+            )}
+            {templateUnsavedChanges && (
+              <Button 
+                onClick={() => handleSaveTemplate(templateState.templatePhases, templateState.templateSettings)}
+                className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2"
+                disabled={templateState.isLoading}
+              >
+                {templateState.isLoading ? "Saving..." : "Save Template"}
+              </Button>
+            )}
+          </>
         )}
       </div>
     </div>
