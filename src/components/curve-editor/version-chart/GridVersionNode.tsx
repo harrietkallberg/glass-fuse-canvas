@@ -1,6 +1,7 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Plus, MoveRight, Settings, Copy, Trash2 } from "lucide-react";
 import { Version } from './types';
 
 interface GridVersionNodeProps {
@@ -9,6 +10,7 @@ interface GridVersionNodeProps {
   isSelected: boolean;
   onVersionSelect: (versionId: string) => void;
   onSetMainVersion?: (versionId: string) => void;
+  onNewVersion?: () => void;
   nodeWidth: number;
   nodeHeight: number;
 }
@@ -19,10 +21,12 @@ const GridVersionNode = ({
   isSelected,
   onVersionSelect,
   onSetMainVersion,
+  onNewVersion,
   nodeWidth,
   nodeHeight
 }: GridVersionNodeProps) => {
-  const isTemplate = version.version_number === "Template";
+  const [showOptions, setShowOptions] = useState(false);
+  const isTemplate = version.version_number === 0 || version.version_number === "Template";
   const isCurrent = version.is_current;
 
   // Colors
@@ -32,6 +36,11 @@ const GridVersionNode = ({
 
   const nodeColor = isTemplate ? templateColor : versionColor;
   const strokeColor = isSelected ? selectedColor : nodeColor;
+
+  const handleNodeClick = () => {
+    onVersionSelect(version.id);
+    setShowOptions(!showOptions);
+  };
 
   return (
     <g transform={`translate(${position.x}, ${position.y})`}>
@@ -61,7 +70,7 @@ const GridVersionNode = ({
         stroke={strokeColor}
         strokeWidth={isSelected ? "2" : "1"}
         className="cursor-pointer transition-all duration-200 hover:stroke-2 drop-shadow-sm"
-        onClick={() => onVersionSelect(version.id)}
+        onClick={handleNodeClick}
       />
       
       {/* Node content */}
@@ -86,22 +95,90 @@ const GridVersionNode = ({
         </div>
       </foreignObject>
       
-      {/* Action buttons for non-template versions */}
-      {!isTemplate && isSelected && onSetMainVersion && (
-        <foreignObject x="0" y={nodeHeight + 8} width={nodeWidth} height="32">
-          <div className="flex justify-center">
-            {!isCurrent && (
+      {/* Action buttons when selected */}
+      {isSelected && showOptions && (
+        <foreignObject x="0" y={nodeHeight + 12} width={nodeWidth} height="120">
+          <div className="flex flex-col gap-1 bg-white border border-gray-200 rounded-lg p-2 shadow-lg">
+            {/* Template options */}
+            {isTemplate && onNewVersion && (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onSetMainVersion(version.id);
+                  onNewVersion();
+                  setShowOptions(false);
                 }}
-                className="text-xs"
+                className="text-xs gap-1 h-7"
               >
-                Set as Current
+                <Plus className="h-3 w-3" />
+                Create New Version
               </Button>
+            )}
+            
+            {/* Version options */}
+            {!isTemplate && (
+              <>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // TODO: Implement move forward
+                    setShowOptions(false);
+                  }}
+                  className="text-xs gap-1 h-7"
+                >
+                  <MoveRight className="h-3 w-3" />
+                  Move Forward
+                </Button>
+                
+                {onNewVersion && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onNewVersion();
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-1 h-7"
+                  >
+                    <Plus className="h-3 w-3" />
+                    Create Branch
+                  </Button>
+                )}
+                
+                {!isCurrent && onSetMainVersion && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSetMainVersion(version.id);
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-1 h-7"
+                  >
+                    <Settings className="h-3 w-3" />
+                    Set as Current
+                  </Button>
+                )}
+                
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // TODO: Implement duplicate
+                    setShowOptions(false);
+                  }}
+                  className="text-xs gap-1 h-7"
+                >
+                  <Copy className="h-3 w-3" />
+                  Duplicate
+                </Button>
+              </>
             )}
           </div>
         </foreignObject>

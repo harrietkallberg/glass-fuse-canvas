@@ -43,7 +43,14 @@ const CurveEditorSection = ({
       if (curveId) {
         try {
           const latestVersions = await getCurveVersions(curveId);
-          setVersions(latestVersions);
+          // Filter out template versions that shouldn't be shown
+          const filteredVersions = latestVersions.filter(v => 
+            v.version_number === 0 || 
+            v.version_number === "Template" || 
+            v.version_number > 0
+          );
+          console.log('Fetched versions:', filteredVersions);
+          setVersions(filteredVersions);
         } catch (error) {
           console.error('Error fetching versions:', error);
         }
@@ -159,26 +166,7 @@ const CurveEditorSection = ({
         </TabsContent>
         
         <TabsContent value="editor" className="space-y-4">
-          <CurveEditor
-            curveId={curveId}
-            currentVersionId={currentVersionId}
-            initialPhases={curveState.phases}
-            templatePhases={templateCurveData?.phases || []}
-            onSave={versionManager.handleSave}
-            notes={notes}
-            setNotes={setNotes}
-            materials={materials}
-            setMaterials={setMaterials}
-            tags={tags}
-            setTags={setTags}
-            selectedGlass={curveState.selectedGlass}
-            roomTemp={curveState.roomTemp}
-            glassLayers={curveState.glassLayers}
-            glassRadius={curveState.glassRadius}
-            firingType={curveState.firingType}
-            topTempMinutes={curveState.topTempMinutes}
-            ovenType={curveState.ovenType}
-          />
+          <div>Curve Editor will be shown here when a version is selected</div>
         </TabsContent>
       </Tabs>
     </div>

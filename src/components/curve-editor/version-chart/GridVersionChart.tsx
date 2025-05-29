@@ -80,15 +80,6 @@ const GridVersionChart = ({
               Track your project versions and progression
             </p>
           </div>
-          {hasTemplate && (
-            <Button 
-              onClick={onNewVersion}
-              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-            >
-              <Plus className="h-4 w-4" />
-              Create New Version
-            </Button>
-          )}
         </div>
 
         {/* Grid Canvas */}
@@ -120,16 +111,16 @@ const GridVersionChart = ({
               <defs>
                 <marker
                   id="arrowhead"
-                  markerWidth="10"
-                  markerHeight="7"
-                  refX="9"
-                  refY="3.5"
+                  markerWidth="12"
+                  markerHeight="8"
+                  refX="10"
+                  refY="4"
                   orient="auto"
                 >
                   <polygon
-                    points="0 0, 10 3.5, 0 7"
-                    fill="#6b7280"
-                    stroke="#6b7280"
+                    points="0 0, 12 4, 0 8"
+                    fill="#374151"
+                    stroke="#374151"
                     strokeWidth="1"
                   />
                 </marker>
@@ -160,6 +151,7 @@ const GridVersionChart = ({
                   isSelected={version.id === currentVersionId}
                   onVersionSelect={onVersionSelect}
                   onSetMainVersion={onSetMainVersion}
+                  onNewVersion={onNewVersion}
                   nodeWidth={NODE_WIDTH}
                   nodeHeight={NODE_HEIGHT}
                 />
@@ -171,7 +163,7 @@ const GridVersionChart = ({
         {/* Footer info */}
         <div className="mt-4 text-xs text-gray-500 text-center">
           {hasTemplate ? (
-            <span>Click nodes to select • Create new versions to track progress</span>
+            <span>Click nodes to view options • Template is the starting point for all versions</span>
           ) : (
             <span>Complete your project template to start creating versions</span>
           )}

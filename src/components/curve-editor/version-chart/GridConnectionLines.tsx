@@ -39,8 +39,8 @@ const GridConnectionLines = ({
           x2={templateCenterX}
           y2={templateBottomY + 60}
           stroke="#4f46e5"
-          strokeWidth="3"
-          strokeOpacity="0.8"
+          strokeWidth="4"
+          strokeOpacity="0.9"
           markerEnd="url(#arrowhead)"
         />
       )}
@@ -66,9 +66,9 @@ const GridConnectionLines = ({
               y1={branchStartY}
               x2={versionCenterX}
               y2={branchStartY}
-              stroke="#6b7280"
-              strokeWidth="2.5"
-              strokeOpacity="0.7"
+              stroke="#374151"
+              strokeWidth="4"
+              strokeOpacity="0.8"
             />
             
             {/* Vertical line down to version */}
@@ -77,9 +77,9 @@ const GridConnectionLines = ({
               y1={branchStartY}
               x2={versionCenterX}
               y2={branchEndY}
-              stroke="#6b7280"
-              strokeWidth="2.5"
-              strokeOpacity="0.7"
+              stroke="#374151"
+              strokeWidth="4"
+              strokeOpacity="0.8"
             />
             
             {/* Final connection to version node */}
@@ -88,29 +88,29 @@ const GridConnectionLines = ({
               y1={branchEndY}
               x2={versionCenterX}
               y2={versionTopY}
-              stroke="#6b7280"
-              strokeWidth="2.5"
-              strokeOpacity="0.7"
+              stroke="#374151"
+              strokeWidth="4"
+              strokeOpacity="0.8"
               markerEnd="url(#arrowhead)"
             />
 
-            {/* Connection points (small circles) */}
+            {/* Connection points (larger circles for visibility) */}
             <circle
               cx={templateCenterX}
               cy={branchStartY}
-              r="3"
+              r="4"
               fill="#4f46e5"
               stroke="white"
-              strokeWidth="1"
+              strokeWidth="2"
             />
             
             <circle
               cx={versionCenterX}
               cy={branchStartY}
-              r="2.5"
-              fill="#6b7280"
+              r="4"
+              fill="#374151"
               stroke="white"
-              strokeWidth="1"
+              strokeWidth="2"
             />
           </g>
         );
