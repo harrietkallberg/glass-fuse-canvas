@@ -1,9 +1,11 @@
 
 import React, { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
-import ProjectDetailsForm from "./ProjectDetailsForm";
-import TemplateCurveEditor from "./TemplateCurveEditor";
-import ProjectActions from "./ProjectActions";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import CurveEditor from "@/components/curve-editor/CurveEditor";
+import { Phase } from "@/utils/curveUtils";
 
 interface ProjectInformationSectionProps {
   isNewCurve: boolean;
@@ -13,9 +15,18 @@ interface ProjectInformationSectionProps {
   setProjectDescription: (description: string) => void;
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
+  onCreateProject: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
-  curveId?: string;
 }
+
+// Default template phases
+const defaultPhases: Phase[] = [
+  { id: "1", targetTemp: 540, duration: 60, holdTime: 0 },
+  { id: "2", targetTemp: 800, duration: 30, holdTime: 10 },
+  { id: "3", targetTemp: 520, duration: 60, holdTime: 30 },
+  { id: "4", targetTemp: 460, duration: 60, holdTime: 0 },
+  { id: "5", targetTemp: 20, duration: 60, holdTime: 0 }
+];
 
 const ProjectInformationSection = ({
   isNewCurve,
@@ -25,11 +36,31 @@ const ProjectInformationSection = ({
   setProjectDescription,
   templateCurveData,
   setTemplateCurveData,
-  onUpdateProject,
-  curveId
+  onCreateProject,
+  onUpdateProject
 }: ProjectInformationSectionProps) => {
+  const [localCurveData, setLocalCurveData] = useState(templateCurveData);
   const [hasChanges, setHasChanges] = useState(false);
-  const { user } = useAuth();
+  const temperatureUnit = "celsius"; // Fixed to celsius only
+
+  const handleSaveTemplate = (phases: Phase[]) => {
+    const curveData = {
+      phases,
+      temperatureUnit,
+    };
+    setLocalCurveData(curveData);
+    setTemplateCurveData(curveData);
+  };
+
+  const handleCreateProject = () => {
+    if (!projectTitle.trim()) {
+      return;
+    }
+    onCreateProject(projectTitle, projectDescription, { 
+      ...localCurveData, 
+      temperatureUnit
+    });
+  };
 
   const handleUpdateProject = () => {
     if (onUpdateProject) {
@@ -48,39 +79,89 @@ const ProjectInformationSection = ({
     if (!isNewCurve) setHasChanges(true);
   };
 
-  const handleTemplateConfirmed = () => {
-    // Template has been confirmed and saved to database
-    console.log('Template confirmed for project:', curveId);
-  };
-
   return (
     <div className="space-y-8">
-      <ProjectDetailsForm
-        projectTitle={projectTitle}
-        setProjectTitle={setProjectTitle}
-        projectDescription={projectDescription}
-        setProjectDescription={setProjectDescription}
-        isNewCurve={isNewCurve}
-        onTitleChange={handleTitleChange}
-        onDescriptionChange={handleDescriptionChange}
-      />
+      {/* Project Details */}
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+        <h3 className="text-xl font-semibold mb-4">Project Details</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="projectTitle">Project Name</Label>
+            <Input
+              id="projectTitle"
+              value={projectTitle}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder="Enter project name..."
+              className="mt-1"
+            />
+          </div>
+          
+          <div>
+            <Label htmlFor="projectDescription">Project Description</Label>
+            <Textarea
+              id="projectDescription"
+              value={projectDescription}
+              onChange={(e) => handleDescriptionChange(e.target.value)}
+              placeholder="Describe your project..."
+              className="mt-1"
+              rows={3}
+            />
+          </div>
 
-      <TemplateCurveEditor
-        isNewCurve={isNewCurve}
-        templateCurveData={templateCurveData}
-        setTemplateCurveData={setTemplateCurveData}
-        curveId={curveId}
-        projectTitle={projectTitle}
-        projectDescription={projectDescription}
-        onTemplateConfirmed={handleTemplateConfirmed}
-      />
+          <div>
+            <Label htmlFor="temperatureUnit">Temperature Unit</Label>
+            <div className="mt-1 p-2 bg-gray-50 rounded-md border">
+              <span className="text-sm text-gray-600">Celsius (°C)</span>
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <ProjectActions
-        isNewCurve={isNewCurve}
-        hasChanges={hasChanges}
-        projectTitle={projectTitle}
-        onUpdateProject={handleUpdateProject}
-      />
+      {/* Template Curve Configuration */}
+      <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-semibold">Template Curve Configuration</h3>
+          {!isNewCurve && (
+            <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+              Project Template
+            </span>
+          )}
+        </div>
+        
+        <div className="text-sm text-gray-600 mb-6">
+          {isNewCurve 
+            ? "Configure your base firing curve template. This will serve as the starting point for all versions."
+            : "This is your project's base template curve. Changes here affect the project identity."
+          }
+        </div>
+        
+        <CurveEditor
+          initialPhases={templateCurveData?.phases || defaultPhases}
+          onSave={isNewCurve ? handleSaveTemplate : undefined}
+          isTemplateMode={true}
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex justify-end">
+        {isNewCurve ? (
+          <Button 
+            onClick={handleCreateProject}
+            className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-8 py-3 text-lg"
+            disabled={!projectTitle.trim()}
+          >
+            Create Project
+          </Button>
+        ) : hasChanges && (
+          <Button 
+            onClick={handleUpdateProject}
+            className="bg-[#F97316] hover:bg-[#F97316]/90 text-white px-6 py-2"
+          >
+            Update Project Info
+          </Button>
+        )}
+      </div>
     </div>
   );
 };

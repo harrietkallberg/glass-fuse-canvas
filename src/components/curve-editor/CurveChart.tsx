@@ -48,8 +48,8 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
         </div>
       </div>
       
-      {/* Chart Container with Enhanced Glass Effect - Match project info site width */}
-      <div className="enhanced-glass-card p-6 h-96 w-full max-w-[800px] mx-auto">
+      {/* Chart Container with Enhanced Glass Effect */}
+      <div className="enhanced-glass-card p-6 h-96">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={combinedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.3)" />
@@ -65,7 +65,7 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
             <Tooltip 
               formatter={(value, name) => [
                 value ? `${value}°C` : 'N/A', 
-                name === 'currentTemp' ? 'Current Version' : 'Template'
+                name === 'currentTemp' ? 'Firing Curve' : 'Template'
               ]}
               labelFormatter={(value) => `Time: ${value} minutes`}
               contentStyle={{
@@ -80,12 +80,12 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
               <Line 
                 type="linear" 
                 dataKey="templateTemp" 
-                stroke="#9CA3AF" 
+                stroke="#D1D5DB" 
                 strokeWidth={3}
-                strokeDasharray="8 4"
-                name="Template"
+                strokeDasharray="5 5"
+                name="Template Curve"
                 connectNulls={false}
-                dot={{ fill: '#9CA3AF', strokeWidth: 2, r: 4 }}
+                dot={{ fill: '#D1D5DB', strokeWidth: 2, r: 4 }}
               />
             )}
             <Line 
@@ -93,7 +93,7 @@ const CurveChart = ({ phases, roomTemp = 20, templatePhases = [] }: CurveChartPr
               dataKey="currentTemp" 
               stroke="#F97316" 
               strokeWidth={3}
-              name="Current Version"
+              name="Firing Curve"
               connectNulls={false}
               dot={{ fill: '#F97316', strokeWidth: 2, r: 4 }}
             />

@@ -1,140 +1,97 @@
 
 import { useState, useEffect } from 'react';
-import { Phase } from '@/utils/curveUtils';
+import { Phase, generateChartData } from '@/utils/curveUtils';
 import { createGlassTemplatePhases } from '@/utils/glassTemplateUtils';
-import glassData from '@/tables.json';
+import glassData from '../tables.json';
 
-interface UseCurveStateProps {
-  initialPhases: Phase[];
-  templatePhases?: Phase[];
-  isTemplateMode?: boolean;
+export interface CurveState {
+  phases: Phase[];
+  activeTab: string;
+  selectedGlass: string;
+  roomTemp: number;
+  glassLayers: string;
+  glassRadius: string;
+  firingType: string;
+  topTempMinutes: string;
+  ovenType: string;
+  chartData: any[];
 }
 
-export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMode = false }: UseCurveStateProps) => {
-  // Phase management
-  const [phases, setPhases] = useState<Phase[]>(initialPhases);
+interface UseCurveStateProps {
+  initialPhases?: Phase[];
+}
+
+export const useCurveState = ({ initialPhases = [] }: UseCurveStateProps) => {
+  const [phases, setPhases] = useState<Phase[]>(
+    initialPhases.length > 0 
+      ? initialPhases 
+      : [{ id: '1', targetTemp: 700, duration: 30, holdTime: 10 }]
+  );
   
-  // Glass settings state - these represent the template configuration
-  const [selectedGlass, setSelectedGlass] = useState<string>("Bullseye Opaleszent");
+  const [activeTab, setActiveTab] = useState('chart');
+  const [selectedGlass, setSelectedGlass] = useState<string>(glassData.Glassorter[0].namn);
   const [roomTemp, setRoomTemp] = useState<number>(20);
   const [glassLayers, setGlassLayers] = useState<string>("1");
   const [glassRadius, setGlassRadius] = useState<string>("10");
   const [firingType, setFiringType] = useState<string>("f");
   const [topTempMinutes, setTopTempMinutes] = useState<string>("10");
   const [ovenType, setOvenType] = useState<string>("t");
+  const [chartData, setChartData] = useState<any[]>([]);
 
-  // Update phases when initialPhases change
+  // Find selected glass info
+  const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
+
   useEffect(() => {
-    setPhases(initialPhases);
-  }, [initialPhases]);
-
-  // Phase operations that match PhaseControls expected signatures
-  const updatePhase = (id: string, field: keyof Phase, value: number) => {
-    setPhases(prev => prev.map(phase => 
-      phase.id === id ? { ...phase, [field]: value } : phase
-    ));
-  };
+    const data = generateChartData(phases, roomTemp);
+    setChartData(data);
+  }, [phases, roomTemp]);
 
   const addPhase = () => {
-    const newPhase: Phase = {
+    const lastPhase = phases[phases.length - 1];
+    const newPhase = {
       id: Date.now().toString(),
-      targetTemp: 20,
-      duration: 60,
-      holdTime: 0
+      targetTemp: lastPhase?.targetTemp || 700,
+      duration: 30,
+      holdTime: 10,
     };
-    setPhases(prev => [...prev, newPhase]);
+    setPhases([...phases, newPhase]);
   };
 
   const removePhase = (id: string) => {
-    setPhases(prev => prev.filter(phase => phase.id !== id));
+    if (phases.length <= 1) return;
+    setPhases(phases.filter(phase => phase.id !== id));
   };
 
-  // Legacy functions for backward compatibility with other components
-  const updatePhaseByIndex = (index: number, updatedPhase: Partial<Phase>) => {
-    setPhases(prev => prev.map((phase, i) => 
-      i === index ? { ...phase, ...updatedPhase } : phase
-    ));
+  const updatePhase = (id: string, field: keyof Phase, value: number) => {
+    setPhases(
+      phases.map(phase => 
+        phase.id === id ? { ...phase, [field]: value } : phase
+      )
+    );
   };
 
-  const addPhaseWithData = (newPhase: Phase) => {
-    setPhases(prev => [...prev, newPhase]);
+  const applyGlassTemplate = () => {
+    if (!selectedGlassInfo) return;
+    
+    const newPhases = createGlassTemplatePhases(
+      selectedGlassInfo,
+      glassData,
+      firingType,
+      ovenType,
+      glassRadius,
+      glassLayers,
+      topTempMinutes,
+      roomTemp
+    );
+    
+    setPhases(newPhases);
   };
-
-  const removePhaseByIndex = (index: number) => {
-    setPhases(prev => prev.filter((_, i) => i !== index));
-  };
-
-  // Template generation - creates the master recipe from glass parameters
-  const generateTemplateFromSettings = () => {
-    try {
-      const selectedGlassInfo = glassData.Glassorter.find(glass => glass.namn === selectedGlass);
-      if (!selectedGlassInfo) {
-        throw new Error("Selected glass not found");
-      }
-
-      const templatePhases = createGlassTemplatePhases(
-        selectedGlassInfo,
-        glassData,
-        firingType,
-        ovenType,
-        glassRadius,
-        glassLayers,
-        topTempMinutes,
-        roomTemp
-      );
-
-      setPhases(templatePhases);
-      return templatePhases;
-    } catch (error) {
-      console.error('Error generating template:', error);
-      return null;
-    }
-  };
-
-  // Get selected glass information
-  const getSelectedGlassInfo = () => {
-    return glassData.Glassorter.find(glass => glass.namn === selectedGlass);
-  };
-
-  // Load template settings into the state (for editing template)
-  const loadTemplateSettings = (templateSettings: any) => {
-    if (templateSettings) {
-      setSelectedGlass(templateSettings.selectedGlass || "Bullseye Opaleszent");
-      setRoomTemp(templateSettings.roomTemp || 20);
-      setGlassLayers(templateSettings.glassLayers || "1");
-      setGlassRadius(templateSettings.glassRadius || "10");
-      setFiringType(templateSettings.firingType || "f");
-      setTopTempMinutes(templateSettings.topTempMinutes || "10");
-      setOvenType(templateSettings.ovenType || "t");
-    }
-  };
-
-  // Get current template settings
-  const getTemplateSettings = () => ({
-    selectedGlass,
-    roomTemp,
-    glassLayers,
-    glassRadius,
-    firingType,
-    topTempMinutes,
-    ovenType
-  });
 
   return {
-    // Phase state and operations (new signatures)
     phases,
     setPhases,
-    updatePhase,
-    addPhase,
-    removePhase,
-    
-    // Legacy phase operations (for backward compatibility)
-    updatePhaseByIndex,
-    addPhaseWithData,
-    removePhaseByIndex,
-    
-    // Glass settings (template configuration)
-    glassData,
+    activeTab,
+    setActiveTab,
     selectedGlass,
     setSelectedGlass,
     roomTemp,
@@ -149,11 +106,12 @@ export const useCurveState = ({ initialPhases, templatePhases = [], isTemplateMo
     setTopTempMinutes,
     ovenType,
     setOvenType,
-    
-    // Template operations
-    generateTemplateFromSettings,
-    getSelectedGlassInfo,
-    loadTemplateSettings,
-    getTemplateSettings,
+    chartData,
+    selectedGlassInfo,
+    addPhase,
+    removePhase,
+    updatePhase,
+    applyGlassTemplate,
+    glassData
   };
 };
