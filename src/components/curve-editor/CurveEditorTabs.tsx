@@ -15,9 +15,9 @@ interface CurveEditorTabsProps {
   templatePhases?: Phase[];
   roomTemp: number;
   currentVersionName: string;
-  onUpdatePhase: (index: number, field: keyof Phase, value: number) => void;
+  onUpdatePhase: (id: string, field: keyof Phase, value: number) => void;
   onAddPhase: () => void;
-  onRemovePhase: (index: number) => void;
+  onRemovePhase: (id: string) => void;
   notes: string;
   setNotes: (notes: string) => void;
   materials: string;
