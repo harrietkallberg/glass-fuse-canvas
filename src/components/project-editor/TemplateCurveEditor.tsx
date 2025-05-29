@@ -36,7 +36,7 @@ const TemplateCurveEditor = ({
   const [savedTemplatePhases, setSavedTemplatePhases] = useState<Phase[]>([]);
   const [previewPhases, setPreviewPhases] = useState<Phase[]>([]);
   const [showPreview, setShowPreview] = useState(false);
-  const [showTableView, setShowTableView] = useState(false);
+  const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
   const { user } = useAuth();
 
   // Initialize curve state - if template exists, use it, otherwise use empty
@@ -366,36 +366,39 @@ const TemplateCurveEditor = ({
         {showPreview && previewPhases.length > 0 && (
           <div className="space-y-6">
             <div className="border-t pt-6">
-              <div className="flex justify-between items-center mb-4">
-                <h4 className="text-lg font-medium">Glass Template Preview</h4>
-                
-                {/* Toggle Switch for Chart/Table View */}
-                <div className="flex items-center space-x-3">
-                  <Label htmlFor="view-toggle" className="text-sm">Chart</Label>
-                  <Switch
-                    id="view-toggle"
-                    checked={showTableView}
-                    onCheckedChange={setShowTableView}
-                  />
-                  <Label htmlFor="view-toggle" className="text-sm">Table</Label>
-                </div>
-              </div>
+              <h4 className="text-lg font-medium mb-4">Glass Template Preview</h4>
               
               {/* Visual Chart or Table View */}
               <div className="bg-white/60 p-4 rounded-xl mb-6">
-                {showTableView ? (
+                {viewMode === 'table' ? (
                   <PhasesTable 
                     phases={previewPhases}
                     updatePhase={() => {}} // Read-only preview
                     addPhase={() => {}} // Read-only preview
                     removePhase={() => {}} // Read-only preview
                     handleSave={() => {}} // Read-only preview
+                    selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                    showSlideSelector={true}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
                   />
                 ) : (
-                  <CurveChart 
-                    phases={previewPhases}
-                    roomTemp={curveState.roomTemp}
-                  />
+                  <>
+                    <PhasesTable 
+                      phases={[]} // Empty to just show the selector
+                      updatePhase={() => {}}
+                      addPhase={() => {}}
+                      removePhase={() => {}}
+                      handleSave={() => {}}
+                      showSlideSelector={true}
+                      viewMode={viewMode}
+                      onViewModeChange={setViewMode}
+                    />
+                    <CurveChart 
+                      phases={previewPhases}
+                      roomTemp={curveState.roomTemp}
+                    />
+                  </>
                 )}
               </div>
               
@@ -416,35 +419,38 @@ const TemplateCurveEditor = ({
         {/* Saved Template Display - Show saved template if it exists */}
         {savedTemplatePhases.length > 0 && !showPreview && (
           <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <h4 className="text-lg font-medium">Saved Template Curve</h4>
-              
-              {/* Toggle Switch for Chart/Table View */}
-              <div className="flex items-center space-x-3">
-                <Label htmlFor="saved-view-toggle" className="text-sm">Chart</Label>
-                <Switch
-                  id="saved-view-toggle"
-                  checked={showTableView}
-                  onCheckedChange={setShowTableView}
-                />
-                <Label htmlFor="saved-view-toggle" className="text-sm">Table</Label>
-              </div>
-            </div>
+            <h4 className="text-lg font-medium">Saved Template Curve</h4>
             
             <div className="bg-white/60 p-4 rounded-xl">
-              {showTableView ? (
+              {viewMode === 'table' ? (
                 <PhasesTable 
                   phases={savedTemplatePhases}
                   updatePhase={() => {}} // Read-only for saved template
                   addPhase={() => {}} // Read-only for saved template
                   removePhase={() => {}} // Read-only for saved template
                   handleSave={() => {}} // Read-only for saved template
+                  selectedGlassInfo={curveState.getSelectedGlassInfo()}
+                  showSlideSelector={true}
+                  viewMode={viewMode}
+                  onViewModeChange={setViewMode}
                 />
               ) : (
-                <CurveChart 
-                  phases={savedTemplatePhases}
-                  roomTemp={curveState.roomTemp}
-                />
+                <>
+                  <PhasesTable 
+                    phases={[]} // Empty to just show the selector
+                    updatePhase={() => {}}
+                    addPhase={() => {}}
+                    removePhase={() => {}}
+                    handleSave={() => {}}
+                    showSlideSelector={true}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                  />
+                  <CurveChart 
+                    phases={savedTemplatePhases}
+                    roomTemp={curveState.roomTemp}
+                  />
+                </>
               )}
             </div>
           </div>

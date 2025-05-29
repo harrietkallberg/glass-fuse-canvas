@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Phase {
   id: string;
@@ -22,13 +21,17 @@ interface PhasesTableProps {
     n_astemp?: number;
     [key: string]: any;
   };
+  showSlideSelector?: boolean;
+  viewMode?: 'chart' | 'table';
+  onViewModeChange?: (mode: 'chart' | 'table') => void;
 }
 
 const PhasesTable = ({
   phases,
-  ovenType,
-  setOvenType,
-  selectedGlassInfo
+  selectedGlassInfo,
+  showSlideSelector = false,
+  viewMode = 'chart',
+  onViewModeChange
 }: PhasesTableProps) => {
   // Extract annealing temperatures from the glass info
   const upperAnnealingTemp = selectedGlassInfo?.o_astemp;
@@ -58,66 +61,79 @@ const PhasesTable = ({
     const isLowerAnnealing = lowerAnnealingTemp && 
       Math.abs(phase.targetTemp - lowerAnnealingTemp) <= 5;
     
-    if (isUpperAnnealing) return 'bg-purple-100/50';
-    if (isLowerAnnealing) return 'bg-orange-100/50';
+    if (isUpperAnnealing) return 'bg-purple-50';
+    if (isLowerAnnealing) return 'bg-orange-50';
     return '';
   };
   
   return (
     <div className="space-y-4">
-      {setOvenType && (
-        <div className="mb-4">
-          <label htmlFor="ovenType" className="block text-sm font-medium mb-1">
-            Oven Type
-          </label>
-          <Select value={ovenType} onValueChange={setOvenType}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select oven type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="t">Top Heated (Toppvärme)</SelectItem>
-              <SelectItem value="s">Side Heated (Sidovärme)</SelectItem>
-            </SelectContent>
-          </Select>
+      {showSlideSelector && onViewModeChange && (
+        <div className="flex justify-end mb-4">
+          <div className="relative bg-gray-100 rounded-lg p-1 flex">
+            <button
+              onClick={() => onViewModeChange('chart')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                viewMode === 'chart'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Chart
+            </button>
+            <button
+              onClick={() => onViewModeChange('table')}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                viewMode === 'table'
+                  ? 'bg-white text-gray-900 shadow-sm'
+                  : 'text-gray-500 hover:text-gray-700'
+              }`}
+            >
+              Table
+            </button>
+          </div>
         </div>
       )}
 
-      <div className="grid grid-cols-4 gap-4 px-2 py-2 bg-muted/30 rounded-lg">
-        <div className="font-medium">Phase</div>
-        <div className="font-medium">Target Temp (°C)</div>
-        <div className="font-medium">Rise Time (min)</div>
-        <div className="font-medium">Hold Time (min)</div>
-      </div>
-      
-      {phases.map((phase, index) => {
-        const highlightClass = getHighlightColor(phase);
-        return (
-          <div 
-            key={phase.id} 
-            className={`grid grid-cols-4 gap-4 items-center px-2 py-1 rounded-lg ${highlightClass}`}
-          >
-            <div className="text-base">Phase {index + 1}</div>
-            
-            <div>
-              <div className={`h-9 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-base ${isAnnealingPhase(phase) ? 'border-2 border-amber-300' : ''}`}>
+      {/* Simple list layout */}
+      <div className="space-y-2">
+        {/* Header */}
+        <div className="grid grid-cols-4 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
+          <div>Phase</div>
+          <div>Target Temp (°C)</div>
+          <div>Rise Time (min)</div>
+          <div>Hold Time (min)</div>
+        </div>
+        
+        {/* Phase rows */}
+        {phases.map((phase, index) => {
+          const highlightClass = getHighlightColor(phase);
+          return (
+            <div 
+              key={phase.id} 
+              className={`grid grid-cols-4 gap-4 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors ${highlightClass} ${
+                isAnnealingPhase(phase) ? 'border-amber-300 border-2' : ''
+              }`}
+            >
+              <div className="text-sm font-medium text-gray-900">
+                Phase {index + 1}
+              </div>
+              
+              <div className="text-sm text-gray-700">
                 {phase.targetTemp}°C
               </div>
-            </div>
-            
-            <div>
-              <div className="h-9 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-base">
+              
+              <div className="text-sm text-gray-700">
                 {phase.duration} min
               </div>
-            </div>
-            
-            <div>
-              <div className="h-9 px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-base">
+              
+              <div className="text-sm text-gray-700">
                 {phase.holdTime} min
               </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   );
 };
