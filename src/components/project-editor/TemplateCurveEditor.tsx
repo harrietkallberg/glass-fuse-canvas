@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { useCurveState } from "@/hooks/useCurveState";
 import GlassSettings from "@/components/curve-editor/GlassSettings";
 import CurveChart from "@/components/curve-editor/CurveChart";
@@ -34,6 +36,7 @@ const TemplateCurveEditor = ({
   const [savedTemplatePhases, setSavedTemplatePhases] = useState<Phase[]>([]);
   const [previewPhases, setPreviewPhases] = useState<Phase[]>([]);
   const [showPreview, setShowPreview] = useState(false);
+  const [showTableView, setShowTableView] = useState(false);
   const { user } = useAuth();
 
   // Initialize curve state - if template exists, use it, otherwise use empty
@@ -273,6 +276,9 @@ const TemplateCurveEditor = ({
       setShowPreview(false);
       setPreviewPhases([]);
       
+      // Re-fetch the template data to ensure consistency
+      await fetchTemplateFromDatabase();
+      
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
       }
@@ -360,26 +366,36 @@ const TemplateCurveEditor = ({
         {showPreview && previewPhases.length > 0 && (
           <div className="space-y-6">
             <div className="border-t pt-6">
-              <h4 className="text-lg font-medium mb-4">Glass Template Preview</h4>
-              
-              {/* Visual Chart */}
-              <div className="bg-white/60 p-4 rounded-xl mb-6">
-                <CurveChart 
-                  phases={previewPhases}
-                  roomTemp={curveState.roomTemp}
-                />
+              <div className="flex justify-between items-center mb-4">
+                <h4 className="text-lg font-medium">Glass Template Preview</h4>
+                
+                {/* Toggle Switch for Chart/Table View */}
+                <div className="flex items-center space-x-3">
+                  <Label htmlFor="view-toggle" className="text-sm">Chart</Label>
+                  <Switch
+                    id="view-toggle"
+                    checked={showTableView}
+                    onCheckedChange={setShowTableView}
+                  />
+                  <Label htmlFor="view-toggle" className="text-sm">Table</Label>
+                </div>
               </div>
               
-              {/* Table View */}
+              {/* Visual Chart or Table View */}
               <div className="bg-white/60 p-4 rounded-xl mb-6">
-                <h5 className="text-md font-medium mb-3">Phase Details</h5>
-                <PhasesTable 
-                  phases={previewPhases}
-                  roomTemp={curveState.roomTemp}
-                  onUpdatePhase={() => {}} // Read-only preview
-                  onRemovePhase={() => {}} // Read-only preview
-                  isReadOnly={true}
-                />
+                {showTableView ? (
+                  <PhasesTable 
+                    phases={previewPhases}
+                    onUpdatePhase={() => {}} // Read-only preview
+                    onRemovePhase={() => {}} // Read-only preview
+                    isReadOnly={true}
+                  />
+                ) : (
+                  <CurveChart 
+                    phases={previewPhases}
+                    roomTemp={curveState.roomTemp}
+                  />
+                )}
               </div>
               
               {/* Confirm Button */}
@@ -399,12 +415,35 @@ const TemplateCurveEditor = ({
         {/* Saved Template Display - Show saved template if it exists */}
         {savedTemplatePhases.length > 0 && !showPreview && (
           <div className="space-y-4">
-            <h4 className="text-lg font-medium">Saved Template Curve</h4>
+            <div className="flex justify-between items-center">
+              <h4 className="text-lg font-medium">Saved Template Curve</h4>
+              
+              {/* Toggle Switch for Chart/Table View */}
+              <div className="flex items-center space-x-3">
+                <Label htmlFor="saved-view-toggle" className="text-sm">Chart</Label>
+                <Switch
+                  id="saved-view-toggle"
+                  checked={showTableView}
+                  onCheckedChange={setShowTableView}
+                />
+                <Label htmlFor="saved-view-toggle" className="text-sm">Table</Label>
+              </div>
+            </div>
+            
             <div className="bg-white/60 p-4 rounded-xl">
-              <CurveChart 
-                phases={savedTemplatePhases}
-                roomTemp={curveState.roomTemp}
-              />
+              {showTableView ? (
+                <PhasesTable 
+                  phases={savedTemplatePhases}
+                  onUpdatePhase={() => {}} // Read-only for saved template
+                  onRemovePhase={() => {}} // Read-only for saved template
+                  isReadOnly={true}
+                />
+              ) : (
+                <CurveChart 
+                  phases={savedTemplatePhases}
+                  roomTemp={curveState.roomTemp}
+                />
+              )}
             </div>
           </div>
         )}
