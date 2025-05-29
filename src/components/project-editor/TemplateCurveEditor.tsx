@@ -40,6 +40,7 @@ const TemplateCurveEditor = ({
   const [hasTemplateChanges, setHasTemplateChanges] = useState(false);
   const [isSavingTemplate, setIsSavingTemplate] = useState(false);
   const [originalPhases, setOriginalPhases] = useState<Phase[]>([]);
+  const [showConfirmButton, setShowConfirmButton] = useState(false);
   const { user } = useAuth();
   const temperatureUnit = "celsius";
 
@@ -89,6 +90,11 @@ const TemplateCurveEditor = ({
     setHasTemplateChanges(hasChanges || originalPhases.length === 0);
   };
 
+  const handleApplyGlassTemplate = () => {
+    // Show the confirm button when glass template is applied
+    setShowConfirmButton(true);
+  };
+
   const handleConfirmTemplate = async () => {
     if (!localCurveData?.phases || !user || !curveId) {
       toast({
@@ -129,6 +135,13 @@ const TemplateCurveEditor = ({
             version_number: 0,
             name: 'Template',
             is_current: false,
+            selected_glass: localCurveData.settings?.selectedGlass,
+            room_temp: localCurveData.settings?.roomTemp || 20,
+            glass_layers: localCurveData.settings?.glassLayers || "1",
+            glass_radius: localCurveData.settings?.glassRadius || "10",
+            firing_type: localCurveData.settings?.firingType || "f",
+            top_temp_minutes: localCurveData.settings?.topTempMinutes || "10",
+            oven_type: localCurveData.settings?.ovenType || "t",
           })
           .select()
           .single();
@@ -144,6 +157,30 @@ const TemplateCurveEditor = ({
         }
 
         templateVersion = newTemplateVersion;
+      } else {
+        // Update existing template version with current settings
+        const { error: updateError } = await supabase
+          .from('curve_versions')
+          .update({
+            selected_glass: localCurveData.settings?.selectedGlass,
+            room_temp: localCurveData.settings?.roomTemp || 20,
+            glass_layers: localCurveData.settings?.glassLayers || "1",
+            glass_radius: localCurveData.settings?.glassRadius || "10",
+            firing_type: localCurveData.settings?.firingType || "f",
+            top_temp_minutes: localCurveData.settings?.topTempMinutes || "10",
+            oven_type: localCurveData.settings?.ovenType || "t",
+          })
+          .eq('id', templateVersion.id);
+
+        if (updateError) {
+          console.error('Error updating template version:', updateError);
+          toast({
+            title: "Error",
+            description: "Failed to update project template",
+            variant: "destructive"
+          });
+          return;
+        }
       }
 
       // Delete existing template phases
@@ -178,6 +215,7 @@ const TemplateCurveEditor = ({
       // Update original phases to reflect the new saved state
       setOriginalPhases([...localCurveData.phases]);
       setHasTemplateChanges(false);
+      setShowConfirmButton(false);
       
       if (onTemplateConfirmed) {
         onTemplateConfirmed();
@@ -185,7 +223,7 @@ const TemplateCurveEditor = ({
       
       toast({
         title: "Template confirmed!",
-        description: "Project template has been saved and will be available across all project sections.",
+        description: "Project template has been saved and will be used for dashboard display.",
       });
 
     } catch (error) {
@@ -199,9 +237,6 @@ const TemplateCurveEditor = ({
       setIsSavingTemplate(false);
     }
   };
-
-  // Show button when there are template changes
-  const showConfirmButton = hasTemplateChanges;
 
   return (
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
@@ -220,23 +255,28 @@ const TemplateCurveEditor = ({
         initialPhases={localCurveData?.phases || defaultPhases}
         onSave={handleCurveChange}
         isTemplateMode={true}
+        onApplyGlassTemplate={handleApplyGlassTemplate}
       />
 
-      {/* Template Confirmation Button */}
+      {/* Template Confirmation Button - Shows after applying glass template */}
       {showConfirmButton && (
         <div className="mt-6 flex justify-center">
           <Button 
             onClick={handleConfirmTemplate}
             disabled={isSavingTemplate}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2"
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
           >
-            {isSavingTemplate ? "Saving..." : "Confirm Template for Project"}
+            {isSavingTemplate ? "Saving..." : "Confirm Template"}
           </Button>
-          {hasTemplateChanges && (
-            <div className="ml-3 flex items-center text-sm text-orange-600">
-              <span>• Unsaved template changes</span>
-            </div>
-          )}
+        </div>
+      )}
+
+      {/* Show unsaved changes indicator */}
+      {hasTemplateChanges && !showConfirmButton && (
+        <div className="mt-6 flex justify-center">
+          <div className="text-sm text-orange-600">
+            • Unsaved template changes
+          </div>
         </div>
       )}
     </div>

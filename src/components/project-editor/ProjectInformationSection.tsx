@@ -13,7 +13,6 @@ interface ProjectInformationSectionProps {
   setProjectDescription: (description: string) => void;
   templateCurveData: any;
   setTemplateCurveData: (data: any) => void;
-  onCreateProject?: (title: string, description: string, curveData: any) => void;
   onUpdateProject?: (title: string, description: string) => void;
   curveId?: string;
 }
@@ -49,6 +48,11 @@ const ProjectInformationSection = ({
     if (!isNewCurve) setHasChanges(true);
   };
 
+  const handleTemplateConfirmed = () => {
+    // Template has been confirmed and saved to database
+    console.log('Template confirmed for project:', curveId);
+  };
+
   return (
     <div className="space-y-8">
       <ProjectDetailsForm
@@ -68,6 +72,7 @@ const ProjectInformationSection = ({
         curveId={curveId}
         projectTitle={projectTitle}
         projectDescription={projectDescription}
+        onTemplateConfirmed={handleTemplateConfirmed}
       />
 
       <ProjectActions

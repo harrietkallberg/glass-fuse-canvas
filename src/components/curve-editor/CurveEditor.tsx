@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { calculateTotalTime } from '@/utils/curveUtils';
 import { useCurveState } from '@/hooks/useCurveState';
@@ -15,13 +14,15 @@ interface CurveEditorProps {
   templatePhases?: Phase[];
   onSave?: (phases: Phase[]) => void;
   isTemplateMode?: boolean;
+  onApplyGlassTemplate?: () => void;
 }
 
 const CurveEditor = ({ 
   initialPhases = [], 
   templatePhases = [],
   onSave, 
-  isTemplateMode = false 
+  isTemplateMode = false,
+  onApplyGlassTemplate
 }: CurveEditorProps) => {
   const curveState = useCurveState({ initialPhases });
   const [activeTab, setActiveTab] = React.useState("curve");
@@ -42,6 +43,11 @@ const CurveEditor = ({
   const handleApplyTemplate = () => {
     curveState.applyGlassTemplate();
     setShowTabs(true);
+    
+    // Call the parent callback to show confirm button
+    if (onApplyGlassTemplate) {
+      onApplyGlassTemplate();
+    }
   };
 
   return (
