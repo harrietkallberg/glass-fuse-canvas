@@ -165,7 +165,7 @@ const CurveTableView = ({
           <TableRow>
             <TableHead>Phase</TableHead>
             <TableHead>Temperature (°C)</TableHead>
-            <TableHead>Duration (min)</TableHead>
+            <TableHead>Phase Time (min)</TableHead>
             <TableHead>Velocity (°C/h)</TableHead>
             <TableHead>Hold Time (min)</TableHead>
             {!isTemplateMode && <TableHead>Status</TableHead>}

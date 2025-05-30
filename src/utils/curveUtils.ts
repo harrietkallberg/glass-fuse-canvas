@@ -66,7 +66,7 @@ export const generateChartData = (phases: Phase[], roomTemp: number): ChartDataP
   return data;
 };
 
-// Calculate total time for the curve
+// Calculate total time for the curve - just sum of phase times (duration only)
 export const calculateTotalTime = (phases: Phase[]): number => {
-  return phases.reduce((total, phase) => total + phase.duration + phase.holdTime, 0);
+  return phases.reduce((total, phase) => total + phase.duration, 0);
 };

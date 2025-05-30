@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface Phase {
@@ -124,7 +125,7 @@ const PhasesTable = ({
           <div className="grid grid-cols-5 gap-4 px-4 py-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-700">
             <div>Phase</div>
             <div>Target Temp (°C)</div>
-            <div>Rise Time (min)</div>
+            <div>Phase Time (min)</div>
             <div>Hold Time (min)</div>
             <div>Velocity (°C/h)</div>
           </div>
