@@ -44,11 +44,11 @@ const CurveEditorSection = ({
           const latestVersions = await getCurveVersions(curveId);
           // Filter out template versions that shouldn't be shown - only show template (version 0) or actual versions
           const filteredVersions = latestVersions.filter(v => {
-            const versionNum = v.version_number;
-            return versionNum === 0 || 
-                   versionNum === "Template" || 
-                   (typeof versionNum === 'number' && versionNum > 0) ||
-                   (typeof versionNum === 'string' && versionNum !== "Template" && versionNum !== "0");
+            const versionStr = String(v.version_number);
+            return v.version_number === 0 || 
+                   versionStr === "Template" || 
+                   (typeof v.version_number === 'number' && v.version_number > 0) ||
+                   (typeof v.version_number === 'string' && versionStr !== "Template" && versionStr !== "0");
           });
           console.log('Fetched versions:', filteredVersions);
           setVersions(filteredVersions);
