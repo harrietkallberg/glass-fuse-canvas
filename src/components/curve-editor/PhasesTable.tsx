@@ -40,19 +40,19 @@ const PhasesTable = ({
   const upperAnnealingTemp = selectedGlassInfo?.o_astemp;
   const lowerAnnealingTemp = selectedGlassInfo?.n_astemp;
   
-  // Calculate velocity for display - exactly matching Python script logic
+  // Get velocity for display - ALWAYS use stored velocity from template/Python calculations
   const getDisplayVelocity = (phase: Phase, index: number): number => {
-    // If velocity is stored in the phase (from glass template), use it with proper sign
+    // ALWAYS use the stored velocity if it exists (from glass template/Python script)
     if (phase.velocity !== undefined) {
-      return phase.velocity; // Keep the original sign as in Python script
+      return phase.velocity; // This comes from Python calculations and should never be recalculated
     }
     
-    // Fallback: calculate from temperature difference and duration (for manually created phases)
+    // Only for manually created phases that don't have stored velocity
+    // (This should rarely happen for template-based phases)
     const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
     const tempDifference = phase.targetTemp - startTemp;
     
     if (phase.duration > 0) {
-      // Match Python: velocity can be positive or negative based on temperature direction
       return Math.round((tempDifference / phase.duration) * 60);
     }
     return 0;
