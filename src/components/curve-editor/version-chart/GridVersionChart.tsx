@@ -32,14 +32,14 @@ const GridVersionChart = ({
     // Parse version number to determine position
     const versionStr = String(version.version_number);
     const parts = versionStr.split('.');
-    const major = parseInt(parts[0]) || 1;
+    const major = parseInt(parts[0]) || 0;
     const minor = parseInt(parts[1]) || 0;
     
-    // Major versions move horizontally (generations)
-    // Minor versions (drafts) stack vertically
+    // Major versions move horizontally (different columns)
+    // Minor versions stack vertically within the same major version (same column, different rows)
     return { 
       column: major + 1, // Start from column 2 (template is column 1)
-      row: minor + 1     // Start from row 1
+      row: minor + 1     // Minor versions stack vertically: 0.1 = row 1, 0.2 = row 2, etc.
     };
   };
 
