@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -186,10 +187,12 @@ const CurveEditorSection = ({
       // Get the current version number for branching logic
       const currentVersionNumber = currentVersionData.version.version_number;
       let nextVersionNumber;
+      let versionName;
       
       if (currentVersionNumber === 0 || currentVersionNumber === "Template") {
-        // Creating first version from template
-        nextVersionNumber = 1;
+        // Creating first version from template - use 0.1
+        nextVersionNumber = 0.1;
+        versionName = "Version 0.1";
       } else {
         // Parse current version to create a new draft
         const versionStr = String(currentVersionNumber);
@@ -198,7 +201,8 @@ const CurveEditorSection = ({
         const minor = parseInt(parts[1]) || 0;
         
         // Create next draft version (increment minor version)
-        nextVersionNumber = `${major}.${minor + 1}`;
+        nextVersionNumber = parseFloat(`${major}.${minor + 1}`);
+        versionName = `Version ${major}.${minor + 1}`;
       }
       
       // Prepare the curve state for the new version
@@ -218,7 +222,7 @@ const CurveEditorSection = ({
       // Create the duplicate version with correct arguments
       const newVersion = await saveCurveVersion(
         curveId,
-        `Draft ${nextVersionNumber}`,
+        versionName,
         newCurveState,
         currentVersionData.phases || []
       );

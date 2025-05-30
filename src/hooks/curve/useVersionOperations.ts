@@ -1,5 +1,3 @@
-
-
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../useAuth';
 import { Phase, calculateTotalTime } from '@/utils/curveUtils';
@@ -13,6 +11,13 @@ export const useVersionOperations = () => {
     // Handle template version
     if (semanticVersion === "Template" || semanticVersion === "0.0") {
       return 0;
+    }
+    
+    // Handle decimal versions like "0.1", "1.2", etc.
+    const numericVersion = parseFloat(semanticVersion);
+    if (!isNaN(numericVersion)) {
+      // Multiply by 10 to store decimals as integers (0.1 -> 1, 1.2 -> 12)
+      return Math.round(numericVersion * 10);
     }
     
     const parts = semanticVersion.split('.');
@@ -30,6 +35,12 @@ export const useVersionOperations = () => {
     // Handle template version
     if (versionNumber === 0) {
       return "Template";
+    }
+    
+    // Handle decimal versions (1 -> 0.1, 12 -> 1.2)
+    if (versionNumber < 100) {
+      const decimal = versionNumber / 10;
+      return decimal.toString();
     }
     
     const major = Math.floor(versionNumber / 10000);

@@ -110,55 +110,74 @@ const GridVersionNode = ({
       {isSelected && showOptions && (
         <foreignObject x="0" y={nodeHeight + 16} width={nodeWidth} height="140">
           <div className="flex flex-col gap-2 bg-white border border-gray-200 rounded-lg p-3 shadow-xl">
-            {/* Edit This Version */}
-            {onEditVersion && (
+            {/* Template nodes only show Duplicate to New Version */}
+            {isTemplate ? (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onEditVersion(version.id);
-                  setShowOptions(false);
-                }}
-                className="text-xs gap-2 h-8 justify-start"
-              >
-                <Edit className="h-3 w-3" />
-                Edit This Version
-              </Button>
-            )}
-            
-            {/* Duplicate to New Version */}
-            {onDuplicateVersion && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDuplicateVersion();
+                  onDuplicateVersion && onDuplicateVersion();
                   setShowOptions(false);
                 }}
                 className="text-xs gap-2 h-8 justify-start"
               >
                 <Copy className="h-3 w-3" />
-                Duplicate to New Version
+                Create New Version
               </Button>
-            )}
-            
-            {/* Move Forward - only for non-template versions */}
-            {!isTemplate && onMoveForward && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onMoveForward();
-                  setShowOptions(false);
-                }}
-                className="text-xs gap-2 h-8 justify-start"
-              >
-                <MoveRight className="h-3 w-3" />
-                Move Forward
-              </Button>
+            ) : (
+              <>
+                {/* Edit This Version - only for non-template versions */}
+                {onEditVersion && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditVersion(version.id);
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-2 h-8 justify-start"
+                  >
+                    <Edit className="h-3 w-3" />
+                    Edit This Version
+                  </Button>
+                )}
+                
+                {/* Duplicate to New Version */}
+                {onDuplicateVersion && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDuplicateVersion();
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-2 h-8 justify-start"
+                  >
+                    <Copy className="h-3 w-3" />
+                    Duplicate to New Version
+                  </Button>
+                )}
+                
+                {/* Move Forward */}
+                {onMoveForward && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onMoveForward();
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-2 h-8 justify-start"
+                  >
+                    <MoveRight className="h-3 w-3" />
+                    Move Forward
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </foreignObject>
