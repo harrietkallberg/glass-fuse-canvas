@@ -148,13 +148,11 @@ const CurveEditorSection = ({
   };
 
   const handleDuplicateVersion = async () => {
-    // Implementation for duplicating version
     console.log('Duplicating version:', currentVersionId);
     await versionManager.handleNewMainVersion();
   };
 
   const handleMoveForward = async () => {
-    // Implementation for moving version forward
     console.log('Moving version forward:', currentVersionId);
   };
 
@@ -185,14 +183,10 @@ const CurveEditorSection = ({
             </button>
           </div>
           <CurveEditor
-            curveData={curveState}
+            initialPhases={curveState.phases}
+            templatePhases={templateCurveData?.phases || []}
             onSave={versionManager.handleSave}
-            notes={notes}
-            setNotes={setNotes}
-            materials={materials}
-            setMaterials={setMaterials}
-            tags={tags}
-            setTags={setTags}
+            isVersionMode={true}
           />
         </div>
       )}
