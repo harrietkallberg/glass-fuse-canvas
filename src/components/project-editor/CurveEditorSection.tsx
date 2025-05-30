@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
 import { useCurves } from "@/hooks/useCurves";
@@ -29,7 +29,7 @@ const CurveEditorSection = ({
   templateCurveData,
   numberToSemantic
 }: CurveEditorSectionProps) => {
-  const [activeTab, setActiveTab] = useState<"chart" | "editor">("chart");
+  const [showEditor, setShowEditor] = useState(false);
   const [notes, setNotes] = useState("");
   const [materials, setMaterials] = useState("");
   const [tags, setTags] = useState("");
@@ -42,13 +42,12 @@ const CurveEditorSection = ({
       if (curveId) {
         try {
           const latestVersions = await getCurveVersions(curveId);
-          // Filter out template versions that shouldn't be shown - only show template (version 0) or actual versions
+          // Only show template (version 0) and actual user-created versions (version > 0)
           const filteredVersions = latestVersions.filter(v => {
             const versionStr = String(v.version_number);
             return v.version_number === 0 || 
                    versionStr === "Template" || 
-                   (typeof v.version_number === 'number' && v.version_number > 0) ||
-                   (typeof v.version_number === 'string' && versionStr !== "Template" && versionStr !== "0");
+                   (typeof v.version_number === 'number' && v.version_number > 0);
           });
           console.log('Fetched versions:', filteredVersions);
           setVersions(filteredVersions);
@@ -143,33 +142,60 @@ const CurveEditorSection = ({
     }
   };
 
-  const handleSetMainVersion = async (versionId: string) => {
-    // Implementation for setting main version
-    console.log('Setting main version:', versionId);
+  const handleEditVersion = async (versionId: string) => {
+    await handleVersionSelect(versionId);
+    setShowEditor(true);
+  };
+
+  const handleDuplicateVersion = async () => {
+    // Implementation for duplicating version
+    console.log('Duplicating version:', currentVersionId);
+    await versionManager.handleNewMainVersion();
+  };
+
+  const handleMoveForward = async () => {
+    // Implementation for moving version forward
+    console.log('Moving version forward:', currentVersionId);
   };
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "chart" | "editor")}>
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="chart">Version Flow</TabsTrigger>
-          <TabsTrigger value="editor">Curve Editor</TabsTrigger>
-        </TabsList>
-        
-        <TabsContent value="chart" className="space-y-4">
-          <CurveVersionChart
-            versions={versions}
-            currentVersionId={currentVersionId}
-            onVersionSelect={handleVersionSelect}
-            onNewVersion={versionManager.handleNewMainVersion}
-            onSetMainVersion={handleSetMainVersion}
+      {/* Version Flow Chart */}
+      <CurveVersionChart
+        versions={versions}
+        currentVersionId={currentVersionId}
+        onVersionSelect={handleVersionSelect}
+        onEditVersion={handleEditVersion}
+        onDuplicateVersion={handleDuplicateVersion}
+        onMoveForward={handleMoveForward}
+      />
+      
+      {/* Curve Editor - shown when editing a version */}
+      {showEditor && currentVersionData && (
+        <div className="mt-8">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-semibold text-gray-800">
+              Editing {currentVersionData.version?.version_number === 0 ? 'Template' : `Version ${currentVersionData.version?.version_number}`}
+            </h3>
+            <button
+              onClick={() => setShowEditor(false)}
+              className="text-gray-500 hover:text-gray-700"
+            >
+              ✕ Close Editor
+            </button>
+          </div>
+          <CurveEditor
+            curveData={curveState}
+            onSave={versionManager.handleSave}
+            notes={notes}
+            setNotes={setNotes}
+            materials={materials}
+            setMaterials={setMaterials}
+            tags={tags}
+            setTags={setTags}
           />
-        </TabsContent>
-        
-        <TabsContent value="editor" className="space-y-4">
-          <div>Curve Editor will be shown here when a version is selected</div>
-        </TabsContent>
-      </Tabs>
+        </div>
+      )}
     </div>
   );
 };

@@ -11,26 +11,36 @@ const GridVersionChart = ({
   currentVersionId, 
   onVersionSelect, 
   onNewVersion,
-  onSetMainVersion
+  onSetMainVersion,
+  onEditVersion,
+  onDuplicateVersion,
+  onMoveForward
 }: CurveVersionChartProps) => {
   // Grid configuration
   const GRID_SIZE = 120;
-  const NODE_WIDTH = 160;
-  const NODE_HEIGHT = 90;
-  const GRID_PADDING = 80;
+  const NODE_WIDTH = 180;
+  const NODE_HEIGHT = 100;
+  const GRID_PADDING = 100;
 
-  // Calculate grid positions for versions
+  // Calculate grid positions for versions based on template-root structure
   const getGridPosition = (version: any) => {
-    // Template is always at (1,1)
+    // Template (ROOT) is always at (1,1)
     if (version.version_number === 0 || version.version_number === "Template") {
       return { column: 1, row: 1 };
     }
     
-    // For now, versions start at column 1, incrementing rows
-    // Later this will be user-configurable for horizontal movement
-    const otherVersions = versions.filter(v => v.version_number !== 0 && v.version_number !== "Template");
-    const versionIndex = otherVersions.indexOf(version);
-    return { column: 1, row: versionIndex + 2 };
+    // Parse version number to determine position
+    const versionStr = String(version.version_number);
+    const parts = versionStr.split('.');
+    const major = parseInt(parts[0]) || 1;
+    const minor = parseInt(parts[1]) || 0;
+    
+    // Major versions move horizontally (generations)
+    // Minor versions (drafts) stack vertically
+    return { 
+      column: major + 1, // Start from column 2 (template is column 1)
+      row: minor + 1     // Start from row 1
+    };
   };
 
   // Convert grid position to pixel coordinates
@@ -50,8 +60,8 @@ const GridVersionChart = ({
         <div className="bg-white rounded-2xl border border-gray-200 p-8 shadow-sm">
           <div className="text-center text-gray-500 py-12">
             <div className="mb-4">
-              <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                <Plus className="h-8 w-8 text-gray-400" />
+              <div className="w-16 h-16 mx-auto bg-gradient-to-br from-orange-100 to-teal-100 rounded-full flex items-center justify-center mb-4">
+                <Plus className="h-8 w-8 text-orange-500" />
               </div>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No Template Created</h3>
@@ -67,7 +77,7 @@ const GridVersionChart = ({
   // Calculate canvas dimensions
   const maxColumn = Math.max(...versions.map(v => getGridPosition(v).column));
   const maxRow = Math.max(...versions.map(v => getGridPosition(v).row));
-  const canvasWidth = Math.max(GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE), 1000);
+  const canvasWidth = Math.max(GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE), 1200);
   const canvasHeight = Math.max(GRID_PADDING * 2 + maxRow * (NODE_HEIGHT + GRID_SIZE), 600);
 
   return (
@@ -84,7 +94,7 @@ const GridVersionChart = ({
         </div>
 
         {/* Grid Canvas */}
-        <div className="overflow-auto border border-gray-100 rounded-xl bg-gradient-to-br from-gray-50/50 to-blue-50/30 shadow-inner">
+        <div className="overflow-auto border border-gray-100 rounded-xl bg-gradient-to-br from-orange-50/30 to-teal-50/30 shadow-inner">
           <svg
             width={canvasWidth}
             height={canvasHeight}
@@ -103,29 +113,10 @@ const GridVersionChart = ({
                   fill="none"
                   stroke="#d1d5db"
                   strokeWidth="1"
-                  strokeDasharray="3,3"
-                  opacity="0.4"
+                  strokeDasharray="5,5"
+                  opacity="0.3"
                 />
               </pattern>
-              
-              {/* Arrow marker for connections */}
-              <defs>
-                <marker
-                  id="arrowhead"
-                  markerWidth="12"
-                  markerHeight="8"
-                  refX="10"
-                  refY="4"
-                  orient="auto"
-                >
-                  <polygon
-                    points="0 0, 12 4, 0 8"
-                    fill="#374151"
-                    stroke="#374151"
-                    strokeWidth="1"
-                  />
-                </marker>
-              </defs>
             </defs>
             
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -152,7 +143,9 @@ const GridVersionChart = ({
                   isSelected={version.id === currentVersionId}
                   onVersionSelect={onVersionSelect}
                   onSetMainVersion={onSetMainVersion}
-                  onNewVersion={onNewVersion}
+                  onEditVersion={onEditVersion}
+                  onDuplicateVersion={onDuplicateVersion}
+                  onMoveForward={onMoveForward}
                   nodeWidth={NODE_WIDTH}
                   nodeHeight={NODE_HEIGHT}
                 />
@@ -164,7 +157,7 @@ const GridVersionChart = ({
         {/* Footer info */}
         <div className="mt-4 text-xs text-gray-500 text-center">
           {hasTemplate ? (
-            <span>Click nodes to view options • Template is the starting point for all versions</span>
+            <span>Click nodes to view options • Template is the root of all versions</span>
           ) : (
             <span>Complete your project template to start creating versions</span>
           )}

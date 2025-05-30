@@ -11,8 +11,11 @@ export interface CurveVersionChartProps {
   versions: Version[];
   currentVersionId: string | null;
   onVersionSelect: (versionId: string) => void;
-  onNewVersion: () => void;
+  onNewVersion?: () => void;
   onSetMainVersion?: (versionId: string) => void;
+  onEditVersion?: (versionId: string) => void;
+  onDuplicateVersion?: () => void;
+  onMoveForward?: () => void;
   selectedVersionColor?: string;
 }
 

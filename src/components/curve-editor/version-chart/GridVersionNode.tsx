@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, MoveRight, Settings, Copy, Trash2 } from "lucide-react";
+import { Edit, Copy, MoveRight } from "lucide-react";
 import { Version } from './types';
 
 interface GridVersionNodeProps {
@@ -10,7 +10,9 @@ interface GridVersionNodeProps {
   isSelected: boolean;
   onVersionSelect: (versionId: string) => void;
   onSetMainVersion?: (versionId: string) => void;
-  onNewVersion?: () => void;
+  onEditVersion?: (versionId: string) => void;
+  onDuplicateVersion?: () => void;
+  onMoveForward?: () => void;
   nodeWidth: number;
   nodeHeight: number;
 }
@@ -21,18 +23,20 @@ const GridVersionNode = ({
   isSelected,
   onVersionSelect,
   onSetMainVersion,
-  onNewVersion,
+  onEditVersion,
+  onDuplicateVersion,
+  onMoveForward,
   nodeWidth,
   nodeHeight
 }: GridVersionNodeProps) => {
   const [showOptions, setShowOptions] = useState(false);
-  const isTemplate = version.version_number === 0 || version.version_number === "Template";
+  const isTemplate = version.version_number === 0 || String(version.version_number) === "Template";
   const isCurrent = version.is_current;
 
-  // Colors
-  const templateColor = "#8B5CF6"; // Purple for template
-  const versionColor = "#6B7280"; // Gray for versions
-  const selectedColor = "#3B82F6"; // Blue for selected
+  // Orange/Teal color scheme
+  const templateColor = "#f97316"; // Orange-500 for template (ROOT)
+  const versionColor = "#14b8a6"; // Teal-500 for versions
+  const selectedColor = "#0ea5e9"; // Sky-500 for selected
 
   const nodeColor = isTemplate ? templateColor : versionColor;
   const strokeColor = isSelected ? selectedColor : nodeColor;
@@ -51,7 +55,7 @@ const GridVersionNode = ({
           y="-3"
           width={nodeWidth + 6}
           height={nodeHeight + 6}
-          rx="8"
+          rx="12"
           fill="none"
           stroke={selectedColor}
           strokeWidth="2"
@@ -65,30 +69,37 @@ const GridVersionNode = ({
         y="0"
         width={nodeWidth}
         height={nodeHeight}
-        rx="8"
+        rx="12"
         fill="white"
         stroke={strokeColor}
-        strokeWidth={isSelected ? "2" : "1"}
-        className="cursor-pointer transition-all duration-200 hover:stroke-2 drop-shadow-sm"
+        strokeWidth={isSelected ? "3" : "2"}
+        className="cursor-pointer transition-all duration-200 hover:stroke-3 drop-shadow-lg"
         onClick={handleNodeClick}
       />
       
       {/* Node content */}
-      <foreignObject x="8" y="8" width={nodeWidth - 16} height={nodeHeight - 16}>
+      <foreignObject x="12" y="12" width={nodeWidth - 24} height={nodeHeight - 24}>
         <div className="h-full flex flex-col justify-center items-center text-center">
           {/* Version label */}
-          <div className={`font-semibold text-sm ${isSelected ? 'text-blue-600' : 'text-gray-700'}`}>
-            {isTemplate ? "Template" : `v${version.version_number}`}
+          <div className={`font-bold text-base ${isSelected ? 'text-sky-600' : isTemplate ? 'text-orange-600' : 'text-teal-600'}`}>
+            {isTemplate ? "ROOT" : `v${version.version_number}`}
           </div>
           
+          {/* Template subtitle */}
+          {isTemplate && (
+            <div className="text-xs text-orange-500 font-medium">
+              Template
+            </div>
+          )}
+          
           {/* Date */}
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs text-gray-500 mt-2">
             {new Date(version.created_at).toLocaleDateString()}
           </div>
           
           {/* Current badge */}
           {isCurrent && !isTemplate && (
-            <div className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full mt-2">
+            <div className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded-full mt-2 font-medium">
               Current
             </div>
           )}
@@ -97,88 +108,57 @@ const GridVersionNode = ({
       
       {/* Action buttons when selected */}
       {isSelected && showOptions && (
-        <foreignObject x="0" y={nodeHeight + 12} width={nodeWidth} height="120">
-          <div className="flex flex-col gap-1 bg-white border border-gray-200 rounded-lg p-2 shadow-lg">
-            {/* Template options */}
-            {isTemplate && onNewVersion && (
+        <foreignObject x="0" y={nodeHeight + 16} width={nodeWidth} height="140">
+          <div className="flex flex-col gap-2 bg-white border border-gray-200 rounded-lg p-3 shadow-xl">
+            {/* Edit This Version */}
+            {onEditVersion && (
               <Button
                 size="sm"
                 variant="outline"
                 onClick={(e) => {
                   e.stopPropagation();
-                  onNewVersion();
+                  onEditVersion(version.id);
                   setShowOptions(false);
                 }}
-                className="text-xs gap-1 h-7"
+                className="text-xs gap-2 h-8 justify-start"
               >
-                <Plus className="h-3 w-3" />
-                Create New Version
+                <Edit className="h-3 w-3" />
+                Edit This Version
               </Button>
             )}
             
-            {/* Version options */}
-            {!isTemplate && (
-              <>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // TODO: Implement move forward
-                    setShowOptions(false);
-                  }}
-                  className="text-xs gap-1 h-7"
-                >
-                  <MoveRight className="h-3 w-3" />
-                  Move Forward
-                </Button>
-                
-                {onNewVersion && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onNewVersion();
-                      setShowOptions(false);
-                    }}
-                    className="text-xs gap-1 h-7"
-                  >
-                    <Plus className="h-3 w-3" />
-                    Create Branch
-                  </Button>
-                )}
-                
-                {!isCurrent && onSetMainVersion && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onSetMainVersion(version.id);
-                      setShowOptions(false);
-                    }}
-                    className="text-xs gap-1 h-7"
-                  >
-                    <Settings className="h-3 w-3" />
-                    Set as Current
-                  </Button>
-                )}
-                
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    // TODO: Implement duplicate
-                    setShowOptions(false);
-                  }}
-                  className="text-xs gap-1 h-7"
-                >
-                  <Copy className="h-3 w-3" />
-                  Duplicate
-                </Button>
-              </>
+            {/* Duplicate to New Version */}
+            {onDuplicateVersion && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDuplicateVersion();
+                  setShowOptions(false);
+                }}
+                className="text-xs gap-2 h-8 justify-start"
+              >
+                <Copy className="h-3 w-3" />
+                Duplicate to New Version
+              </Button>
+            )}
+            
+            {/* Move Forward - only for non-template versions */}
+            {!isTemplate && onMoveForward && (
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMoveForward();
+                  setShowOptions(false);
+                }}
+                className="text-xs gap-2 h-8 justify-start"
+              >
+                <MoveRight className="h-3 w-3" />
+                Move Forward
+              </Button>
             )}
           </div>
         </foreignObject>

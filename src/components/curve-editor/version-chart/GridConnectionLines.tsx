@@ -17,98 +17,59 @@ const GridConnectionLines = ({
   nodeWidth,
   nodeHeight
 }: GridConnectionLinesProps) => {
-  const templateVersion = versions.find(v => v.version_number === 0 || v.version_number === "Template");
-  const otherVersions = versions.filter(v => v.version_number !== 0 && v.version_number !== "Template");
+  const templateVersion = versions.find(v => v.version_number === 0 || String(v.version_number) === "Template");
+  const otherVersions = versions.filter(v => v.version_number !== 0 && String(v.version_number) !== "Template");
 
   if (!templateVersion || otherVersions.length === 0) return null;
 
   const templatePos = getGridPosition(templateVersion);
   const templatePixels = gridToPixels(templatePos.column, templatePos.row);
 
-  // Template center point (bottom center for outgoing connections)
-  const templateCenterX = templatePixels.x + nodeWidth / 2;
-  const templateBottomY = templatePixels.y + nodeHeight;
+  // Template center point (right side for outgoing connections)
+  const templateRightX = templatePixels.x + nodeWidth;
+  const templateCenterY = templatePixels.y + nodeHeight / 2;
 
   return (
     <g>
-      {/* Main vertical trunk from template */}
-      {otherVersions.length > 0 && (
-        <line
-          x1={templateCenterX}
-          y1={templateBottomY}
-          x2={templateCenterX}
-          y2={templateBottomY + 60}
-          stroke="#4f46e5"
-          strokeWidth="4"
-          strokeOpacity="0.9"
-          markerEnd="url(#arrowhead)"
-        />
-      )}
-
-      {otherVersions.map((version, index) => {
+      {otherVersions.map((version) => {
         const versionPos = getGridPosition(version);
         const versionPixels = gridToPixels(versionPos.column, versionPos.row);
         
-        // Version center point (top center for incoming connections)
-        const versionCenterX = versionPixels.x + nodeWidth / 2;
-        const versionTopY = versionPixels.y;
+        // Version center point (left side for incoming connections)
+        const versionLeftX = versionPixels.x;
+        const versionCenterY = versionPixels.y + nodeHeight / 2;
 
-        // Connection path: vertical down from template trunk, then horizontal to version
-        const trunkY = templateBottomY + 60;
-        const branchStartY = trunkY;
-        const branchEndY = versionTopY - 20;
-
+        // Direct horizontal connection from template to version
         return (
           <g key={`connection-${version.id}`}>
-            {/* Horizontal branch from trunk to version column */}
+            {/* Main connection line - dashed orange to teal gradient */}
             <line
-              x1={templateCenterX}
-              y1={branchStartY}
-              x2={versionCenterX}
-              y2={branchStartY}
-              stroke="#374151"
-              strokeWidth="4"
+              x1={templateRightX}
+              y1={templateCenterY}
+              x2={versionLeftX}
+              y2={versionCenterY}
+              stroke="#f97316"
+              strokeWidth="3"
+              strokeDasharray="8,4"
               strokeOpacity="0.8"
+              className="transition-all duration-300"
             />
             
-            {/* Vertical line down to version */}
-            <line
-              x1={versionCenterX}
-              y1={branchStartY}
-              x2={versionCenterX}
-              y2={branchEndY}
-              stroke="#374151"
-              strokeWidth="4"
-              strokeOpacity="0.8"
-            />
-            
-            {/* Final connection to version node */}
-            <line
-              x1={versionCenterX}
-              y1={branchEndY}
-              x2={versionCenterX}
-              y2={versionTopY}
-              stroke="#374151"
-              strokeWidth="4"
-              strokeOpacity="0.8"
-              markerEnd="url(#arrowhead)"
-            />
-
-            {/* Connection points (larger circles for visibility) */}
+            {/* Connection points */}
             <circle
-              cx={templateCenterX}
-              cy={branchStartY}
-              r="4"
-              fill="#4f46e5"
+              cx={templateRightX}
+              cy={templateCenterY}
+              r="6"
+              fill="#f97316"
               stroke="white"
               strokeWidth="2"
             />
             
             <circle
-              cx={versionCenterX}
-              cy={branchStartY}
-              r="4"
-              fill="#374151"
+              cx={versionLeftX}
+              cy={versionCenterY}
+              r="6"
+              fill="#14b8a6"
               stroke="white"
               strokeWidth="2"
             />
