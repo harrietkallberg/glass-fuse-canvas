@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../useAuth';
 import { Phase, calculateTotalTime } from '@/utils/curveUtils';
@@ -63,7 +62,10 @@ export const useVersionOperations = () => {
     curveState: any,
     phases: Phase[]
   ) => {
-    if (!user) return null;
+    if (!user) {
+      console.error('No user found when trying to save curve version');
+      return null;
+    }
 
     console.log('Starting to save curve version:', { curveId, versionName, curveState, phases });
 
@@ -103,7 +105,7 @@ export const useVersionOperations = () => {
 
       if (versionError) {
         console.error('Error creating version:', versionError);
-        return null;
+        throw new Error(`Failed to create version: ${versionError.message}`);
       }
 
       console.log('Successfully created version:', versionData);
@@ -117,7 +119,7 @@ export const useVersionOperations = () => {
 
       if (updateError) {
         console.error('Error updating existing versions:', updateError);
-        return null;
+        throw new Error(`Failed to update existing versions: ${updateError.message}`);
       }
 
       // Finally, set the new version as current
@@ -128,22 +130,33 @@ export const useVersionOperations = () => {
 
       if (setCurrentError) {
         console.error('Error setting version as current:', setCurrentError);
-        return null;
+        throw new Error(`Failed to set version as current: ${setCurrentError.message}`);
       }
 
       // Save phases with velocity values
       if (phases && phases.length > 0) {
         const phasesToInsert = phases.map((phase, index) => {
-          console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
+          console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, holdTime=${phase.holdTime}, velocity=${phase.velocity}`);
+          
+          // Validate phase data
+          if (typeof phase.targetTemp !== 'number' || isNaN(phase.targetTemp)) {
+            console.warn(`Phase ${index} has invalid targetTemp: ${phase.targetTemp}, setting to 0`);
+          }
+          if (typeof phase.holdTime !== 'number' || isNaN(phase.holdTime)) {
+            console.warn(`Phase ${index} has invalid holdTime: ${phase.holdTime}, setting to 0`);
+          }
+          
           return {
             version_id: versionData.id,
             phase_order: index,
-            target_temp: phase.targetTemp,
-            duration: phase.duration,
-            hold_time: phase.holdTime,
-            velocity: phase.velocity || 0, // Include velocity in database save
+            target_temp: Number(phase.targetTemp) || 0,
+            duration: Number(phase.duration) || 0,
+            hold_time: Number(phase.holdTime) || 0,
+            velocity: Number(phase.velocity) || 0,
           };
         });
+
+        console.log('Inserting phases:', phasesToInsert);
 
         const { error: phasesError } = await supabase
           .from('curve_phases')
@@ -151,7 +164,7 @@ export const useVersionOperations = () => {
 
         if (phasesError) {
           console.error('Error saving phases:', phasesError);
-          return null;
+          throw new Error(`Failed to save phases: ${phasesError.message}`);
         }
 
         console.log('Successfully saved phases with velocities');
@@ -162,7 +175,7 @@ export const useVersionOperations = () => {
       return { ...versionData, is_current: true };
     } catch (error) {
       console.error('Error in saveCurveVersion:', error);
-      return null;
+      throw error; // Re-throw to let the caller handle it
     }
   };
 

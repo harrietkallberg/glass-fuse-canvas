@@ -127,13 +127,16 @@ export const useCurveVersionManager = ({
         tags: currentVersionData.version.tags || ""
       };
       
-      // Create the duplicate version with the exact same phases and velocities
-      const newVersionPhases = currentVersionData.phases ? currentVersionData.phases.map((phase: any) => ({
-        targetTemp: phase.target_temp || phase.targetTemp || 0,
-        duration: phase.duration || 0,
-        holdTime: phase.hold_time || phase.holdTime || 0,
-        velocity: phase.velocity || 0
-      })) : [];
+      // Create the duplicate version with properly mapped phase data
+      const newVersionPhases = currentVersionData.phases ? currentVersionData.phases.map((phase: any) => {
+        console.log('Mapping phase for duplication:', phase);
+        return {
+          targetTemp: phase.target_temp || 0, // Use target_temp from DB
+          duration: phase.duration || 0,
+          holdTime: phase.hold_time || 0, // Use hold_time from DB
+          velocity: phase.velocity || 0
+        };
+      }) : [];
       
       console.log('Creating new version with phases:', newVersionPhases);
       console.log('Creating new version with curve state:', newCurveState);
@@ -166,10 +169,10 @@ export const useCurveVersionManager = ({
           }
         }, 500);
       } else {
-        console.error('Failed to create new version');
+        console.error('Failed to create new version - saveCurveVersion returned null');
         toast({
           title: "Error",
-          description: "Failed to create new version",
+          description: "Failed to create new version - please check the console for details",
           variant: "destructive"
         });
       }
@@ -177,7 +180,7 @@ export const useCurveVersionManager = ({
       console.error('Error duplicating version:', error);
       toast({
         title: "Error",
-        description: "Failed to duplicate version",
+        description: `Failed to duplicate version: ${error.message || 'Unknown error'}`,
         variant: "destructive"
       });
     }
