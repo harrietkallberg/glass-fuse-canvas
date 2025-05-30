@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -36,11 +35,12 @@ const CurveEditorSection = ({
   
   const { getCurveVersions, loadCurveVersion, saveCurveVersion, getNextVersionNumber } = useCurves();
 
-  // Real-time version fetching with cleanup
+  // Real-time version fetching with cleanup - more frequent updates
   useEffect(() => {
     const fetchVersions = async () => {
       if (curveId) {
         try {
+          console.log('CurveEditorSection - Fetching versions for curve:', curveId);
           const latestVersions = await getCurveVersions(curveId);
           
           // Filter to only show template and properly created versions
@@ -55,8 +55,13 @@ const CurveEditorSection = ({
                     !v.name.startsWith('Version 1.0')); // Exclude auto-created versions
           });
           
-          console.log('Filtered versions:', filteredVersions);
-          setVersions(filteredVersions);
+          console.log('CurveEditorSection - Filtered versions:', filteredVersions);
+          
+          // Only update if the versions have actually changed
+          if (JSON.stringify(filteredVersions) !== JSON.stringify(versions)) {
+            console.log('CurveEditorSection - Versions changed, updating state');
+            setVersions(filteredVersions);
+          }
         } catch (error) {
           console.error('Error fetching versions:', error);
         }
@@ -66,11 +71,11 @@ const CurveEditorSection = ({
     // Initial fetch
     fetchVersions();
 
-    // Set up polling for real-time updates
-    const interval = setInterval(fetchVersions, 3000); // Every 3 seconds
+    // Set up polling for real-time updates - every 1 second for better responsiveness
+    const interval = setInterval(fetchVersions, 1000);
 
     return () => clearInterval(interval);
-  }, [curveId, getCurveVersions, setVersions]);
+  }, [curveId, getCurveVersions, setVersions, versions]);
 
   // Update form fields when current version data changes
   useEffect(() => {
@@ -233,20 +238,7 @@ const CurveEditorSection = ({
       if (newVersion) {
         console.log('Successfully created new version:', newVersion);
         
-        // Refresh versions to show the new node
-        const refreshedVersions = await getCurveVersions(curveId);
-        const filteredVersions = refreshedVersions.filter(v => {
-          const versionStr = String(v.version_number);
-          return v.version_number === 0 || 
-                 versionStr === "Template" || 
-                 (typeof v.version_number === 'number' && 
-                  v.version_number > 0 && 
-                  v.name && 
-                  v.name !== 'Version 1' && 
-                  !v.name.startsWith('Version 1.0'));
-        });
-        setVersions(filteredVersions);
-        
+        // The real-time polling will automatically pick up the new version
         // Load the new version
         const newVersionData = await loadCurveVersion(newVersion.id);
         if (newVersionData) {
