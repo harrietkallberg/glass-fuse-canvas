@@ -1,7 +1,7 @@
 
 export interface Version {
   id: string;
-  version_number: string;
+  version_number: string | number;
   name: string;
   is_current: boolean;
   created_at: string;

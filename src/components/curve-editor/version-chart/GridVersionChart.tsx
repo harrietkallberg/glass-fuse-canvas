@@ -28,7 +28,8 @@ const GridVersionChart = ({
     
     // For now, versions start at column 1, incrementing rows
     // Later this will be user-configurable for horizontal movement
-    const versionIndex = versions.filter(v => v.version_number !== 0 && v.version_number !== "Template").indexOf(version);
+    const otherVersions = versions.filter(v => v.version_number !== 0 && v.version_number !== "Template");
+    const versionIndex = otherVersions.indexOf(version);
     return { column: 1, row: versionIndex + 2 };
   };
 
