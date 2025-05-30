@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useCurves } from "@/hooks/useCurves";
+import { useVersionOperations } from "@/hooks/curve/useVersionOperations";
 import { Phase } from "@/utils/curveUtils";
 import { toast } from "@/components/ui/use-toast";
 
@@ -22,7 +23,8 @@ export const useCurveVersionManager = ({
   setCurrentVersionData,
   numberToSemantic
 }: UseCurveVersionManagerProps) => {
-  const { getCurveVersions, loadCurveVersion, saveCurveVersion, deleteVersion } = useCurves();
+  const { getCurveVersions, loadCurveVersion, saveCurveVersion } = useCurves();
+  const { deleteVersion } = useVersionOperations();
 
   // Real-time version fetching with optimized polling
   useEffect(() => {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useAuth } from './useAuth';
 import { useCurveOperations } from './curve/useCurveOperations';
@@ -18,7 +17,8 @@ export const useCurves = () => {
     getCurveVersions, 
     deleteUnwantedVersions,
     numberToSemantic, 
-    semanticToNumber 
+    semanticToNumber,
+    deleteVersion 
   } = useVersionOperations();
   const { getNextVersionNumber } = useVersionUtils();
 
@@ -77,6 +77,7 @@ export const useCurves = () => {
     refetchCurves,
     numberToSemantic,
     getNextVersionNumber,
+    deleteVersion
   };
 };
 

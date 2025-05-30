@@ -305,12 +305,12 @@ export const useVersionOperations = () => {
   };
 
   return {
+    semanticToNumber,
+    numberToSemantic,
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
     deleteUnwantedVersions,
-    deleteVersion,
-    numberToSemantic,
-    semanticToNumber,
+    deleteVersion
   };
 };
