@@ -3,7 +3,9 @@ import { Version, NodePosition } from './types';
 
 export const groupVersionsByGeneration = (versions: Version[]) => {
   return versions.reduce((acc, version) => {
-    const parts = version.version_number.split('.');
+    // Convert version_number to string first, then split
+    const versionStr = String(version.version_number);
+    const parts = versionStr.split('.');
     const generation = parseInt(parts[0]) || 1;
     const draft = parseInt(parts[1]) || 0;
     

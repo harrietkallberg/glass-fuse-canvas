@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import CurveVersionChart from "@/components/CurveVersionChart";
@@ -44,12 +43,13 @@ const CurveEditorSection = ({
         try {
           const latestVersions = await getCurveVersions(curveId);
           // Filter out template versions that shouldn't be shown - only show template (version 0) or actual versions
-          const filteredVersions = latestVersions.filter(v => 
-            v.version_number === 0 || 
-            v.version_number === "Template" || 
-            (typeof v.version_number === 'number' && v.version_number > 0) ||
-            (typeof v.version_number === 'string' && v.version_number !== "Template" && v.version_number !== "0")
-          );
+          const filteredVersions = latestVersions.filter(v => {
+            const versionNum = v.version_number;
+            return versionNum === 0 || 
+                   versionNum === "Template" || 
+                   (typeof versionNum === 'number' && versionNum > 0) ||
+                   (typeof versionNum === 'string' && versionNum !== "Template" && versionNum !== "0");
+          });
           console.log('Fetched versions:', filteredVersions);
           setVersions(filteredVersions);
         } catch (error) {
