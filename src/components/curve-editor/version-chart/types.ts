@@ -1,4 +1,3 @@
-
 export interface Version {
   id: string;
   version_number: string | number;
@@ -16,6 +15,7 @@ export interface CurveVersionChartProps {
   onEditVersion?: (versionId: string) => void;
   onDuplicateVersion?: () => void;
   onMoveForward?: () => void;
+  onDeleteVersion?: (versionId: string) => void;
   selectedVersionColor?: string;
 }
 

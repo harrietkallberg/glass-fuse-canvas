@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
@@ -15,7 +14,8 @@ const GridVersionChart = ({
   onSetMainVersion,
   onEditVersion,
   onDuplicateVersion,
-  onMoveForward
+  onMoveForward,
+  onDeleteVersion
 }: CurveVersionChartProps) => {
   const { getCurveVersions } = useCurves();
   
@@ -154,6 +154,7 @@ const GridVersionChart = ({
                   onEditVersion={onEditVersion}
                   onDuplicateVersion={onDuplicateVersion}
                   onMoveForward={onMoveForward}
+                  onDeleteVersion={onDeleteVersion}
                   nodeWidth={NODE_WIDTH}
                   nodeHeight={NODE_HEIGHT}
                 />

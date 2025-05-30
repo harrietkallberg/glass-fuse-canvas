@@ -254,11 +254,48 @@ export const useVersionOperations = () => {
     }
   };
 
+  const deleteVersion = async (versionId: string) => {
+    if (!user) {
+      console.error('No user found when trying to delete version');
+      return false;
+    }
+
+    try {
+      // First delete all phases for this version
+      const { error: phasesError } = await supabase
+        .from('curve_phases')
+        .delete()
+        .eq('version_id', versionId);
+
+      if (phasesError) {
+        console.error('Error deleting version phases:', phasesError);
+        throw new Error(`Failed to delete version phases: ${phasesError.message}`);
+      }
+
+      // Then delete the version itself
+      const { error: versionError } = await supabase
+        .from('curve_versions')
+        .delete()
+        .eq('id', versionId);
+
+      if (versionError) {
+        console.error('Error deleting version:', versionError);
+        throw new Error(`Failed to delete version: ${versionError.message}`);
+      }
+
+      return true;
+    } catch (error) {
+      console.error('Error in deleteVersion:', error);
+      throw error;
+    }
+  };
+
   return {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
     deleteUnwantedVersions,
+    deleteVersion,
     numberToSemantic,
     semanticToNumber,
   };

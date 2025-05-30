@@ -1,7 +1,6 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Edit, Copy, MoveRight } from "lucide-react";
+import { Edit, Copy, MoveRight, Trash2 } from "lucide-react";
 import { Version } from './types';
 
 interface GridVersionNodeProps {
@@ -13,6 +12,7 @@ interface GridVersionNodeProps {
   onEditVersion?: (versionId: string) => void;
   onDuplicateVersion?: () => void;
   onMoveForward?: () => void;
+  onDeleteVersion?: (versionId: string) => void;
   nodeWidth: number;
   nodeHeight: number;
 }
@@ -26,6 +26,7 @@ const GridVersionNode = ({
   onEditVersion,
   onDuplicateVersion,
   onMoveForward,
+  onDeleteVersion,
   nodeWidth,
   nodeHeight
 }: GridVersionNodeProps) => {
@@ -175,6 +176,23 @@ const GridVersionNode = ({
                   >
                     <MoveRight className="h-3 w-3" />
                     Move Forward
+                  </Button>
+                )}
+
+                {/* Delete Version */}
+                {onDeleteVersion && (
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteVersion(version.id);
+                      setShowOptions(false);
+                    }}
+                    className="text-xs gap-2 h-8 justify-start"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Delete Version
                   </Button>
                 )}
               </>

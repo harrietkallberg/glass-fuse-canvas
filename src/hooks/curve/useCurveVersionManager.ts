@@ -22,7 +22,7 @@ export const useCurveVersionManager = ({
   setCurrentVersionData,
   numberToSemantic
 }: UseCurveVersionManagerProps) => {
-  const { getCurveVersions, loadCurveVersion, saveCurveVersion } = useCurves();
+  const { getCurveVersions, loadCurveVersion, saveCurveVersion, deleteVersion } = useCurves();
 
   // Real-time version fetching with optimized polling
   useEffect(() => {
@@ -194,8 +194,60 @@ export const useCurveVersionManager = ({
     }
   };
 
+  const handleDeleteVersion = async (versionId: string) => {
+    if (!versionId) {
+      console.error('No version ID provided for deletion');
+      return;
+    }
+
+    try {
+      // Don't allow deleting the template version
+      const versionToDelete = versions.find(v => v.id === versionId);
+      if (!versionToDelete || versionToDelete.version_number === 0 || String(versionToDelete.version_number) === "Template") {
+        toast({
+          title: "Cannot Delete Template",
+          description: "The template version cannot be deleted.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Delete the version
+      await deleteVersion(versionId);
+      
+      // Refresh versions list
+      const updatedVersions = await getCurveVersions(curveId);
+      setVersions(updatedVersions);
+      
+      // If the deleted version was the current one, select another version
+      if (versionId === currentVersionId) {
+        const templateVersion = updatedVersions.find(v => v.version_number === 0 || String(v.version_number) === "Template");
+        if (templateVersion) {
+          const curveData = await loadCurveVersion(templateVersion.id);
+          if (curveData) {
+            setCurrentVersionId(templateVersion.id);
+            setCurrentVersionData(curveData);
+          }
+        }
+      }
+      
+      toast({
+        title: "Version Deleted",
+        description: "The version has been successfully deleted.",
+      });
+    } catch (error) {
+      console.error('Error deleting version:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete version - please check the console for details",
+        variant: "destructive"
+      });
+    }
+  };
+
   return {
     handleVersionSelect,
-    handleDuplicateVersion
+    handleDuplicateVersion,
+    handleDeleteVersion
   };
 };

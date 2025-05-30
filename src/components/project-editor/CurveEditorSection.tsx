@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import { useVersionManager } from "@/components/curve-editor/VersionManager";
@@ -35,7 +34,7 @@ const CurveEditorSection = ({
   const [tags, setTags] = useState("");
 
   // Use the new version manager hook
-  const { handleVersionSelect, handleDuplicateVersion } = useCurveVersionManager({
+  const { handleVersionSelect, handleDuplicateVersion, handleDeleteVersion } = useCurveVersionManager({
     curveId,
     versions,
     setVersions,
@@ -100,6 +99,7 @@ const CurveEditorSection = ({
         onEditVersion={handleEditVersion}
         onDuplicateVersion={handleDuplicateVersionWrapper}
         onMoveForward={handleMoveForward}
+        onDeleteVersion={handleDeleteVersion}
       />
       
       {/* Curve Editor - shown when editing a version */}
