@@ -1,4 +1,5 @@
 
+
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../useAuth';
 import { Phase, calculateTotalTime } from '@/utils/curveUtils';
@@ -171,7 +172,7 @@ export const useVersionOperations = () => {
       return null;
     }
 
-    const phases: Phase[] = phasesData.map(phase => {
+    const phases: Phase[] = phasesData.map((phase: any) => {
       console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
       return {
         id: phase.id,

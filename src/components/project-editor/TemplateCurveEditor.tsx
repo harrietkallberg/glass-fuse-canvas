@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -90,7 +89,7 @@ const TemplateCurveEditor = ({
         return;
       }
 
-      const phases: Phase[] = phasesData.map((phase, index) => {
+      const phases: Phase[] = phasesData.map((phase: any, index) => {
         console.log(`Fetching template phase: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
         return {
           id: (index + 1).toString(),

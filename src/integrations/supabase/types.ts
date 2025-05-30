@@ -16,6 +16,7 @@ export type Database = {
           id: string
           phase_order: number
           target_temp: number
+          velocity: number | null
           version_id: string
         }
         Insert: {
@@ -24,6 +25,7 @@ export type Database = {
           id?: string
           phase_order: number
           target_temp?: number
+          velocity?: number | null
           version_id: string
         }
         Update: {
@@ -32,6 +34,7 @@ export type Database = {
           id?: string
           phase_order?: number
           target_temp?: number
+          velocity?: number | null
           version_id?: string
         }
         Relationships: [
