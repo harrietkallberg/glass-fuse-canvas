@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useCurves } from "@/hooks/useCurves";
 import { Phase } from "@/utils/curveUtils";
@@ -93,48 +92,57 @@ export const useCurveVersionManager = ({
   };
 
   const handleDuplicateVersion = async (currentVersionData: any) => {
-    if (!currentVersionId || !currentVersionData) {
-      console.error('No current version selected for duplication');
-      toast({
-        title: "Error",
-        description: "No version selected for duplication",
-        variant: "destructive"
-      });
+    if (!currentVersionData || !currentVersionData.version) {
+      console.error('Invalid version data for duplication');
       return;
     }
-    
-    console.log('Duplicating version:', currentVersionId, currentVersionData);
-    
+
     try {
-      // Get the current version number and calculate next minor version
+      // Get the current version number and increment it
       const currentVersionNumber = currentVersionData.version.version_number;
-      const nextVersionString = getNextMinorVersion(currentVersionNumber);
-      const versionName = `Version ${nextVersionString}`;
-      
-      console.log(`Creating new version: ${versionName} from version number ${currentVersionNumber}`);
-      
-      // Prepare the curve state for the new version
+      const newVersionNumber = currentVersionNumber + 1;
+      const versionName = `Version ${numberToSemantic(newVersionNumber)}`;
+
+      console.log('Duplicating version:', {
+        currentVersionNumber,
+        newVersionNumber,
+        versionName
+      });
+
+      // Create new curve state with current settings
       const newCurveState = {
-        selectedGlass: currentVersionData.version.selected_glass || "Bullseye Opaleszent",
-        roomTemp: currentVersionData.version.room_temp || 20,
-        glassLayers: currentVersionData.version.glass_layers || "1",
-        glassRadius: currentVersionData.version.glass_radius || "10",
-        firingType: currentVersionData.version.firing_type || "f",
-        topTempMinutes: currentVersionData.version.top_temp_minutes || "10",
-        ovenType: currentVersionData.version.oven_type || "t",
-        notes: currentVersionData.version.notes || "",
-        materials: currentVersionData.version.materials || "",
-        tags: currentVersionData.version.tags || ""
+        selectedGlass: currentVersionData.version.selected_glass,
+        roomTemp: currentVersionData.version.room_temp,
+        glassLayers: currentVersionData.version.glass_layers,
+        glassRadius: currentVersionData.version.glass_radius,
+        firingType: currentVersionData.version.firing_type,
+        topTempMinutes: currentVersionData.version.top_temp_minutes,
+        ovenType: currentVersionData.version.oven_type,
+        notes: currentVersionData.version.notes || '',
+        materials: currentVersionData.version.materials || '',
+        tags: currentVersionData.version.tags || '',
       };
-      
+
       // Create the duplicate version with properly mapped phase data
       const newVersionPhases = currentVersionData.phases ? currentVersionData.phases.map((phase: any) => {
-        console.log('Mapping phase for duplication:', phase);
+        // Ensure all values are numbers and have default values
+        const targetTemp = Number(phase.targetTemp) || 0;
+        const duration = Number(phase.duration) || 0;
+        const holdTime = Number(phase.holdTime) || 0;
+        const velocity = Number(phase.velocity) || 0;
+
+        console.log('Mapping phase for duplication:', {
+          targetTemp,
+          duration,
+          holdTime,
+          velocity
+        });
+
         return {
-          targetTemp: phase.target_temp || 0, // Use target_temp from DB
-          duration: phase.duration || 0,
-          holdTime: phase.hold_time || 0, // Use hold_time from DB
-          velocity: phase.velocity || 0
+          targetTemp,
+          duration,
+          holdTime,
+          velocity
         };
       }) : [];
       
@@ -180,7 +188,7 @@ export const useCurveVersionManager = ({
       console.error('Error duplicating version:', error);
       toast({
         title: "Error",
-        description: `Failed to duplicate version: ${error.message || 'Unknown error'}`,
+        description: "Failed to duplicate version - please check the console for details",
         variant: "destructive"
       });
     }

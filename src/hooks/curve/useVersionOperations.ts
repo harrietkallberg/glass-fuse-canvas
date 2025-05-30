@@ -81,15 +81,8 @@ export const useVersionOperations = () => {
 
       if (updateError) {
         console.error('Error updating existing versions:', updateError);
-        return null;
+        throw new Error(`Failed to update existing versions: ${updateError.message}`);
       }
-
-      console.log('Creating new version with data:', {
-        curve_id: curveId,
-        version_number: numericVersion,
-        name: versionName,
-        is_current: true,
-      });
 
       // Create new version as current
       const { data: versionData, error: versionError } = await supabase
@@ -124,23 +117,21 @@ export const useVersionOperations = () => {
       // Save phases with velocity values
       if (phases && phases.length > 0) {
         const phasesToInsert = phases.map((phase, index) => {
-          console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, holdTime=${phase.holdTime}, velocity=${phase.velocity}`);
-          
-          // Validate phase data
-          if (typeof phase.targetTemp !== 'number' || isNaN(phase.targetTemp)) {
-            console.warn(`Phase ${index} has invalid targetTemp: ${phase.targetTemp}, setting to 0`);
-          }
-          if (typeof phase.holdTime !== 'number' || isNaN(phase.holdTime)) {
-            console.warn(`Phase ${index} has invalid holdTime: ${phase.holdTime}, setting to 0`);
-          }
+          // Ensure all values are numbers and have default values
+          const targetTemp = Number(phase.targetTemp) || 0;
+          const duration = Number(phase.duration) || 0;
+          const holdTime = Number(phase.holdTime) || 0;
+          const velocity = Number(phase.velocity) || 0;
+
+          console.log(`Saving phase ${index}: targetTemp=${targetTemp}, duration=${duration}, holdTime=${holdTime}, velocity=${velocity}`);
           
           return {
             version_id: versionData.id,
             phase_order: index,
-            target_temp: Number(phase.targetTemp) || 0,
-            duration: Number(phase.duration) || 0,
-            hold_time: Number(phase.holdTime) || 0,
-            velocity: Number(phase.velocity) || 0,
+            target_temp: targetTemp,
+            duration: duration,
+            hold_time: holdTime,
+            velocity: velocity,
           };
         });
 
@@ -168,43 +159,55 @@ export const useVersionOperations = () => {
   };
 
   const loadCurveVersion = async (versionId: string) => {
-    const { data: versionData, error: versionError } = await supabase
-      .from('curve_versions')
-      .select('*')
-      .eq('id', versionId)
-      .single();
+    try {
+      const { data: versionData, error: versionError } = await supabase
+        .from('curve_versions')
+        .select('*')
+        .eq('id', versionId)
+        .single();
 
-    if (versionError) {
-      console.error('Error loading version:', versionError);
-      return null;
-    }
+      if (versionError) {
+        console.error('Error loading version:', versionError);
+        return null;
+      }
 
-    const { data: phasesData, error: phasesError } = await supabase
-      .from('curve_phases')
-      .select('*')
-      .eq('version_id', versionId)
-      .order('phase_order');
+      const { data: phasesData, error: phasesError } = await supabase
+        .from('curve_phases')
+        .select('*')
+        .eq('version_id', versionId)
+        .order('phase_order');
 
-    if (phasesError) {
-      console.error('Error loading phases:', phasesError);
-      return null;
-    }
+      if (phasesError) {
+        console.error('Error loading phases:', phasesError);
+        return null;
+      }
 
-    const phases: Phase[] = phasesData.map((phase: any) => {
-      console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+      const phases: Phase[] = phasesData.map((phase: any) => {
+        // Ensure all required fields are present and properly typed
+        const targetTemp = typeof phase.target_temp === 'number' ? phase.target_temp : 0;
+        const duration = typeof phase.duration === 'number' ? phase.duration : 0;
+        const holdTime = typeof phase.hold_time === 'number' ? phase.hold_time : 0;
+        const velocity = typeof phase.velocity === 'number' ? phase.velocity : 0;
+
+        console.log(`Loading phase from DB: targetTemp=${targetTemp}, duration=${duration}, holdTime=${holdTime}, velocity=${velocity}`);
+        
+        return {
+          id: phase.id,
+          targetTemp,
+          duration,
+          holdTime,
+          velocity,
+        };
+      });
+
       return {
-        id: phase.id,
-        targetTemp: phase.target_temp,
-        duration: phase.duration,
-        holdTime: phase.hold_time,
-        velocity: phase.velocity || 0, // Load velocity from database
+        version: versionData,
+        phases,
       };
-    });
-
-    return {
-      version: versionData,
-      phases,
-    };
+    } catch (error) {
+      console.error('Error in loadCurveVersion:', error);
+      return null;
+    }
   };
 
   const getCurveVersions = async (curveId: string): Promise<CurveVersion[]> => {
