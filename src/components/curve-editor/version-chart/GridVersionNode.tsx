@@ -123,7 +123,7 @@ const GridVersionNode = ({
                 className="text-xs gap-2 h-8 justify-start"
               >
                 <Copy className="h-3 w-3" />
-                Create New Version
+                Duplicate to New Version
               </Button>
             ) : (
               <>
