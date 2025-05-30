@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -36,20 +35,26 @@ const CurveEditorSection = ({
   
   const { getCurveVersions, loadCurveVersion } = useCurves();
 
-  // Real-time version fetching
+  // Real-time version fetching with cleanup
   useEffect(() => {
     const fetchVersions = async () => {
       if (curveId) {
         try {
           const latestVersions = await getCurveVersions(curveId);
-          // Only show template (version 0) and actual user-created versions (version > 0)
+          
+          // Filter to only show template and properly created versions
           const filteredVersions = latestVersions.filter(v => {
             const versionStr = String(v.version_number);
-            return v.version_number === 0 || 
+            return v.version_number === 0 || // Template
                    versionStr === "Template" || 
-                   (typeof v.version_number === 'number' && v.version_number > 0);
+                   (typeof v.version_number === 'number' && 
+                    v.version_number > 0 && 
+                    v.name && 
+                    v.name !== 'Version 1' && // Exclude default auto-created versions
+                    !v.name.startsWith('Version 1.0')); // Exclude auto-created versions
           });
-          console.log('Fetched versions:', filteredVersions);
+          
+          console.log('Filtered versions:', filteredVersions);
           setVersions(filteredVersions);
         } catch (error) {
           console.error('Error fetching versions:', error);

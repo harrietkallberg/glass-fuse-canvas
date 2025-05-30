@@ -9,20 +9,32 @@ export const useVersionOperations = () => {
 
   // Convert semantic version to number for database storage
   const semanticToNumber = (semanticVersion: string): number => {
+    // Handle template version
+    if (semanticVersion === "Template" || semanticVersion === "0.0") {
+      return 0;
+    }
+    
     const parts = semanticVersion.split('.');
-    const major = parseInt(parts[0]) || 0;
+    const major = parseInt(parts[0]) || 1;
     const minor = parseInt(parts[1]) || 0;
     const patch = parseInt(parts[2]) || 0;
     const subPatch = parseInt(parts[3]) || 0;
-    return major * 1000000 + minor * 10000 + patch * 100 + subPatch;
+    
+    // Use a smaller multiplier to avoid huge numbers
+    return major * 10000 + minor * 100 + patch * 10 + subPatch;
   };
 
   // Convert number back to semantic version
   const numberToSemantic = (versionNumber: number): string => {
-    const major = Math.floor(versionNumber / 1000000);
-    const minor = Math.floor((versionNumber % 1000000) / 10000);
-    const patch = Math.floor((versionNumber % 10000) / 100);
-    const subPatch = versionNumber % 100;
+    // Handle template version
+    if (versionNumber === 0) {
+      return "Template";
+    }
+    
+    const major = Math.floor(versionNumber / 10000);
+    const minor = Math.floor((versionNumber % 10000) / 100);
+    const patch = Math.floor((versionNumber % 100) / 10);
+    const subPatch = versionNumber % 10;
     
     if (subPatch > 0) {
       return `${major}.${minor}.${patch}.${subPatch}`;
@@ -182,7 +194,7 @@ export const useVersionOperations = () => {
         return [];
       }
 
-      console.log('Fetched versions:', data);
+      console.log('Fetched versions from database:', data);
       return data || [];
     } catch (error) {
       console.error('Error in getCurveVersions:', error);
@@ -190,10 +202,33 @@ export const useVersionOperations = () => {
     }
   };
 
+  // New function to clean up unwanted versions
+  const deleteUnwantedVersions = async (curveId: string) => {
+    try {
+      // Delete any versions that are not the template (version_number = 0)
+      // and were created automatically
+      const { error } = await supabase
+        .from('curve_versions')
+        .delete()
+        .eq('curve_id', curveId)
+        .neq('version_number', 0)
+        .is('name', null); // Delete versions without proper names
+
+      if (error) {
+        console.error('Error deleting unwanted versions:', error);
+      } else {
+        console.log('Cleaned up unwanted versions for curve:', curveId);
+      }
+    } catch (error) {
+      console.error('Error in deleteUnwantedVersions:', error);
+    }
+  };
+
   return {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
+    deleteUnwantedVersions,
     numberToSemantic,
     semanticToNumber,
   };

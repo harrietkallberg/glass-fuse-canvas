@@ -12,8 +12,15 @@ export const useCurves = () => {
   const [loading, setLoading] = useState(true);
 
   const { createCurve, deleteCurve, fetchCurves } = useCurveOperations();
-  const { saveCurveVersion, loadCurveVersion, getCurveVersions } = useVersionOperations();
-  const { numberToSemantic, getNextVersionNumber } = useVersionUtils();
+  const { 
+    saveCurveVersion, 
+    loadCurveVersion, 
+    getCurveVersions, 
+    deleteUnwantedVersions,
+    numberToSemantic, 
+    semanticToNumber 
+  } = useVersionOperations();
+  const { getNextVersionNumber } = useVersionUtils();
 
   // Fetch user's curves - only real data from database
   const refetchCurves = async () => {
@@ -65,6 +72,7 @@ export const useCurves = () => {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
+    deleteUnwantedVersions,
     refetchCurveVersions,
     refetchCurves,
     numberToSemantic,
