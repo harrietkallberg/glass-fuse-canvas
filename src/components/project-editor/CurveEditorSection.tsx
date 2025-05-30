@@ -1,12 +1,10 @@
 
-import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
-import VersionInfoDisplay from "@/components/curve-editor/VersionInfoDisplay";
-import CurveEditorTabs from "@/components/curve-editor/CurveEditorTabs";
 import { useVersionManager } from "@/components/curve-editor/VersionManager";
-import { useCurveState } from "@/hooks/useCurveState";
+import { useCurveVersionManager } from "@/hooks/curve/useCurveVersionManager";
+import { createCurveState } from "./curve-editor/CurveStateManager";
+import CurveEditorDisplay from "./curve-editor/CurveEditorDisplay";
 
 interface CurveEditorSectionProps {
   curveId: string;
@@ -31,37 +29,38 @@ const CurveEditorSection = ({
   templateCurveData,
   numberToSemantic
 }: CurveEditorSectionProps) => {
-  const [activeTab, setActiveTab] = useState("curve");
-  const [selectedVersionColor, setSelectedVersionColor] = useState("#F97316");
-  const [notes, setNotes] = useState(currentVersionData?.version?.notes || "");
-  const [materials, setMaterials] = useState(currentVersionData?.version?.materials || "");
-  const [tags, setTags] = useState(currentVersionData?.version?.tags || "");
+  const [showEditor, setShowEditor] = useState(false);
+  const [notes, setNotes] = useState("");
+  const [materials, setMaterials] = useState("");
+  const [tags, setTags] = useState("");
 
-  // Initialize curve state with current version phases or template phases
-  const initialPhases = currentVersionData?.phases || templateCurveData?.phases || [];
-  const curveState = useCurveState({ initialPhases });
+  // Use the new version manager hook
+  const { handleVersionSelect, handleDuplicateVersion } = useCurveVersionManager({
+    curveId,
+    versions,
+    setVersions,
+    currentVersionId,
+    setCurrentVersionId,
+    setCurrentVersionData,
+    numberToSemantic
+  });
 
-  // Update curve state when version data changes
-  React.useEffect(() => {
-    if (currentVersionData) {
-      curveState.setPhases(currentVersionData.phases);
+  // Update form fields when current version data changes
+  useEffect(() => {
+    if (currentVersionData?.version) {
       setNotes(currentVersionData.version.notes || "");
       setMaterials(currentVersionData.version.materials || "");
       setTags(currentVersionData.version.tags || "");
-      
-      // Update other curve settings from version data
-      if (currentVersionData.version.selected_glass) curveState.setSelectedGlass(currentVersionData.version.selected_glass);
-      if (currentVersionData.version.room_temp) curveState.setRoomTemp(currentVersionData.version.room_temp);
-      if (currentVersionData.version.glass_layers) curveState.setGlassLayers(currentVersionData.version.glass_layers);
-      if (currentVersionData.version.glass_radius) curveState.setGlassRadius(currentVersionData.version.glass_radius);
-      if (currentVersionData.version.firing_type) curveState.setFiringType(currentVersionData.version.firing_type);
-      if (currentVersionData.version.top_temp_minutes) curveState.setTopTempMinutes(currentVersionData.version.top_temp_minutes);
-      if (currentVersionData.version.oven_type) curveState.setOvenType(currentVersionData.version.oven_type);
-    } else if (templateCurveData) {
-      // If no current version, initialize with template
-      curveState.setPhases(templateCurveData.phases || []);
     }
-  }, [currentVersionData, templateCurveData]);
+  }, [currentVersionData]);
+
+  // Create curve state using the extracted utility
+  const curveState = createCurveState(currentVersionData, templateCurveData);
+
+  // Debug logging for curve state
+  useEffect(() => {
+    console.log('CurveEditorSection - curveState phases:', curveState.phases);
+  }, [curveState.phases]);
 
   const versionManager = useVersionManager({
     curveId,
@@ -77,67 +76,42 @@ const CurveEditorSection = ({
     numberToSemantic
   });
 
-  const handleVersionSelect = async (versionId: string) => {
-    await versionManager.handleVersionSelect(versionId);
-    
-    // Generate new color for selected version
-    const colors = ["#F97316", "#33C3F0", "#10B981", "#8B5CF6", "#F59E0B", "#EF4444"];
-    const versionIndex = versions.findIndex(v => v.id === versionId);
-    setSelectedVersionColor(colors[versionIndex % colors.length]);
+  const handleEditVersion = async (versionId: string) => {
+    await handleVersionSelect(versionId);
+    setShowEditor(true);
   };
 
-  const currentVersionName = currentVersionId 
-    ? numberToSemantic(versions.find(v => v.id === currentVersionId)?.version_number || 10000)
-    : "1.0";
+  const handleDuplicateVersionWrapper = async () => {
+    await handleDuplicateVersion(currentVersionData);
+  };
+
+  const handleMoveForward = async () => {
+    console.log('Moving version forward:', currentVersionId);
+    // TODO: Implement move forward logic to increment major version (0.x -> 1.0, 1.x -> 2.0, etc.)
+  };
 
   return (
-    <div className="space-y-8">
-      {/* Version Chart */}
-      <CurveVersionChart 
-        versions={versions.map(v => ({
-          ...v,
-          version_number: numberToSemantic(v.version_number)
-        }))}
+    <div className="space-y-6">
+      {/* Version Flow Chart */}
+      <CurveVersionChart
+        versions={versions}
         currentVersionId={currentVersionId}
         onVersionSelect={handleVersionSelect}
-        onNewVersion={versionManager.handleNewMainVersion}
-        selectedVersionColor={selectedVersionColor}
+        onEditVersion={handleEditVersion}
+        onDuplicateVersion={handleDuplicateVersionWrapper}
+        onMoveForward={handleMoveForward}
       />
       
-      {/* Current Version Info */}
-      <VersionInfoDisplay 
-        currentVersionName={currentVersionName}
-        selectedVersionColor={selectedVersionColor}
+      {/* Curve Editor - shown when editing a version */}
+      <CurveEditorDisplay
+        showEditor={showEditor}
+        setShowEditor={setShowEditor}
+        currentVersionData={currentVersionData}
+        curveState={curveState}
+        templateCurveData={templateCurveData}
+        numberToSemantic={numberToSemantic}
+        onSave={versionManager.handleSave}
       />
-
-      {/* Main Editor */}
-      <CurveEditorTabs 
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        phases={curveState.phases}
-        templatePhases={templateCurveData?.phases || []}
-        roomTemp={curveState.roomTemp}
-        currentVersionName={currentVersionName}
-        onUpdatePhase={curveState.updatePhase}
-        onAddPhase={curveState.addPhase}
-        onRemovePhase={curveState.removePhase}
-        notes={notes}
-        setNotes={setNotes}
-        materials={materials}
-        setMaterials={setMaterials}
-        tags={tags}
-        setTags={setTags}
-      />
-
-      {/* Single Save Button at Bottom */}
-      <div className="flex justify-center">
-        <Button 
-          onClick={versionManager.handleSave}
-          className="px-8 py-3 bg-[#F97316] hover:bg-[#F97316]/90 text-white text-lg"
-        >
-          Save Changes
-        </Button>
-      </div>
     </div>
   );
 };

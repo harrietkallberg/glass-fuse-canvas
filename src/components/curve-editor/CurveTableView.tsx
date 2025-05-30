@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -27,17 +28,22 @@ const CurveTableView = ({
   roomTemp = 20
 }: CurveTableViewProps) => {
   
-  // Get the velocity for display - use stored velocity if available, otherwise calculate
+  // Get the velocity for display - exactly matching Python script logic
   const getDisplayVelocity = (phase: Phase, index: number): number => {
-    // If velocity is stored in the phase (from glass template), use it as-is (including negative values)
+    // If velocity is stored in the phase (from glass template), use it with proper sign
     if (phase.velocity !== undefined) {
-      return Math.abs(phase.velocity); // Display absolute value for readability
+      return phase.velocity; // Keep the original sign as in Python script
     }
     
     // Fallback: calculate from temperature difference and duration (for manually created phases)
     const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
     const tempDifference = phase.targetTemp - startTemp;
-    return phase.duration > 0 ? Math.round(Math.abs(tempDifference / phase.duration) * 60) : 0;
+    
+    if (phase.duration > 0) {
+      // Match Python: velocity can be positive or negative based on temperature direction
+      return Math.round((tempDifference / phase.duration) * 60);
+    }
+    return 0;
   };
 
   // Compare phases to determine modifications (only for version mode)
@@ -136,6 +142,11 @@ const CurveTableView = ({
     return currentValue.toString();
   };
 
+  // Format velocity with proper sign display
+  const formatVelocityDisplay = (velocity: number) => {
+    return velocity > 0 ? `+${velocity}` : velocity.toString();
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -154,7 +165,7 @@ const CurveTableView = ({
           <TableRow>
             <TableHead>Phase</TableHead>
             <TableHead>Temperature (°C)</TableHead>
-            <TableHead>Duration (min)</TableHead>
+            <TableHead>Phase Time (min)</TableHead>
             <TableHead>Velocity (°C/h)</TableHead>
             <TableHead>Hold Time (min)</TableHead>
             {!isTemplateMode && <TableHead>Status</TableHead>}
@@ -187,7 +198,7 @@ const CurveTableView = ({
               <TableCell className={item.status === 'removed' ? 'text-gray-400 line-through' : ''}>
                 {item.current ? (
                   <>
-                    {getDisplayVelocity(item.current, index)}°C/h
+                    {formatVelocityDisplay(getDisplayVelocity(item.current, index))}°C/h
                   </>
                 ) : '—'}
               </TableCell>

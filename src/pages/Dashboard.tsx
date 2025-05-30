@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import Navigation from "@/components/Navigation";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
@@ -7,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { generateChartData } from "@/utils/curveUtils";
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
@@ -46,8 +46,11 @@ const Dashboard = () => {
             oven_type,
             glass_layers,
             firing_type,
+            room_temp,
             curve_phases (
               target_temp,
+              duration,
+              hold_time,
               phase_order
             )
           )
@@ -65,17 +68,34 @@ const Dashboard = () => {
 
       console.log('Found projects with templates:', curvesWithTemplates);
 
-      // Transform the data for display
+      // Transform the data for display - use REAL template data, not mock data
       const transformedCurves = curvesWithTemplates.map(curve => {
         const templateVersion = curve.curve_versions[0];
         
-        // Create curve data for preview chart from template phases
-        const curveData = templateVersion?.curve_phases
-          ?.sort((a, b) => a.phase_order - b.phase_order)
-          ?.map((phase, index) => ({
-            time: index * 60, // Simple time progression for preview
-            temperature: phase.target_temp
-          })) || [];
+        // Create real curve data from template phases
+        let curveData = [];
+        if (templateVersion?.curve_phases && templateVersion.curve_phases.length > 0) {
+          // Sort phases by order and convert to Phase objects
+          const sortedPhases = templateVersion.curve_phases
+            .sort((a, b) => a.phase_order - b.phase_order)
+            .map(phase => ({
+              id: phase.phase_order.toString(),
+              targetTemp: phase.target_temp,
+              duration: phase.duration,
+              holdTime: phase.hold_time
+            }));
+
+          // Generate real chart data using the curve utils
+          const roomTemp = templateVersion.room_temp || 20;
+          curveData = generateChartData(sortedPhases, roomTemp);
+        } else {
+          // Fallback to simple data points if no template phases exist
+          // This represents a "no template" state - minimal curve
+          curveData = [
+            { time: 0, temperature: 20 },
+            { time: 300, temperature: 20 } // Flat line indicating no template
+          ];
+        }
 
         return {
           id: curve.id,
@@ -84,14 +104,16 @@ const Dashboard = () => {
           created_at: curve.created_at,
           updated_at: curve.updated_at,
           is_private: curve.is_private,
-          glass_type: templateVersion?.selected_glass || 'Standard',
+          glass_type: templateVersion?.selected_glass || 'No Template',
           oven_type: templateVersion?.oven_type === 't' ? 'Top Heated' : 
-                    templateVersion?.oven_type === 's' ? 'Side Heated' : 'Electric',
-          thickness: templateVersion?.glass_layers ? `${templateVersion.glass_layers} layers` : '6mm',
+                    templateVersion?.oven_type === 's' ? 'Side Heated' : 
+                    templateVersion?.oven_type === 'e' ? 'Electric' : 'No Template',
+          thickness: templateVersion?.glass_layers ? `${templateVersion.glass_layers} layers` : 'No Template',
           project_type: templateVersion?.firing_type === 'f' ? 'Full Fuse' : 
-                       templateVersion?.firing_type === 't' ? 'Tack Fuse' : 'Full Fuse',
+                       templateVersion?.firing_type === 't' ? 'Tack Fuse' : 
+                       templateVersion?.firing_type === 's' ? 'Slumping' : 'No Template',
           curveData,
-          colorClass: 'enhanced-glass-card'
+          colorClass: templateVersion?.curve_phases?.length > 0 ? 'enhanced-glass-card' : 'glass-card'
         };
       });
 

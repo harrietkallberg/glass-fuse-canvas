@@ -8,20 +8,45 @@ export const useVersionOperations = () => {
 
   // Convert semantic version to number for database storage
   const semanticToNumber = (semanticVersion: string): number => {
+    // Handle template version
+    if (semanticVersion === "Template" || semanticVersion === "0.0") {
+      return 0;
+    }
+    
+    // Handle decimal versions like "0.1", "1.2", etc.
+    const numericVersion = parseFloat(semanticVersion);
+    if (!isNaN(numericVersion)) {
+      // Multiply by 10 to store decimals as integers (0.1 -> 1, 1.2 -> 12)
+      return Math.round(numericVersion * 10);
+    }
+    
     const parts = semanticVersion.split('.');
-    const major = parseInt(parts[0]) || 0;
+    const major = parseInt(parts[0]) || 1;
     const minor = parseInt(parts[1]) || 0;
     const patch = parseInt(parts[2]) || 0;
     const subPatch = parseInt(parts[3]) || 0;
-    return major * 1000000 + minor * 10000 + patch * 100 + subPatch;
+    
+    // Use a smaller multiplier to avoid huge numbers
+    return major * 10000 + minor * 100 + patch * 10 + subPatch;
   };
 
   // Convert number back to semantic version
   const numberToSemantic = (versionNumber: number): string => {
-    const major = Math.floor(versionNumber / 1000000);
-    const minor = Math.floor((versionNumber % 1000000) / 10000);
-    const patch = Math.floor((versionNumber % 10000) / 100);
-    const subPatch = versionNumber % 100;
+    // Handle template version
+    if (versionNumber === 0) {
+      return "Template";
+    }
+    
+    // Handle decimal versions (1 -> 0.1, 12 -> 1.2)
+    if (versionNumber < 100) {
+      const decimal = versionNumber / 10;
+      return decimal.toString();
+    }
+    
+    const major = Math.floor(versionNumber / 10000);
+    const minor = Math.floor((versionNumber % 10000) / 100);
+    const patch = Math.floor((versionNumber % 100) / 10);
+    const subPatch = versionNumber % 10;
     
     if (subPatch > 0) {
       return `${major}.${minor}.${patch}.${subPatch}`;
@@ -37,9 +62,12 @@ export const useVersionOperations = () => {
     curveState: any,
     phases: Phase[]
   ) => {
-    if (!user) return null;
+    if (!user) {
+      console.error('No user found when trying to save curve version');
+      return null;
+    }
 
-    console.log('Starting to save curve version:', { curveId, versionName });
+    console.log('Starting to save curve version:', { curveId, versionName, curveState, phases });
 
     const semanticVersion = versionName.replace('Version ', '');
     const numericVersion = semanticToNumber(semanticVersion);
@@ -88,34 +116,54 @@ export const useVersionOperations = () => {
 
       if (versionError) {
         console.error('Error creating version:', versionError);
-        return null;
+        throw new Error(`Failed to create version: ${versionError.message}`);
       }
 
       console.log('Successfully created version:', versionData);
 
-      // Save phases
-      const phasesToInsert = phases.map((phase, index) => ({
-        version_id: versionData.id,
-        phase_order: index,
-        target_temp: phase.targetTemp,
-        duration: phase.duration,
-        hold_time: phase.holdTime,
-      }));
+      // Save phases with velocity values
+      if (phases && phases.length > 0) {
+        const phasesToInsert = phases.map((phase, index) => {
+          console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, holdTime=${phase.holdTime}, velocity=${phase.velocity}`);
+          
+          // Validate phase data
+          if (typeof phase.targetTemp !== 'number' || isNaN(phase.targetTemp)) {
+            console.warn(`Phase ${index} has invalid targetTemp: ${phase.targetTemp}, setting to 0`);
+          }
+          if (typeof phase.holdTime !== 'number' || isNaN(phase.holdTime)) {
+            console.warn(`Phase ${index} has invalid holdTime: ${phase.holdTime}, setting to 0`);
+          }
+          
+          return {
+            version_id: versionData.id,
+            phase_order: index,
+            target_temp: Number(phase.targetTemp) || 0,
+            duration: Number(phase.duration) || 0,
+            hold_time: Number(phase.holdTime) || 0,
+            velocity: Number(phase.velocity) || 0,
+          };
+        });
 
-      const { error: phasesError } = await supabase
-        .from('curve_phases')
-        .insert(phasesToInsert);
+        console.log('Inserting phases:', phasesToInsert);
 
-      if (phasesError) {
-        console.error('Error saving phases:', phasesError);
-        return null;
+        const { error: phasesError } = await supabase
+          .from('curve_phases')
+          .insert(phasesToInsert);
+
+        if (phasesError) {
+          console.error('Error saving phases:', phasesError);
+          throw new Error(`Failed to save phases: ${phasesError.message}`);
+        }
+
+        console.log('Successfully saved phases with velocities');
+      } else {
+        console.warn('No phases to save for the new version');
       }
-
-      console.log('Successfully saved phases');
+      
       return { ...versionData, is_current: true };
     } catch (error) {
       console.error('Error in saveCurveVersion:', error);
-      return null;
+      throw error; // Re-throw to let the caller handle it
     }
   };
 
@@ -142,12 +190,16 @@ export const useVersionOperations = () => {
       return null;
     }
 
-    const phases: Phase[] = phasesData.map(phase => ({
-      id: phase.id,
-      targetTemp: phase.target_temp,
-      duration: phase.duration,
-      holdTime: phase.hold_time,
-    }));
+    const phases: Phase[] = phasesData.map((phase: any) => {
+      console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+      return {
+        id: phase.id,
+        targetTemp: phase.target_temp,
+        duration: phase.duration,
+        holdTime: phase.hold_time,
+        velocity: phase.velocity || 0, // Load velocity from database
+      };
+    });
 
     return {
       version: versionData,
@@ -169,7 +221,7 @@ export const useVersionOperations = () => {
         return [];
       }
 
-      console.log('Fetched versions:', data);
+      console.log('Fetched versions from database:', data);
       return data || [];
     } catch (error) {
       console.error('Error in getCurveVersions:', error);
@@ -177,10 +229,33 @@ export const useVersionOperations = () => {
     }
   };
 
+  // New function to clean up unwanted versions
+  const deleteUnwantedVersions = async (curveId: string) => {
+    try {
+      // Delete any versions that are not the template (version_number = 0)
+      // and were created automatically
+      const { error } = await supabase
+        .from('curve_versions')
+        .delete()
+        .eq('curve_id', curveId)
+        .neq('version_number', 0)
+        .is('name', null); // Delete versions without proper names
+
+      if (error) {
+        console.error('Error deleting unwanted versions:', error);
+      } else {
+        console.log('Cleaned up unwanted versions for curve:', curveId);
+      }
+    } catch (error) {
+      console.error('Error in deleteUnwantedVersions:', error);
+    }
+  };
+
   return {
     saveCurveVersion,
     loadCurveVersion,
     getCurveVersions,
+    deleteUnwantedVersions,
     numberToSemantic,
     semanticToNumber,
   };
