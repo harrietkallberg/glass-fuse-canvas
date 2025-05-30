@@ -118,14 +118,18 @@ export const useVersionOperations = () => {
         return null;
       }
 
-      // Save phases
-      const phasesToInsert = phases.map((phase, index) => ({
-        version_id: versionData.id,
-        phase_order: index,
-        target_temp: phase.targetTemp,
-        duration: phase.duration,
-        hold_time: phase.holdTime,
-      }));
+      // Save phases with velocity values
+      const phasesToInsert = phases.map((phase, index) => {
+        console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
+        return {
+          version_id: versionData.id,
+          phase_order: index,
+          target_temp: phase.targetTemp,
+          duration: phase.duration,
+          hold_time: phase.holdTime,
+          velocity: phase.velocity || 0, // Include velocity in database save
+        };
+      });
 
       const { error: phasesError } = await supabase
         .from('curve_phases')
@@ -136,7 +140,7 @@ export const useVersionOperations = () => {
         return null;
       }
 
-      console.log('Successfully saved phases');
+      console.log('Successfully saved phases with velocities');
       return { ...versionData, is_current: true };
     } catch (error) {
       console.error('Error in saveCurveVersion:', error);
@@ -167,12 +171,16 @@ export const useVersionOperations = () => {
       return null;
     }
 
-    const phases: Phase[] = phasesData.map(phase => ({
-      id: phase.id,
-      targetTemp: phase.target_temp,
-      duration: phase.duration,
-      holdTime: phase.hold_time,
-    }));
+    const phases: Phase[] = phasesData.map(phase => {
+      console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+      return {
+        id: phase.id,
+        targetTemp: phase.target_temp,
+        duration: phase.duration,
+        holdTime: phase.hold_time,
+        velocity: phase.velocity || 0, // Load velocity from database
+      };
+    });
 
     return {
       version: versionData,

@@ -78,7 +78,7 @@ const TemplateCurveEditor = ({
         return;
       }
 
-      // Fetch template phases
+      // Fetch template phases with velocity
       const { data: phasesData, error: phasesError } = await supabase
         .from('curve_phases')
         .select('*')
@@ -90,12 +90,16 @@ const TemplateCurveEditor = ({
         return;
       }
 
-      const phases: Phase[] = phasesData.map((phase, index) => ({
-        id: (index + 1).toString(),
-        targetTemp: phase.target_temp,
-        duration: phase.duration,
-        holdTime: phase.hold_time,
-      }));
+      const phases: Phase[] = phasesData.map((phase, index) => {
+        console.log(`Fetching template phase: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+        return {
+          id: (index + 1).toString(),
+          targetTemp: phase.target_temp,
+          duration: phase.duration,
+          holdTime: phase.hold_time,
+          velocity: phase.velocity || 0, // Include velocity from database
+        };
+      });
 
       const templateData = {
         phases,
@@ -242,13 +246,17 @@ const TemplateCurveEditor = ({
         .delete()
         .eq('version_id', templateVersion.id);
 
-      const phasesToInsert = previewPhases.map((phase: Phase, index: number) => ({
-        version_id: templateVersion.id,
-        phase_order: index,
-        target_temp: phase.targetTemp,
-        duration: phase.duration,
-        hold_time: phase.holdTime,
-      }));
+      const phasesToInsert = previewPhases.map((phase: Phase, index: number) => {
+        console.log(`Saving template phase ${index}: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
+        return {
+          version_id: templateVersion.id,
+          phase_order: index,
+          target_temp: phase.targetTemp,
+          duration: phase.duration,
+          hold_time: phase.holdTime,
+          velocity: phase.velocity || 0, // Save velocity to database
+        };
+      });
 
       const { error: phasesError } = await supabase
         .from('curve_phases')
