@@ -16,11 +16,11 @@ const GridVersionChart = ({
   onDuplicateVersion,
   onMoveForward
 }: CurveVersionChartProps) => {
-  // Grid configuration
-  const GRID_SIZE = 120;
+  // Grid configuration - reduced spacing
+  const GRID_SIZE = 80; // Reduced from 120
   const NODE_WIDTH = 180;
   const NODE_HEIGHT = 100;
-  const GRID_PADDING = 100;
+  const GRID_PADDING = 60; // Reduced from 100
 
   // Calculate grid positions for versions based on template-root structure
   const getGridPosition = (version: any) => {
@@ -77,8 +77,8 @@ const GridVersionChart = ({
   // Calculate canvas dimensions
   const maxColumn = Math.max(...versions.map(v => getGridPosition(v).column));
   const maxRow = Math.max(...versions.map(v => getGridPosition(v).row));
-  const canvasWidth = Math.max(GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE), 1200);
-  const canvasHeight = Math.max(GRID_PADDING * 2 + maxRow * (NODE_HEIGHT + GRID_SIZE), 600);
+  const canvasWidth = GRID_PADDING * 2 + maxColumn * (NODE_WIDTH + GRID_SIZE);
+  const canvasHeight = Math.max(GRID_PADDING * 2 + maxRow * (NODE_HEIGHT + GRID_SIZE), 400);
 
   return (
     <div className="w-full">
@@ -93,12 +93,13 @@ const GridVersionChart = ({
           </div>
         </div>
 
-        {/* Grid Canvas */}
+        {/* Grid Canvas - aligned with title */}
         <div className="overflow-auto border border-gray-100 rounded-xl bg-gradient-to-br from-orange-50/30 to-teal-50/30 shadow-inner">
           <svg
             width={canvasWidth}
             height={canvasHeight}
-            className="min-w-full"
+            className="w-full"
+            style={{ minWidth: canvasWidth }}
           >
             {/* Enhanced Grid Pattern */}
             <defs>

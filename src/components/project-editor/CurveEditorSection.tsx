@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -33,7 +34,7 @@ const CurveEditorSection = ({
   const [materials, setMaterials] = useState("");
   const [tags, setTags] = useState("");
   
-  const { getCurveVersions, loadCurveVersion } = useCurves();
+  const { getCurveVersions, loadCurveVersion, saveCurveVersion, getNextVersionNumber } = useCurves();
 
   // Real-time version fetching with cleanup
   useEffect(() => {
@@ -153,12 +154,69 @@ const CurveEditorSection = ({
   };
 
   const handleDuplicateVersion = async () => {
+    if (!currentVersionId || !currentVersionData) return;
+    
     console.log('Duplicating version:', currentVersionId);
-    await versionManager.handleNewMainVersion();
+    
+    try {
+      // Get the next version number as a draft (x.1, x.2, etc.)
+      const nextVersionNumber = await getNextVersionNumber(curveId);
+      const versionParts = String(nextVersionNumber).split('.');
+      const major = parseInt(versionParts[0]) || 1;
+      const nextDraftVersion = `${major}.1`; // Create first draft of this major version
+      
+      // Create the duplicate version
+      const duplicatedData = {
+        curveId,
+        versionNumber: nextDraftVersion,
+        name: `Draft ${nextDraftVersion}`,
+        notes: currentVersionData.version.notes || "",
+        materials: currentVersionData.version.materials || "",
+        tags: currentVersionData.version.tags || "",
+        settings: {
+          selectedGlass: currentVersionData.version.selected_glass,
+          roomTemp: currentVersionData.version.room_temp,
+          glassLayers: currentVersionData.version.glass_layers,
+          glassRadius: currentVersionData.version.glass_radius,
+          firingType: currentVersionData.version.firing_type,
+          topTempMinutes: currentVersionData.version.top_temp_minutes,
+          ovenType: currentVersionData.version.oven_type,
+        },
+        phases: currentVersionData.phases || []
+      };
+      
+      const newVersion = await saveCurveVersion(duplicatedData);
+      
+      if (newVersion) {
+        // Refresh versions to show the new node
+        const refreshedVersions = await getCurveVersions(curveId);
+        const filteredVersions = refreshedVersions.filter(v => {
+          const versionStr = String(v.version_number);
+          return v.version_number === 0 || 
+                 versionStr === "Template" || 
+                 (typeof v.version_number === 'number' && 
+                  v.version_number > 0 && 
+                  v.name && 
+                  v.name !== 'Version 1' && 
+                  !v.name.startsWith('Version 1.0'));
+        });
+        setVersions(filteredVersions);
+        
+        // Load the new version
+        const newVersionData = await loadCurveVersion(newVersion.id);
+        if (newVersionData) {
+          setCurrentVersionId(newVersion.id);
+          setCurrentVersionData(newVersionData);
+        }
+      }
+    } catch (error) {
+      console.error('Error duplicating version:', error);
+    }
   };
 
   const handleMoveForward = async () => {
     console.log('Moving version forward:', currentVersionId);
+    // TODO: Implement move forward logic
   };
 
   return (
