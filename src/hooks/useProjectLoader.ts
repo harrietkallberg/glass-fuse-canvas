@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -89,27 +88,43 @@ export const useProjectLoader = ({
       if (templateVersion) {
         console.log('Found template version:', templateVersion);
         
-        // Load the complete template data including phases
-        const templateData = await loadCurveVersion(templateVersion.id);
-        if (templateData) {
-          const completeTemplateData = {
-            phases: templateData.phases || [],
-            settings: {
-              selectedGlass: templateData.version.selected_glass,
-              roomTemp: templateData.version.room_temp,
-              glassLayers: templateData.version.glass_layers,
-              glassRadius: templateData.version.glass_radius,
-              firingType: templateData.version.firing_type,
-              topTempMinutes: templateData.version.top_temp_minutes,
-              ovenType: templateData.version.oven_type,
-            }
-          };
-          console.log('Loaded complete template data:', completeTemplateData);
-          setTemplateCurveData(completeTemplateData);
-        } else {
-          console.log('No template data found for version');
+        // Get template phases
+        const { data: phases, error: phasesError } = await supabase
+          .from('curve_phases')
+          .select('*')
+          .eq('version_id', templateVersion.id)
+          .order('phase_order');
+
+        if (phasesError) {
+          console.error('Error fetching template phases:', phasesError);
           setTemplateCurveData(null);
+          return;
         }
+
+        // Convert database phases to our format
+        const templatePhases = phases?.map(phase => ({
+          id: phase.id,
+          targetTemp: phase.target_temp,
+          duration: phase.duration,
+          holdTime: phase.hold_time
+        })) || [];
+
+        // Create complete template data with settings
+        const completeTemplateData = {
+          phases: templatePhases,
+          settings: {
+            selectedGlass: templateVersion.selected_glass || '',
+            roomTemp: templateVersion.room_temp || 20,
+            glassLayers: templateVersion.glass_layers || '1',
+            glassRadius: templateVersion.glass_radius || '10',
+            firingType: templateVersion.firing_type || 'f',
+            topTempMinutes: templateVersion.top_temp_minutes || '10',
+            ovenType: templateVersion.oven_type || 't',
+          }
+        };
+
+        console.log('Loaded complete template data:', completeTemplateData);
+        setTemplateCurveData(completeTemplateData);
       } else {
         console.log('No template version found');
         // No template exists, set to null to show default state
