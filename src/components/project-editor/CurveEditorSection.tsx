@@ -159,17 +159,29 @@ const CurveEditorSection = ({
     console.log('Duplicating version:', currentVersionId);
     
     try {
-      // Get the next version number as a draft (x.1, x.2, etc.)
-      const nextVersionNumber = await getNextVersionNumber(curveId);
-      const versionParts = String(nextVersionNumber).split('.');
-      const major = parseInt(versionParts[0]) || 1;
-      const nextDraftVersion = `${major}.1`; // Create first draft of this major version
+      // Get the current version number for branching logic
+      const currentVersionNumber = currentVersionData.version.version_number;
+      let nextVersionNumber;
+      
+      if (currentVersionNumber === 0 || currentVersionNumber === "Template") {
+        // Creating first version from template
+        nextVersionNumber = 1;
+      } else {
+        // Parse current version to create a new draft
+        const versionStr = String(currentVersionNumber);
+        const parts = versionStr.split('.');
+        const major = parseInt(parts[0]) || 1;
+        const minor = parseInt(parts[1]) || 0;
+        
+        // Create next draft version (increment minor version)
+        nextVersionNumber = `${major}.${minor + 1}`;
+      }
       
       // Create the duplicate version
       const duplicatedData = {
         curveId,
-        versionNumber: nextDraftVersion,
-        name: `Draft ${nextDraftVersion}`,
+        versionNumber: nextVersionNumber,
+        name: `Draft ${nextVersionNumber}`,
         notes: currentVersionData.version.notes || "",
         materials: currentVersionData.version.materials || "",
         tags: currentVersionData.version.tags || "",
