@@ -1,6 +1,7 @@
 
 import React from "react";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
+import { Phase } from "@/utils/curveUtils";
 
 interface CurveEditorDisplayProps {
   showEditor: boolean;
@@ -25,6 +26,15 @@ const CurveEditorDisplay = ({
     return null;
   }
 
+  // Wrapper function to handle the save with proper parameters
+  const handleSave = async (phases: Phase[]) => {
+    const notes = currentVersionData.version?.notes || "";
+    const materials = currentVersionData.version?.materials || "";
+    const tags = currentVersionData.version?.tags || "";
+    
+    await onSave(phases, notes, materials, tags);
+  };
+
   return (
     <div className="mt-8">
       <div className="flex justify-between items-center mb-4">
@@ -41,7 +51,7 @@ const CurveEditorDisplay = ({
       <CurveEditor
         initialPhases={curveState.phases}
         templatePhases={templateCurveData?.phases || []}
-        onSave={onSave}
+        onSave={handleSave}
         isVersionMode={true}
       />
     </div>
