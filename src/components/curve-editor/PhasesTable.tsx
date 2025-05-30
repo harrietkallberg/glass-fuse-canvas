@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface Phase {
@@ -40,11 +39,24 @@ const PhasesTable = ({
   const upperAnnealingTemp = selectedGlassInfo?.o_astemp;
   const lowerAnnealingTemp = selectedGlassInfo?.n_astemp;
   
+  // Debug logging to track velocity values
+  React.useEffect(() => {
+    console.log('PhasesTable - phases received:', phases);
+    phases.forEach((phase, index) => {
+      console.log(`Phase ${index + 1}: velocity = ${phase.velocity}, targetTemp = ${phase.targetTemp}`);
+    });
+  }, [phases]);
+  
   // Get velocity for display - ONLY use stored velocity from Python script calculations
   const getDisplayVelocity = (phase: Phase): number => {
+    console.log(`Getting velocity for phase with targetTemp ${phase.targetTemp}: stored velocity = ${phase.velocity}`);
     // ALWAYS and ONLY use the stored velocity from Python calculations
-    // Never recalculate or use fallback logic
-    return phase.velocity || 0;
+    // If velocity is undefined or null, it means the data wasn't properly preserved
+    if (phase.velocity === undefined || phase.velocity === null) {
+      console.warn('WARNING: Phase velocity is undefined/null - data may not be properly preserved from Python script');
+      return 0;
+    }
+    return phase.velocity;
   };
   
   // Check if a phase contains an annealing temperature
@@ -147,6 +159,9 @@ const PhasesTable = ({
                 
                 <div className="text-sm text-gray-700">
                   {velocity > 0 ? '+' : ''}{velocity}°C/h
+                  {velocity === 0 && (
+                    <span className="text-red-500 text-xs ml-1">(missing velocity data)</span>
+                  )}
                 </div>
               </div>
             );

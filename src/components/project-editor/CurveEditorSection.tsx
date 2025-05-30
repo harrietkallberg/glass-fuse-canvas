@@ -83,6 +83,16 @@ const CurveEditorSection = ({
   // Create default curve state based on template or empty state
   const getDefaultCurveState = () => {
     if (templateCurveData?.phases) {
+      console.log('Using template curve data with phases:', templateCurveData.phases);
+      // Ensure velocity values are preserved from template
+      const phasesWithVelocity = templateCurveData.phases.map((phase: any) => {
+        console.log(`Template phase: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
+        return {
+          ...phase,
+          velocity: phase.velocity // Explicitly preserve velocity from template
+        };
+      });
+      
       return {
         selectedGlass: templateCurveData.settings?.selectedGlass || "Bullseye Opaleszent",
         roomTemp: templateCurveData.settings?.roomTemp || 20,
@@ -91,7 +101,7 @@ const CurveEditorSection = ({
         firingType: templateCurveData.settings?.firingType || "f",
         topTempMinutes: templateCurveData.settings?.topTempMinutes || "10",
         ovenType: templateCurveData.settings?.ovenType || "t",
-        phases: templateCurveData.phases
+        phases: phasesWithVelocity
       };
     }
     
@@ -116,8 +126,23 @@ const CurveEditorSection = ({
     firingType: currentVersionData.version?.firing_type || "f",
     topTempMinutes: currentVersionData.version?.top_temp_minutes || "10",
     ovenType: currentVersionData.version?.oven_type || "t",
-    phases: currentVersionData.phases || []
+    phases: currentVersionData.phases ? currentVersionData.phases.map((phase: any) => {
+      // Ensure velocity is preserved when loading from database
+      console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+      return {
+        id: phase.id,
+        targetTemp: phase.target_temp,
+        duration: phase.duration,
+        holdTime: phase.hold_time,
+        velocity: phase.velocity // Explicitly preserve velocity from database
+      };
+    }) : []
   } : getDefaultCurveState();
+
+  // Debug logging for curve state
+  useEffect(() => {
+    console.log('CurveEditorSection - curveState phases:', curveState.phases);
+  }, [curveState.phases]);
 
   const versionManager = useVersionManager({
     curveId,
