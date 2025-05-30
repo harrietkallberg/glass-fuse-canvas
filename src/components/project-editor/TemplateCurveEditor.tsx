@@ -36,6 +36,7 @@ const TemplateCurveEditor = ({
   const [previewPhases, setPreviewPhases] = useState<Phase[]>([]);
   const [showPreview, setShowPreview] = useState(false);
   const [viewMode, setViewMode] = useState<'chart' | 'table'>('chart');
+  const [isEditMode, setIsEditMode] = useState(false);
   const { user } = useAuth();
 
   // Initialize curve state - if template exists, use it, otherwise use empty
@@ -131,17 +132,45 @@ const TemplateCurveEditor = ({
 
   const handleCreateTemplate = () => {
     setShowTemplateEditor(true);
+    setIsEditMode(true);
   };
 
   const handleViewGlassTemplate = () => {
-    const generatedPhases = curveState.generateTemplateFromSettings();
-    if (generatedPhases) {
-      setPreviewPhases(generatedPhases);
+    if (savedTemplatePhases.length > 0 && !isEditMode) {
+      // Just show the existing template
+      setPreviewPhases(savedTemplatePhases);
       setShowPreview(true);
       toast({
-        title: "Template Generated",
-        description: "Preview your glass template below. Click 'Confirm as Project Template' to save it.",
+        title: "Template Preview",
+        description: "Viewing your saved project template.",
       });
+    } else {
+      // Generate new template from current settings
+      const generatedPhases = curveState.generateTemplateFromSettings();
+      if (generatedPhases) {
+        setPreviewPhases(generatedPhases);
+        setShowPreview(true);
+        toast({
+          title: "Template Generated",
+          description: "Preview your glass template below. Click 'Confirm as Project Template' to save it.",
+        });
+      }
+    }
+  };
+
+  const handleEditTemplate = () => {
+    setIsEditMode(true);
+    setShowPreview(false);
+    setPreviewPhases([]);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditMode(false);
+    setShowPreview(false);
+    setPreviewPhases([]);
+    // Reset settings to saved template settings
+    if (templateCurveData?.settings) {
+      curveState.loadTemplateSettings(templateCurveData.settings);
     }
   };
 
@@ -282,6 +311,7 @@ const TemplateCurveEditor = ({
       setSavedTemplatePhases(previewPhases);
       setShowPreview(false);
       setPreviewPhases([]);
+      setIsEditMode(false);
       
       // Re-fetch the template data to ensure consistency
       await fetchTemplateFromDatabase();
@@ -305,6 +335,22 @@ const TemplateCurveEditor = ({
     } finally {
       setIsSavingTemplate(false);
     }
+  };
+
+  // Check if template exists and we're not in edit mode
+  const hasTemplate = savedTemplatePhases.length > 0;
+  const isGlassSettingsDisabled = hasTemplate && !isEditMode;
+
+  // Determine button text and action
+  const getButtonText = () => {
+    if (!hasTemplate) return "View Glass Template";
+    if (isEditMode) return "View Glass Template";
+    return "Edit Project Template";
+  };
+
+  const getButtonAction = () => {
+    if (!hasTemplate || isEditMode) return handleViewGlassTemplate;
+    return handleEditTemplate;
   };
 
   // If no template exists and user hasn't chosen to create one
@@ -350,24 +396,48 @@ const TemplateCurveEditor = ({
       
       <div className="space-y-6">
         {/* Glass Settings Configuration */}
-        <GlassSettings 
-          glassData={curveState.glassData}
-          selectedGlass={curveState.selectedGlass}
-          setSelectedGlass={curveState.setSelectedGlass}
-          roomTemp={curveState.roomTemp}
-          setRoomTemp={curveState.setRoomTemp}
-          glassLayers={curveState.glassLayers}
-          setGlassLayers={curveState.setGlassLayers}
-          glassRadius={curveState.glassRadius}
-          setGlassRadius={curveState.setGlassRadius}
-          firingType={curveState.firingType}
-          setFiringType={curveState.setFiringType}
-          topTempMinutes={curveState.topTempMinutes}
-          setTopTempMinutes={curveState.setTopTempMinutes}
-          viewGlassTemplate={handleViewGlassTemplate}
-          ovenType={curveState.ovenType}
-          setOvenType={curveState.setOvenType}
-        />
+        <div className="relative">
+          {isGlassSettingsDisabled && (
+            <div className="absolute inset-0 bg-gray-100/50 backdrop-blur-sm rounded-xl z-10 flex items-center justify-center">
+              <div className="text-gray-600 text-center">
+                <p className="font-medium">Template is locked</p>
+                <p className="text-sm">Click "Edit Project Template" to modify settings</p>
+              </div>
+            </div>
+          )}
+          
+          <GlassSettings 
+            glassData={curveState.glassData}
+            selectedGlass={curveState.selectedGlass}
+            setSelectedGlass={isGlassSettingsDisabled ? () => {} : curveState.setSelectedGlass}
+            roomTemp={curveState.roomTemp}
+            setRoomTemp={isGlassSettingsDisabled ? () => {} : curveState.setRoomTemp}
+            glassLayers={curveState.glassLayers}
+            setGlassLayers={isGlassSettingsDisabled ? () => {} : curveState.setGlassLayers}
+            glassRadius={curveState.glassRadius}
+            setGlassRadius={isGlassSettingsDisabled ? () => {} : curveState.setGlassRadius}
+            firingType={curveState.firingType}
+            setFiringType={isGlassSettingsDisabled ? () => {} : curveState.setFiringType}
+            topTempMinutes={curveState.topTempMinutes}
+            setTopTempMinutes={isGlassSettingsDisabled ? () => {} : curveState.setTopTempMinutes}
+            viewGlassTemplate={getButtonAction()}
+            ovenType={curveState.ovenType}
+            setOvenType={isGlassSettingsDisabled ? () => {} : curveState.setOvenType}
+            buttonText={getButtonText()}
+          />
+        </div>
+        
+        {/* Action buttons when in edit mode */}
+        {isEditMode && hasTemplate && (
+          <div className="flex gap-3 justify-end">
+            <Button 
+              onClick={handleCancelEdit}
+              variant="outline"
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
         
         {/* Template Preview - Show when user clicks "Generate Template" */}
         {showPreview && previewPhases.length > 0 && (
@@ -424,7 +494,7 @@ const TemplateCurveEditor = ({
           </div>
         )}
         
-        {/* Saved Template Display - Show saved template if it exists */}
+        {/* Saved Template Display - Show saved template if it exists and not previewing */}
         {savedTemplatePhases.length > 0 && !showPreview && (
           <div className="space-y-4">
             <h4 className="text-lg font-medium">Saved Template Curve</h4>

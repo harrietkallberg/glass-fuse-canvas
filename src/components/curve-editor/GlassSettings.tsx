@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -21,6 +22,7 @@ interface GlassSettingsProps {
   viewGlassTemplate: () => void;
   ovenType: string;
   setOvenType: (type: string) => void;
+  buttonText?: string;
 }
 
 const GlassSettings = ({
@@ -39,7 +41,8 @@ const GlassSettings = ({
   setTopTempMinutes,
   viewGlassTemplate,
   ovenType,
-  setOvenType
+  setOvenType,
+  buttonText = "View Glass Template"
 }: GlassSettingsProps) => {
   const glassList = glassData.Glassorter;
 
@@ -155,7 +158,7 @@ const GlassSettings = ({
         
         <div className="md:col-span-2 flex justify-end">
           <Button onClick={viewGlassTemplate}>
-            View Glass Template
+            {buttonText}
           </Button>
         </div>
       </div>
