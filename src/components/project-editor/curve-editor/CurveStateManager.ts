@@ -12,13 +12,13 @@ export const createCurveState = (currentVersionData: any, templateCurveData: any
       topTempMinutes: currentVersionData.version?.top_temp_minutes || "10",
       ovenType: currentVersionData.version?.oven_type || "t",
       phases: currentVersionData.phases ? currentVersionData.phases.map((phase: any) => {
-        console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
+        console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, holdTime=${phase.hold_time}, velocity=${phase.velocity}`);
         return {
           id: phase.id,
-          targetTemp: phase.target_temp,
-          duration: phase.duration,
-          holdTime: phase.hold_time,
-          velocity: phase.velocity
+          targetTemp: phase.target_temp || 0, // Use target_temp from database
+          duration: phase.duration || 0,
+          holdTime: phase.hold_time || 0, // Use hold_time from database
+          velocity: phase.velocity || 0
         };
       }) : []
     };
@@ -31,7 +31,7 @@ export const createCurveState = (currentVersionData: any, templateCurveData: any
       console.log(`Template phase: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
       return {
         ...phase,
-        velocity: phase.velocity
+        velocity: phase.velocity || 0
       };
     });
     

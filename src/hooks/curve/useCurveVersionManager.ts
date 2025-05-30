@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useCurves } from "@/hooks/useCurves";
 import { Phase } from "@/utils/curveUtils";
+import { toast } from "@/components/ui/use-toast";
 
 interface UseCurveVersionManagerProps {
   curveId: string;
@@ -56,7 +57,7 @@ export const useCurveVersionManager = ({
     fetchVersions();
 
     // Set up polling for real-time updates
-    const interval = setInterval(fetchVersions, 1000);
+    const interval = setInterval(fetchVersions, 2000); // Increased to 2 seconds to reduce load
 
     return () => clearInterval(interval);
   }, [curveId, getCurveVersions, setVersions]);
@@ -92,9 +93,17 @@ export const useCurveVersionManager = ({
   };
 
   const handleDuplicateVersion = async (currentVersionData: any) => {
-    if (!currentVersionId || !currentVersionData) return;
+    if (!currentVersionId || !currentVersionData) {
+      console.error('No current version selected for duplication');
+      toast({
+        title: "Error",
+        description: "No version selected for duplication",
+        variant: "destructive"
+      });
+      return;
+    }
     
-    console.log('Duplicating version:', currentVersionId);
+    console.log('Duplicating version:', currentVersionId, currentVersionData);
     
     try {
       // Get the current version number and calculate next minor version
@@ -106,27 +115,28 @@ export const useCurveVersionManager = ({
       
       // Prepare the curve state for the new version
       const newCurveState = {
-        selectedGlass: currentVersionData.version.selected_glass,
-        roomTemp: currentVersionData.version.room_temp,
-        glassLayers: currentVersionData.version.glass_layers,
-        glassRadius: currentVersionData.version.glass_radius,
-        firingType: currentVersionData.version.firing_type,
-        topTempMinutes: currentVersionData.version.top_temp_minutes,
-        ovenType: currentVersionData.version.oven_type,
+        selectedGlass: currentVersionData.version.selected_glass || "Bullseye Opaleszent",
+        roomTemp: currentVersionData.version.room_temp || 20,
+        glassLayers: currentVersionData.version.glass_layers || "1",
+        glassRadius: currentVersionData.version.glass_radius || "10",
+        firingType: currentVersionData.version.firing_type || "f",
+        topTempMinutes: currentVersionData.version.top_temp_minutes || "10",
+        ovenType: currentVersionData.version.oven_type || "t",
         notes: currentVersionData.version.notes || "",
         materials: currentVersionData.version.materials || "",
         tags: currentVersionData.version.tags || ""
       };
       
       // Create the duplicate version with the exact same phases and velocities
-      const newVersionPhases = currentVersionData.phases.map((phase: any) => ({
-        targetTemp: phase.targetTemp,
-        duration: phase.duration,
-        holdTime: phase.holdTime,
-        velocity: phase.velocity
-      }));
+      const newVersionPhases = currentVersionData.phases ? currentVersionData.phases.map((phase: any) => ({
+        targetTemp: phase.target_temp || phase.targetTemp || 0,
+        duration: phase.duration || 0,
+        holdTime: phase.hold_time || phase.holdTime || 0,
+        velocity: phase.velocity || 0
+      })) : [];
       
       console.log('Creating new version with phases:', newVersionPhases);
+      console.log('Creating new version with curve state:', newCurveState);
       
       const newVersion = await saveCurveVersion(
         curveId,
@@ -138,6 +148,15 @@ export const useCurveVersionManager = ({
       if (newVersion) {
         console.log('Successfully created new version:', newVersion);
         
+        toast({
+          title: "Version Duplicated",
+          description: `Successfully created ${versionName}`,
+        });
+        
+        // Refresh versions immediately
+        const updatedVersions = await getCurveVersions(curveId);
+        setVersions(updatedVersions);
+        
         // Load the new version after a short delay to ensure database consistency
         setTimeout(async () => {
           const newVersionData = await loadCurveVersion(newVersion.id);
@@ -146,9 +165,21 @@ export const useCurveVersionManager = ({
             setCurrentVersionData(newVersionData);
           }
         }, 500);
+      } else {
+        console.error('Failed to create new version');
+        toast({
+          title: "Error",
+          description: "Failed to create new version",
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error('Error duplicating version:', error);
+      toast({
+        title: "Error",
+        description: "Failed to duplicate version",
+        variant: "destructive"
+      });
     }
   };
 
