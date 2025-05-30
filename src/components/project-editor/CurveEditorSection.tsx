@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
-import CurveEditor from "@/components/curve-editor/CurveEditor";
-import { useCurves } from "@/hooks/useCurves";
 import { useVersionManager } from "@/components/curve-editor/VersionManager";
-import { Phase } from "@/utils/curveUtils";
+import { useCurveVersionManager } from "@/hooks/curve/useCurveVersionManager";
+import { createCurveState } from "./curve-editor/CurveStateManager";
+import CurveEditorDisplay from "./curve-editor/CurveEditorDisplay";
 
 interface CurveEditorSectionProps {
   curveId: string;
@@ -32,46 +32,18 @@ const CurveEditorSection = ({
   const [showEditor, setShowEditor] = useState(false);
   const [notes, setNotes] = useState("");
   const [materials, setMaterials] = useState("");
-  const [tags, setTags]= useState("");
-  
-  const { getCurveVersions, loadCurveVersion, saveCurveVersion, getNextVersionNumber } = useCurves();
+  const [tags, setTags] = useState("");
 
-  // Real-time version fetching with a proper dependency array
-  useEffect(() => {
-    const fetchVersions = async () => {
-      if (curveId) {
-        try {
-          console.log('CurveEditorSection - Fetching versions for curve:', curveId);
-          const latestVersions = await getCurveVersions(curveId);
-          
-          // Filter to only show template and properly created versions
-          const filteredVersions = latestVersions.filter(v => {
-            const versionStr = String(v.version_number);
-            return v.version_number === 0 || // Template
-                   versionStr === "Template" || 
-                   (typeof v.version_number === 'number' && 
-                    v.version_number > 0 && 
-                    v.name && 
-                    v.name !== 'Version 1' && // Exclude default auto-created versions
-                    !v.name.startsWith('Version 1.0')); // Exclude auto-created versions
-          });
-          
-          console.log('CurveEditorSection - Filtered versions:', filteredVersions);
-          setVersions(filteredVersions);
-        } catch (error) {
-          console.error('Error fetching versions:', error);
-        }
-      }
-    };
-
-    // Initial fetch
-    fetchVersions();
-
-    // Set up polling for real-time updates - every 2 seconds is enough
-    const interval = setInterval(fetchVersions, 2000);
-
-    return () => clearInterval(interval);
-  }, [curveId, getCurveVersions, setVersions]); // Remove 'versions' from deps to prevent re-polling
+  // Use the new version manager hook
+  const { handleVersionSelect, handleDuplicateVersion } = useCurveVersionManager({
+    curveId,
+    versions,
+    setVersions,
+    currentVersionId,
+    setCurrentVersionId,
+    setCurrentVersionData,
+    numberToSemantic
+  });
 
   // Update form fields when current version data changes
   useEffect(() => {
@@ -82,64 +54,8 @@ const CurveEditorSection = ({
     }
   }, [currentVersionData]);
 
-  // Create default curve state based on template or empty state
-  const getDefaultCurveState = () => {
-    if (templateCurveData?.phases) {
-      console.log('Using template curve data with phases:', templateCurveData.phases);
-      // Ensure velocity values are preserved from template
-      const phasesWithVelocity = templateCurveData.phases.map((phase: any) => {
-        console.log(`Template phase: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
-        return {
-          ...phase,
-          velocity: phase.velocity // Explicitly preserve velocity from template
-        };
-      });
-      
-      return {
-        selectedGlass: templateCurveData.settings?.selectedGlass || "Bullseye Opaleszent",
-        roomTemp: templateCurveData.settings?.roomTemp || 20,
-        glassLayers: templateCurveData.settings?.glassLayers || "1",
-        glassRadius: templateCurveData.settings?.glassRadius || "10",
-        firingType: templateCurveData.settings?.firingType || "f",
-        topTempMinutes: templateCurveData.settings?.topTempMinutes || "10",
-        ovenType: templateCurveData.settings?.ovenType || "t",
-        phases: phasesWithVelocity
-      };
-    }
-    
-    // Default empty state
-    return {
-      selectedGlass: "Bullseye Opaleszent",
-      roomTemp: 20,
-      glassLayers: "1",
-      glassRadius: "10",
-      firingType: "f",
-      topTempMinutes: "10",
-      ovenType: "t",
-      phases: []
-    };
-  };
-
-  const curveState = currentVersionData ? {
-    selectedGlass: currentVersionData.version?.selected_glass || "Bullseye Opaleszent",
-    roomTemp: currentVersionData.version?.room_temp || 20,
-    glassLayers: currentVersionData.version?.glass_layers || "1",
-    glassRadius: currentVersionData.version?.glass_radius || "10",
-    firingType: currentVersionData.version?.firing_type || "f",
-    topTempMinutes: currentVersionData.version?.top_temp_minutes || "10",
-    ovenType: currentVersionData.version?.oven_type || "t",
-    phases: currentVersionData.phases ? currentVersionData.phases.map((phase: any) => {
-      // Ensure velocity is preserved when loading from database
-      console.log(`Loading phase from DB: targetTemp=${phase.target_temp}, velocity=${phase.velocity}`);
-      return {
-        id: phase.id,
-        targetTemp: phase.target_temp,
-        duration: phase.duration,
-        holdTime: phase.hold_time,
-        velocity: phase.velocity // Explicitly preserve velocity from database
-      };
-    }) : []
-  } : getDefaultCurveState();
+  // Create curve state using the extracted utility
+  const curveState = createCurveState(currentVersionData, templateCurveData);
 
   // Debug logging for curve state
   useEffect(() => {
@@ -160,101 +76,13 @@ const CurveEditorSection = ({
     numberToSemantic
   });
 
-  const handleVersionSelect = async (versionId: string) => {
-    if (!versionId || versionId === currentVersionId) return;
-    
-    try {
-      const curveData = await loadCurveVersion(versionId);
-      if (curveData) {
-        setCurrentVersionId(versionId);
-        setCurrentVersionData(curveData);
-      }
-    } catch (error) {
-      console.error('Error loading version:', error);
-    }
-  };
-
   const handleEditVersion = async (versionId: string) => {
     await handleVersionSelect(versionId);
     setShowEditor(true);
   };
 
-  const getNextMinorVersion = (currentVersionNumber: number): string => {
-    if (currentVersionNumber === 0) {
-      // From template, create 0.1
-      return "0.1";
-    }
-    
-    // For existing versions, increment the minor version
-    // Convert number back to semantic version to parse it
-    const semanticVersion = numberToSemantic(currentVersionNumber);
-    const parts = semanticVersion.split('.');
-    const major = parseInt(parts[0]) || 0;
-    const minor = parseInt(parts[1]) || 0;
-    
-    // Increment minor version
-    return `${major}.${minor + 1}`;
-  };
-
-  const handleDuplicateVersion = async () => {
-    if (!currentVersionId || !currentVersionData) return;
-    
-    console.log('Duplicating version:', currentVersionId);
-    
-    try {
-      // Get the current version number and calculate next minor version
-      const currentVersionNumber = currentVersionData.version.version_number;
-      const nextVersionString = getNextMinorVersion(currentVersionNumber);
-      const versionName = `Version ${nextVersionString}`;
-      
-      console.log(`Creating new version: ${versionName} from version number ${currentVersionNumber}`);
-      
-      // Prepare the curve state for the new version
-      const newCurveState = {
-        selectedGlass: currentVersionData.version.selected_glass,
-        roomTemp: currentVersionData.version.room_temp,
-        glassLayers: currentVersionData.version.glass_layers,
-        glassRadius: currentVersionData.version.glass_radius,
-        firingType: currentVersionData.version.firing_type,
-        topTempMinutes: currentVersionData.version.top_temp_minutes,
-        ovenType: currentVersionData.version.oven_type,
-        notes: currentVersionData.version.notes || "",
-        materials: currentVersionData.version.materials || "",
-        tags: currentVersionData.version.tags || ""
-      };
-      
-      // Create the duplicate version with the exact same phases and velocities
-      const newVersionPhases = currentVersionData.phases.map((phase: any) => ({
-        targetTemp: phase.targetTemp,
-        duration: phase.duration,
-        holdTime: phase.holdTime,
-        velocity: phase.velocity
-      }));
-      
-      console.log('Creating new version with phases:', newVersionPhases);
-      
-      const newVersion = await saveCurveVersion(
-        curveId,
-        versionName,
-        newCurveState,
-        newVersionPhases
-      );
-      
-      if (newVersion) {
-        console.log('Successfully created new version:', newVersion);
-        
-        // Load the new version after a short delay to ensure database consistency
-        setTimeout(async () => {
-          const newVersionData = await loadCurveVersion(newVersion.id);
-          if (newVersionData) {
-            setCurrentVersionId(newVersion.id);
-            setCurrentVersionData(newVersionData);
-          }
-        }, 500);
-      }
-    } catch (error) {
-      console.error('Error duplicating version:', error);
-    }
+  const handleDuplicateVersionWrapper = async () => {
+    await handleDuplicateVersion(currentVersionData);
   };
 
   const handleMoveForward = async () => {
@@ -270,32 +98,20 @@ const CurveEditorSection = ({
         currentVersionId={currentVersionId}
         onVersionSelect={handleVersionSelect}
         onEditVersion={handleEditVersion}
-        onDuplicateVersion={handleDuplicateVersion}
+        onDuplicateVersion={handleDuplicateVersionWrapper}
         onMoveForward={handleMoveForward}
       />
       
       {/* Curve Editor - shown when editing a version */}
-      {showEditor && currentVersionData && (
-        <div className="mt-8">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-semibold text-gray-800">
-              Editing {currentVersionData.version?.version_number === 0 ? 'Template' : `Version ${numberToSemantic(currentVersionData.version?.version_number)}`}
-            </h3>
-            <button
-              onClick={() => setShowEditor(false)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ✕ Close Editor
-            </button>
-          </div>
-          <CurveEditor
-            initialPhases={curveState.phases}
-            templatePhases={templateCurveData?.phases || []}
-            onSave={versionManager.handleSave}
-            isVersionMode={true}
-          />
-        </div>
-      )}
+      <CurveEditorDisplay
+        showEditor={showEditor}
+        setShowEditor={setShowEditor}
+        currentVersionData={currentVersionData}
+        curveState={curveState}
+        templateCurveData={templateCurveData}
+        numberToSemantic={numberToSemantic}
+        onSave={versionManager.handleSave}
+      />
     </div>
   );
 };
