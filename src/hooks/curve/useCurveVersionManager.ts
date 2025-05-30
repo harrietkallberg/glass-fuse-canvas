@@ -203,7 +203,17 @@ export const useCurveVersionManager = ({
     try {
       // Don't allow deleting the template version
       const versionToDelete = versions.find(v => v.id === versionId);
-      if (!versionToDelete || versionToDelete.version_number === 0 || String(versionToDelete.version_number) === "Template") {
+      if (!versionToDelete) {
+        console.error('Version not found:', versionId);
+        toast({
+          title: "Error",
+          description: "Version not found",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      if (versionToDelete.version_number === 0 || String(versionToDelete.version_number) === "Template") {
         toast({
           title: "Cannot Delete Template",
           description: "The template version cannot be deleted.",
@@ -212,17 +222,25 @@ export const useCurveVersionManager = ({
         return;
       }
 
+      console.log('Attempting to delete version:', versionToDelete);
+
       // Delete the version
-      await deleteVersion(versionId);
+      const success = await deleteVersion(versionId);
+      
+      if (!success) {
+        throw new Error('Delete operation returned false');
+      }
       
       // Refresh versions list
       const updatedVersions = await getCurveVersions(curveId);
+      console.log('Updated versions after deletion:', updatedVersions);
       setVersions(updatedVersions);
       
       // If the deleted version was the current one, select another version
       if (versionId === currentVersionId) {
         const templateVersion = updatedVersions.find(v => v.version_number === 0 || String(v.version_number) === "Template");
         if (templateVersion) {
+          console.log('Loading template version after deletion:', templateVersion);
           const curveData = await loadCurveVersion(templateVersion.id);
           if (curveData) {
             setCurrentVersionId(templateVersion.id);
@@ -239,7 +257,7 @@ export const useCurveVersionManager = ({
       console.error('Error deleting version:', error);
       toast({
         title: "Error",
-        description: "Failed to delete version - please check the console for details",
+        description: error instanceof Error ? error.message : "Failed to delete version - please check the console for details",
         variant: "destructive"
       });
     }

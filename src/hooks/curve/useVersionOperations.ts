@@ -261,28 +261,42 @@ export const useVersionOperations = () => {
     }
 
     try {
-      // First delete all phases for this version
-      const { error: phasesError } = await supabase
-        .from('curve_phases')
-        .delete()
-        .eq('version_id', versionId);
+      console.log('Starting version deletion for version:', versionId);
 
-      if (phasesError) {
-        console.error('Error deleting version phases:', phasesError);
-        throw new Error(`Failed to delete version phases: ${phasesError.message}`);
-      }
-
-      // Then delete the version itself
-      const { error: versionError } = await supabase
+      // First get the version to check if it exists and get its curve_id
+      const { data: versionData, error: versionCheckError } = await supabase
         .from('curve_versions')
-        .delete()
-        .eq('id', versionId);
+        .select('curve_id, version_number')
+        .eq('id', versionId)
+        .single();
 
-      if (versionError) {
-        console.error('Error deleting version:', versionError);
-        throw new Error(`Failed to delete version: ${versionError.message}`);
+      if (versionCheckError) {
+        console.error('Error checking version:', versionCheckError);
+        throw new Error(`Failed to verify version: ${versionCheckError.message}`);
       }
 
+      if (!versionData) {
+        console.error('Version not found:', versionId);
+        throw new Error('Version not found');
+      }
+
+      // Don't allow deleting template version
+      if (versionData.version_number === 0 || String(versionData.version_number) === "Template") {
+        console.error('Attempted to delete template version');
+        throw new Error('Cannot delete template version');
+      }
+
+      // Start a transaction by using a single RPC call
+      const { error: transactionError } = await supabase.rpc('delete_curve_version', {
+        p_version_id: versionId
+      });
+
+      if (transactionError) {
+        console.error('Error in delete transaction:', transactionError);
+        throw new Error(`Failed to delete version: ${transactionError.message}`);
+      }
+
+      console.log('Successfully deleted version:', versionId);
       return true;
     } catch (error) {
       console.error('Error in deleteVersion:', error);

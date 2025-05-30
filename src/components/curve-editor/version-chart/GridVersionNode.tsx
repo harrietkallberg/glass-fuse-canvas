@@ -109,7 +109,7 @@ const GridVersionNode = ({
       
       {/* Action buttons when selected */}
       {isSelected && showOptions && (
-        <foreignObject x="0" y={nodeHeight + 16} width={nodeWidth} height="140">
+        <foreignObject x="0" y={nodeHeight + 16} width={nodeWidth} height="160">
           <div className="flex flex-col gap-2 bg-white border border-gray-200 rounded-lg p-3 shadow-xl">
             {/* Template nodes only show Duplicate to New Version */}
             {isTemplate ? (
@@ -189,10 +189,10 @@ const GridVersionNode = ({
                       onDeleteVersion(version.id);
                       setShowOptions(false);
                     }}
-                    className="text-xs gap-2 h-8 justify-start"
+                    className="text-xs gap-2 h-8 justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
                   >
                     <Trash2 className="h-3 w-3" />
-                    Delete Version
+                    Delete This Version
                   </Button>
                 )}
               </>
