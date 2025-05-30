@@ -345,12 +345,12 @@ const TemplateCurveEditor = ({
   const getButtonText = () => {
     if (!hasTemplate) return "View Glass Template";
     if (isEditMode) return "View Glass Template";
-    return "Edit Project Template";
+    return "View Glass Template"; // Always show "View Glass Template" as button text
   };
 
   const getButtonAction = () => {
     if (!hasTemplate || isEditMode) return handleViewGlassTemplate;
-    return handleEditTemplate;
+    return handleViewGlassTemplate; // Always use view action for the main button
   };
 
   // If no template exists and user hasn't chosen to create one
@@ -385,9 +385,21 @@ const TemplateCurveEditor = ({
     <div className="glass-card p-6 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/30">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xl font-semibold">Project Template</h3>
-        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-          Baseline Curve
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Baseline Curve
+          </span>
+          {/* Show Edit Template button when template exists and not in edit mode */}
+          {hasTemplate && !isEditMode && (
+            <Button 
+              onClick={handleEditTemplate}
+              variant="outline"
+              size="sm"
+            >
+              Edit Project Template
+            </Button>
+          )}
+        </div>
       </div>
       
       <div className="text-sm text-gray-600 mb-6">
@@ -396,36 +408,26 @@ const TemplateCurveEditor = ({
       
       <div className="space-y-6">
         {/* Glass Settings Configuration */}
-        <div className="relative">
-          {isGlassSettingsDisabled && (
-            <div className="absolute inset-0 bg-gray-100/50 backdrop-blur-sm rounded-xl z-10 flex items-center justify-center">
-              <div className="text-gray-600 text-center">
-                <p className="font-medium">Template is locked</p>
-                <p className="text-sm">Click "Edit Project Template" to modify settings</p>
-              </div>
-            </div>
-          )}
-          
-          <GlassSettings 
-            glassData={curveState.glassData}
-            selectedGlass={curveState.selectedGlass}
-            setSelectedGlass={isGlassSettingsDisabled ? () => {} : curveState.setSelectedGlass}
-            roomTemp={curveState.roomTemp}
-            setRoomTemp={isGlassSettingsDisabled ? () => {} : curveState.setRoomTemp}
-            glassLayers={curveState.glassLayers}
-            setGlassLayers={isGlassSettingsDisabled ? () => {} : curveState.setGlassLayers}
-            glassRadius={curveState.glassRadius}
-            setGlassRadius={isGlassSettingsDisabled ? () => {} : curveState.setGlassRadius}
-            firingType={curveState.firingType}
-            setFiringType={isGlassSettingsDisabled ? () => {} : curveState.setFiringType}
-            topTempMinutes={curveState.topTempMinutes}
-            setTopTempMinutes={isGlassSettingsDisabled ? () => {} : curveState.setTopTempMinutes}
-            viewGlassTemplate={getButtonAction()}
-            ovenType={curveState.ovenType}
-            setOvenType={isGlassSettingsDisabled ? () => {} : curveState.setOvenType}
-            buttonText={getButtonText()}
-          />
-        </div>
+        <GlassSettings 
+          glassData={curveState.glassData}
+          selectedGlass={curveState.selectedGlass}
+          setSelectedGlass={curveState.setSelectedGlass}
+          roomTemp={curveState.roomTemp}
+          setRoomTemp={curveState.setRoomTemp}
+          glassLayers={curveState.glassLayers}
+          setGlassLayers={curveState.setGlassLayers}
+          glassRadius={curveState.glassRadius}
+          setGlassRadius={curveState.setGlassRadius}
+          firingType={curveState.firingType}
+          setFiringType={curveState.setFiringType}
+          topTempMinutes={curveState.topTempMinutes}
+          setTopTempMinutes={curveState.setTopTempMinutes}
+          viewGlassTemplate={getButtonAction()}
+          ovenType={curveState.ovenType}
+          setOvenType={curveState.setOvenType}
+          buttonText={getButtonText()}
+          disabled={isGlassSettingsDisabled}
+        />
         
         {/* Action buttons when in edit mode */}
         {isEditMode && hasTemplate && (

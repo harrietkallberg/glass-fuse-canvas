@@ -23,6 +23,7 @@ interface GlassSettingsProps {
   ovenType: string;
   setOvenType: (type: string) => void;
   buttonText?: string;
+  disabled?: boolean;
 }
 
 const GlassSettings = ({
@@ -42,7 +43,8 @@ const GlassSettings = ({
   viewGlassTemplate,
   ovenType,
   setOvenType,
-  buttonText = "View Glass Template"
+  buttonText = "View Glass Template",
+  disabled = false
 }: GlassSettingsProps) => {
   const glassList = glassData.Glassorter;
 
@@ -61,7 +63,7 @@ const GlassSettings = ({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <Label htmlFor="glass-type">Glass Type</Label>
-          <Select value={selectedGlass} onValueChange={setSelectedGlass}>
+          <Select value={selectedGlass} onValueChange={disabled ? undefined : setSelectedGlass} disabled={disabled}>
             <SelectTrigger id="glass-type">
               <SelectValue placeholder="Select glass type" />
             </SelectTrigger>
@@ -77,7 +79,7 @@ const GlassSettings = ({
         
         <div>
           <Label htmlFor="oven-type">Oven Type</Label>
-          <Select value={ovenType} onValueChange={setOvenType}>
+          <Select value={ovenType} onValueChange={disabled ? undefined : setOvenType} disabled={disabled}>
             <SelectTrigger id="oven-type">
               <SelectValue placeholder="Select oven type" />
             </SelectTrigger>
@@ -94,13 +96,14 @@ const GlassSettings = ({
             id="room-temp"
             type="number" 
             value={roomTemp} 
-            onChange={e => setRoomTemp(Number(e.target.value))}
+            onChange={disabled ? undefined : (e => setRoomTemp(Number(e.target.value)))}
+            disabled={disabled}
           />
         </div>
         
         <div>
           <Label htmlFor="glass-layers">Glass Layers</Label>
-          <Select value={glassLayers} onValueChange={setGlassLayers}>
+          <Select value={glassLayers} onValueChange={disabled ? undefined : setGlassLayers} disabled={disabled}>
             <SelectTrigger id="glass-layers">
               <SelectValue placeholder="Select layers" />
             </SelectTrigger>
@@ -116,7 +119,7 @@ const GlassSettings = ({
         
         <div>
           <Label htmlFor="glass-radius">Glass Radius (cm)</Label>
-          <Select value={glassRadius} onValueChange={setGlassRadius}>
+          <Select value={glassRadius} onValueChange={disabled ? undefined : setGlassRadius} disabled={disabled}>
             <SelectTrigger id="glass-radius">
               <SelectValue placeholder="Select radius" />
             </SelectTrigger>
@@ -134,7 +137,7 @@ const GlassSettings = ({
         
         <div>
           <Label htmlFor="firing-type">Firing Type</Label>
-          <Select value={firingType} onValueChange={setFiringType}>
+          <Select value={firingType} onValueChange={disabled ? undefined : setFiringType} disabled={disabled}>
             <SelectTrigger id="firing-type">
               <SelectValue placeholder="Select firing type" />
             </SelectTrigger>
@@ -152,7 +155,8 @@ const GlassSettings = ({
             id="top-temp-minutes"
             type="number" 
             value={topTempMinutes} 
-            onChange={e => setTopTempMinutes(e.target.value)}
+            onChange={disabled ? undefined : (e => setTopTempMinutes(e.target.value))}
+            disabled={disabled}
           />
         </div>
         
