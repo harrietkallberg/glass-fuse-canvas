@@ -24,6 +24,7 @@ interface GlassSettingsProps {
   setOvenType: (type: string) => void;
   buttonText?: string;
   disabled?: boolean;
+  showButton?: boolean;
 }
 
 const GlassSettings = ({
@@ -44,7 +45,8 @@ const GlassSettings = ({
   ovenType,
   setOvenType,
   buttonText = "View Glass Template",
-  disabled = false
+  disabled = false,
+  showButton = true
 }: GlassSettingsProps) => {
   const glassList = glassData.Glassorter;
 
@@ -160,11 +162,13 @@ const GlassSettings = ({
           />
         </div>
         
-        <div className="md:col-span-2 flex justify-end">
-          <Button onClick={viewGlassTemplate}>
-            {buttonText}
-          </Button>
-        </div>
+        {showButton && (
+          <div className="md:col-span-2 flex justify-end">
+            <Button onClick={viewGlassTemplate}>
+              {buttonText}
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -353,6 +354,9 @@ const TemplateCurveEditor = ({
     return handleViewGlassTemplate; // Always use view action for the main button
   };
 
+  // Show the button only when: no template exists, or in edit mode
+  const shouldShowViewButton = !hasTemplate || isEditMode;
+
   // If no template exists and user hasn't chosen to create one
   if (!templateCurveData?.phases && !showTemplateEditor) {
     return (
@@ -427,6 +431,7 @@ const TemplateCurveEditor = ({
           setOvenType={curveState.setOvenType}
           buttonText={getButtonText()}
           disabled={isGlassSettingsDisabled}
+          showButton={shouldShowViewButton}
         />
         
         {/* Action buttons when in edit mode */}
