@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -177,27 +176,27 @@ const CurveEditorSection = ({
         nextVersionNumber = `${major}.${minor + 1}`;
       }
       
-      // Create the duplicate version
-      const duplicatedData = {
-        curveId,
-        versionNumber: nextVersionNumber,
-        name: `Draft ${nextVersionNumber}`,
+      // Prepare the curve state for the new version
+      const newCurveState = {
+        selectedGlass: currentVersionData.version.selected_glass,
+        roomTemp: currentVersionData.version.room_temp,
+        glassLayers: currentVersionData.version.glass_layers,
+        glassRadius: currentVersionData.version.glass_radius,
+        firingType: currentVersionData.version.firing_type,
+        topTempMinutes: currentVersionData.version.top_temp_minutes,
+        ovenType: currentVersionData.version.oven_type,
         notes: currentVersionData.version.notes || "",
         materials: currentVersionData.version.materials || "",
-        tags: currentVersionData.version.tags || "",
-        settings: {
-          selectedGlass: currentVersionData.version.selected_glass,
-          roomTemp: currentVersionData.version.room_temp,
-          glassLayers: currentVersionData.version.glass_layers,
-          glassRadius: currentVersionData.version.glass_radius,
-          firingType: currentVersionData.version.firing_type,
-          topTempMinutes: currentVersionData.version.top_temp_minutes,
-          ovenType: currentVersionData.version.oven_type,
-        },
-        phases: currentVersionData.phases || []
+        tags: currentVersionData.version.tags || ""
       };
       
-      const newVersion = await saveCurveVersion(duplicatedData);
+      // Create the duplicate version with correct arguments
+      const newVersion = await saveCurveVersion(
+        curveId,
+        `Draft ${nextVersionNumber}`,
+        newCurveState,
+        currentVersionData.phases || []
+      );
       
       if (newVersion) {
         // Refresh versions to show the new node
