@@ -5,6 +5,7 @@ import { Plus } from "lucide-react";
 import { CurveVersionChartProps } from "./types";
 import GridVersionNode from "./GridVersionNode";
 import GridConnectionLines from "./GridConnectionLines";
+import { useCurves } from "@/hooks/useCurves";
 
 const GridVersionChart = ({ 
   versions, 
@@ -16,6 +17,58 @@ const GridVersionChart = ({
   onDuplicateVersion,
   onMoveForward
 }: CurveVersionChartProps) => {
+  const { getCurveVersions } = useCurves();
+  
+  // Get curveId from the first version (all versions belong to the same curve)
+  const curveId = versions.length > 0 ? versions[0].curve_id : null;
+
+  // Real-time version fetching with cleanup
+  useEffect(() => {
+    const fetchVersions = async () => {
+      if (curveId) {
+        try {
+          const latestVersions = await getCurveVersions(curveId);
+          
+          // Filter to only show template and properly created versions
+          const filteredVersions = latestVersions.filter(v => {
+            const versionStr = String(v.version_number);
+            return v.version_number === 0 || // Template
+                   versionStr === "Template" || 
+                   (typeof v.version_number === 'number' && 
+                    v.version_number > 0 && 
+                    v.name && 
+                    v.name !== 'Version 1' && // Exclude default auto-created versions
+                    !v.name.startsWith('Version 1.0')); // Exclude auto-created versions
+          });
+          
+          console.log('GridVersionChart - Filtered versions:', filteredVersions);
+          
+          // Only update if the versions have actually changed
+          if (JSON.stringify(filteredVersions) !== JSON.stringify(versions)) {
+            // We need to trigger a re-render of parent component
+            // This will be handled by the parent's polling mechanism
+          }
+        } catch (error) {
+          console.error('Error fetching versions in GridVersionChart:', error);
+        }
+      }
+    };
+
+    // Initial fetch
+    if (curveId) {
+      fetchVersions();
+    }
+
+    // Set up polling for real-time updates
+    const interval = setInterval(() => {
+      if (curveId) {
+        fetchVersions();
+      }
+    }, 2000); // Every 2 seconds
+
+    return () => clearInterval(interval);
+  }, [curveId, getCurveVersions]);
+
   // Grid configuration - reduced spacing
   const GRID_SIZE = 80; // Reduced from 120
   const NODE_WIDTH = 180;
