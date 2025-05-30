@@ -40,22 +40,11 @@ const PhasesTable = ({
   const upperAnnealingTemp = selectedGlassInfo?.o_astemp;
   const lowerAnnealingTemp = selectedGlassInfo?.n_astemp;
   
-  // Get velocity for display - ALWAYS use stored velocity from template/Python calculations
-  const getDisplayVelocity = (phase: Phase, index: number): number => {
-    // ALWAYS use the stored velocity if it exists (from glass template/Python script)
-    if (phase.velocity !== undefined) {
-      return phase.velocity; // This comes from Python calculations and should never be recalculated
-    }
-    
-    // Only for manually created phases that don't have stored velocity
-    // (This should rarely happen for template-based phases)
-    const startTemp = index === 0 ? roomTemp : phases[index - 1]?.targetTemp || roomTemp;
-    const tempDifference = phase.targetTemp - startTemp;
-    
-    if (phase.duration > 0) {
-      return Math.round((tempDifference / phase.duration) * 60);
-    }
-    return 0;
+  // Get velocity for display - ONLY use stored velocity from Python script calculations
+  const getDisplayVelocity = (phase: Phase): number => {
+    // ALWAYS and ONLY use the stored velocity from Python calculations
+    // Never recalculate or use fallback logic
+    return phase.velocity || 0;
   };
   
   // Check if a phase contains an annealing temperature
@@ -131,7 +120,7 @@ const PhasesTable = ({
           {/* Phase rows */}
           {phases.map((phase, index) => {
             const highlightClass = getHighlightColor(phase);
-            const velocity = getDisplayVelocity(phase, index);
+            const velocity = getDisplayVelocity(phase);
             
             return (
               <div 
