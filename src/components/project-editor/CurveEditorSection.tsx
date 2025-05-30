@@ -178,32 +178,35 @@ const CurveEditorSection = ({
     setShowEditor(true);
   };
 
+  const getNextMinorVersion = (currentVersionNumber: number): string => {
+    if (currentVersionNumber === 0) {
+      // From template, create 0.1
+      return "0.1";
+    }
+    
+    // For existing versions, increment the minor version
+    // Convert number back to semantic version to parse it
+    const semanticVersion = numberToSemantic(currentVersionNumber);
+    const parts = semanticVersion.split('.');
+    const major = parseInt(parts[0]) || 0;
+    const minor = parseInt(parts[1]) || 0;
+    
+    // Increment minor version
+    return `${major}.${minor + 1}`;
+  };
+
   const handleDuplicateVersion = async () => {
     if (!currentVersionId || !currentVersionData) return;
     
     console.log('Duplicating version:', currentVersionId);
     
     try {
-      // Get the current version number for branching logic
+      // Get the current version number and calculate next minor version
       const currentVersionNumber = currentVersionData.version.version_number;
-      let nextVersionNumber;
-      let versionName;
+      const nextVersionString = getNextMinorVersion(currentVersionNumber);
+      const versionName = `Version ${nextVersionString}`;
       
-      if (currentVersionNumber === 0 || currentVersionNumber === "Template") {
-        // Creating first version from template - use 0.1
-        nextVersionNumber = 0.1;
-        versionName = "Version 0.1";
-      } else {
-        // Parse current version to create a new draft
-        const versionStr = String(currentVersionNumber);
-        const parts = versionStr.split('.');
-        const major = parseInt(parts[0]) || 1;
-        const minor = parseInt(parts[1]) || 0;
-        
-        // Create next draft version (increment minor version)
-        nextVersionNumber = parseFloat(`${major}.${minor + 1}`);
-        versionName = `Version ${major}.${minor + 1}`;
-      }
+      console.log(`Creating new version: ${versionName} from version number ${currentVersionNumber}`);
       
       // Prepare the curve state for the new version
       const newCurveState = {
@@ -219,7 +222,7 @@ const CurveEditorSection = ({
         tags: currentVersionData.version.tags || ""
       };
       
-      // Create the duplicate version with correct arguments
+      // Create the duplicate version with the exact same phases and velocities
       const newVersion = await saveCurveVersion(
         curveId,
         versionName,
@@ -228,6 +231,8 @@ const CurveEditorSection = ({
       );
       
       if (newVersion) {
+        console.log('Successfully created new version:', newVersion);
+        
         // Refresh versions to show the new node
         const refreshedVersions = await getCurveVersions(curveId);
         const filteredVersions = refreshedVersions.filter(v => {
@@ -256,7 +261,7 @@ const CurveEditorSection = ({
 
   const handleMoveForward = async () => {
     console.log('Moving version forward:', currentVersionId);
-    // TODO: Implement move forward logic
+    // TODO: Implement move forward logic to increment major version (0.x -> 1.0, 1.x -> 2.0, etc.)
   };
 
   return (
@@ -276,7 +281,7 @@ const CurveEditorSection = ({
         <div className="mt-8">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-semibold text-gray-800">
-              Editing {currentVersionData.version?.version_number === 0 ? 'Template' : `Version ${currentVersionData.version?.version_number}`}
+              Editing {currentVersionData.version?.version_number === 0 ? 'Template' : `Version ${numberToSemantic(currentVersionData.version?.version_number)}`}
             </h3>
             <button
               onClick={() => setShowEditor(false)}
