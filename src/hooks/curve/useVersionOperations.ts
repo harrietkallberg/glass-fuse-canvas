@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '../useAuth';
 import { Phase, calculateTotalTime } from '@/utils/curveUtils';
@@ -64,7 +65,7 @@ export const useVersionOperations = () => {
   ) => {
     if (!user) return null;
 
-    console.log('Starting to save curve version:', { curveId, versionName });
+    console.log('Starting to save curve version:', { curveId, versionName, curveState, phases });
 
     const semanticVersion = versionName.replace('Version ', '');
     const numericVersion = semanticToNumber(semanticVersion);
@@ -131,28 +132,33 @@ export const useVersionOperations = () => {
       }
 
       // Save phases with velocity values
-      const phasesToInsert = phases.map((phase, index) => {
-        console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
-        return {
-          version_id: versionData.id,
-          phase_order: index,
-          target_temp: phase.targetTemp,
-          duration: phase.duration,
-          hold_time: phase.holdTime,
-          velocity: phase.velocity || 0, // Include velocity in database save
-        };
-      });
+      if (phases && phases.length > 0) {
+        const phasesToInsert = phases.map((phase, index) => {
+          console.log(`Saving phase ${index}: targetTemp=${phase.targetTemp}, velocity=${phase.velocity}`);
+          return {
+            version_id: versionData.id,
+            phase_order: index,
+            target_temp: phase.targetTemp,
+            duration: phase.duration,
+            hold_time: phase.holdTime,
+            velocity: phase.velocity || 0, // Include velocity in database save
+          };
+        });
 
-      const { error: phasesError } = await supabase
-        .from('curve_phases')
-        .insert(phasesToInsert);
+        const { error: phasesError } = await supabase
+          .from('curve_phases')
+          .insert(phasesToInsert);
 
-      if (phasesError) {
-        console.error('Error saving phases:', phasesError);
-        return null;
+        if (phasesError) {
+          console.error('Error saving phases:', phasesError);
+          return null;
+        }
+
+        console.log('Successfully saved phases with velocities');
+      } else {
+        console.warn('No phases to save for the new version');
       }
-
-      console.log('Successfully saved phases with velocities');
+      
       return { ...versionData, is_current: true };
     } catch (error) {
       console.error('Error in saveCurveVersion:', error);

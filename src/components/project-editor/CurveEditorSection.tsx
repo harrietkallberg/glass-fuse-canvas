@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import CurveVersionChart from "@/components/CurveVersionChart";
 import CurveEditor from "@/components/curve-editor/CurveEditor";
@@ -31,11 +32,11 @@ const CurveEditorSection = ({
   const [showEditor, setShowEditor] = useState(false);
   const [notes, setNotes] = useState("");
   const [materials, setMaterials] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags]= useState("");
   
   const { getCurveVersions, loadCurveVersion, saveCurveVersion, getNextVersionNumber } = useCurves();
 
-  // Real-time version fetching with cleanup - more frequent updates
+  // Real-time version fetching with a proper dependency array
   useEffect(() => {
     const fetchVersions = async () => {
       if (curveId) {
@@ -56,12 +57,7 @@ const CurveEditorSection = ({
           });
           
           console.log('CurveEditorSection - Filtered versions:', filteredVersions);
-          
-          // Only update if the versions have actually changed
-          if (JSON.stringify(filteredVersions) !== JSON.stringify(versions)) {
-            console.log('CurveEditorSection - Versions changed, updating state');
-            setVersions(filteredVersions);
-          }
+          setVersions(filteredVersions);
         } catch (error) {
           console.error('Error fetching versions:', error);
         }
@@ -71,11 +67,11 @@ const CurveEditorSection = ({
     // Initial fetch
     fetchVersions();
 
-    // Set up polling for real-time updates - every 1 second for better responsiveness
-    const interval = setInterval(fetchVersions, 1000);
+    // Set up polling for real-time updates - every 2 seconds is enough
+    const interval = setInterval(fetchVersions, 2000);
 
     return () => clearInterval(interval);
-  }, [curveId, getCurveVersions, setVersions, versions]);
+  }, [curveId, getCurveVersions, setVersions]); // Remove 'versions' from deps to prevent re-polling
 
   // Update form fields when current version data changes
   useEffect(() => {
@@ -228,23 +224,33 @@ const CurveEditorSection = ({
       };
       
       // Create the duplicate version with the exact same phases and velocities
+      const newVersionPhases = currentVersionData.phases.map((phase: any) => ({
+        targetTemp: phase.targetTemp,
+        duration: phase.duration,
+        holdTime: phase.holdTime,
+        velocity: phase.velocity
+      }));
+      
+      console.log('Creating new version with phases:', newVersionPhases);
+      
       const newVersion = await saveCurveVersion(
         curveId,
         versionName,
         newCurveState,
-        currentVersionData.phases || []
+        newVersionPhases
       );
       
       if (newVersion) {
         console.log('Successfully created new version:', newVersion);
         
-        // The real-time polling will automatically pick up the new version
-        // Load the new version
-        const newVersionData = await loadCurveVersion(newVersion.id);
-        if (newVersionData) {
-          setCurrentVersionId(newVersion.id);
-          setCurrentVersionData(newVersionData);
-        }
+        // Load the new version after a short delay to ensure database consistency
+        setTimeout(async () => {
+          const newVersionData = await loadCurveVersion(newVersion.id);
+          if (newVersionData) {
+            setCurrentVersionId(newVersion.id);
+            setCurrentVersionData(newVersionData);
+          }
+        }, 500);
       }
     } catch (error) {
       console.error('Error duplicating version:', error);
